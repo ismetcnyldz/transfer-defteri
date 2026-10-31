@@ -208,6 +208,45 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 .kv{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:8px 0;border-top:1px solid var(--line)}
 .kv:first-child{border-top:0}
 .kv span{color:var(--muted)}
+/* plaka rozeti */
+.plate{display:inline-flex;align-items:stretch;border:2px solid #1b1f2a;border-radius:6px;overflow:hidden;background:#fff;color:#111;font-family:var(--font-num);font-weight:600;font-size:13px;letter-spacing:.08em;line-height:1;height:26px;flex:none}
+.plate span.tr{background:#003399;color:#fff;font-family:var(--font-ui);font-size:8px;font-weight:800;letter-spacing:0;display:grid;place-items:center;padding:0 4px;align-content:end;padding-bottom:3px}
+.plate span.no{display:grid;place-items:center;padding:0 8px;white-space:nowrap}
+.plate.big{height:40px;font-size:20px;border-width:3px;border-radius:8px}
+.plate.big span.tr{font-size:10px;padding:0 6px}
+/* yönetici & duvar */
+.wall{min-height:100%;display:grid;place-items:center;padding:24px 16px}
+.wall .box{max-width:420px;display:grid;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.wall h2{font-size:20px;font-weight:800}
+.wall p{margin:0;color:var(--muted)}
+.plans{display:grid;gap:6px}
+.plans div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding:6px 0}
+.plans b{font-family:var(--font-num)}
+.ibanbox{display:grid;gap:4px;background:var(--surface2);border-radius:10px;padding:10px 12px}
+.ibanbox small{text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-size:11px;font-weight:700}
+.ibanbox b{font-family:var(--font-num);font-size:15px;word-break:break-all}
+.wa-btn{display:inline-flex;justify-content:center;background:var(--ok);color:#fff;font-weight:800;padding:12px 16px;border-radius:12px;text-decoration:none}
+.astats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.astats button{background:var(--surface2);border-radius:10px;padding:8px 6px;display:grid;gap:2px;text-align:center;border:1px solid transparent}
+.astats button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.astats .n{font-size:18px;font-weight:800;font-family:var(--font-num)}
+.astats .l{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.crow{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+.crow .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow .sub{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow .st{grid-row:1/3;display:grid;gap:4px;justify-items:end}
+.crow.exp{border-color:var(--bad)} .crow.soon{border-color:var(--warn)} .crow.sus{opacity:.6}
+.kvs{display:grid;gap:6px;padding:10px 14px;font-size:14px}
+.kvs div{display:flex;justify-content:space-between;gap:10px}
+.kvs span{color:var(--muted)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px}
+.btn.sm{padding:8px 12px;font-size:13px}
+.btn.ok{background:var(--ok-soft);color:var(--ok)}
+.btn.warn{background:var(--warn-soft);color:var(--warn)}
+.btn.badb{background:var(--bad-soft);color:var(--bad)}
+.invite{background:var(--surface2);border-radius:10px;padding:10px 12px;font-size:13px;white-space:pre-wrap;font-family:var(--font-num);margin:0 14px 10px}
+.pay{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:6px 14px;border-top:1px solid var(--line)}
+.pay span{color:var(--muted)}
 @media (min-width:720px){ .hdr-in,main,.sheet-body,.sheet-hdr .in{max-width:720px;margin-inline:auto} .stats{grid-template-columns:repeat(3,1fr)} }
 </style>
 </head>
@@ -221,7 +260,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <button role="tab" id="tabSignup" aria-selected="false" style="flex:1">Yeni firma kaydı</button>
     </div>
     <form class="card-f" id="loginForm">
-      <div class="in"><label for="lEmail">E‑posta</label><input id="lEmail" type="email" autocomplete="username" inputmode="email" required></div>
+      <div class="in"><label for="lEmail">Kullanıcı adı veya e‑posta</label><input id="lEmail" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>
       <div class="in"><label for="lPass">Şifre</label><input id="lPass" type="password" autocomplete="current-password" required></div>
       <div class="err" id="lErr" hidden></div>
       <div class="okmsg" id="lOk" hidden></div>
@@ -246,8 +285,9 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 <header class="hdr">
   <div class="hdr-in gut">
     <div class="brand">
-      <h1><span>T</span><em id="coName">Transfer Defteri</em></h1>
+      <h1><span>T</span><em id="coName">Transfer Defteri</em><span class="plate" id="plateBadge" hidden><span class="tr">TR</span><span class="no" id="plateNo"></span></span></h1>
       <div class="right"><div class="date" id="todayLbl"></div>
+      <button class="ico" id="btnAdmin" aria-label="Yönetim paneli" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg><span class="dot" id="adminDot" hidden></span></button>
       <button class="ico" id="btnPlaces" aria-label="Oteller ve yerler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M8 8h2M8 12h2M8 16h2M17 14h1M17 18h1M3 21h18"/></svg></button>
       <button class="ico" id="btnSettings" aria-label="Ayarlar ve müşteri linki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button></div>
     </div>
@@ -430,6 +470,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <div class="sec-t">Firma</div>
       <div class="f"><label for="sName">Firma adı (müşteri formunda görünür)</label><input id="sName"></div>
       <div class="f"><label for="sWa">WhatsApp numaranız (müşteri formunda "bize yazın" düğmesi)</label><input id="sWa" type="tel" placeholder="+90 5xx xxx xx xx"></div>
+      <div class="f"><label for="sPlate">Araç plakası (üstte rozet olarak görünür)</label><input id="sPlate" placeholder="07 ABC 123" autocapitalize="characters" autocomplete="off"></div>
       <div class="f"><label for="sSlug">Link kısa adı</label><input id="sSlug" placeholder="vip" autocapitalize="off" autocomplete="off"></div>
       <div style="padding:10px 14px"><button class="btn gold" id="sSave">Kaydet</button> <span class="err" id="sErr" hidden></span></div>
     </fieldset>
@@ -438,7 +479,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <div style="padding:6px 14px">
         <div class="kv"><span>Giriş</span><b id="sEmail"></b></div>
         <div class="kv"><span>Plan</span><b id="sPlan"></b></div>
-        <div class="kv"><span>Deneme bitişi</span><b id="sTrial"></b></div>
+        <div class="kv"><span>Bitiş tarihi</span><b id="sTrial"></b></div>
       </div>
       <div style="padding:6px 14px 14px"><button class="btn" id="sPass">Şifre değiştir</button> <button class="btn" id="sLogout">Çıkış yap</button></div>
       <div id="passBox" hidden style="padding:0 14px 14px;display:grid;gap:8px">
@@ -447,7 +488,116 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 0.3</div>
+    <div class="note">Transfer Defteri · sürüm 0.4</div>
+  </div>
+</div>
+
+<div id="wallView" class="wall" hidden>
+  <div class="box">
+    <div class="logo"><div class="mark">T</div><div><h1 style="font-size:18px">Transfer Defteri</h1><small id="wallCo"></small></div></div>
+    <h2 id="wallT">Deneme süreniz doldu</h2>
+    <p id="wallP">Kayıtlarınız güvende; yenileme yaptığınızda kaldığınız yerden devam edersiniz.</p>
+    <div class="plans" id="wallPlans"></div>
+    <div class="ibanbox" id="wallIban" hidden><small>Havale / EFT</small><b id="wallIbanNo"></b><span id="wallIbanName"></span><span class="note" style="margin:0;text-align:left">Açıklamaya kullanıcı adınızı yazın: <b id="wallUser"></b></span><button class="btn sm" id="wallCopyIban" type="button">IBAN'ı kopyala</button></div>
+    <a class="wa-btn" id="wallWa" target="_blank" rel="noopener" hidden>WhatsApp'tan yazın</a>
+    <button class="sbtn" id="wallLogout" type="button">Çıkış yap</button>
+  </div>
+</div>
+
+<div id="pwView" class="wall" hidden>
+  <form class="box" id="pwForm">
+    <h2>Yeni şifrenizi belirleyin</h2>
+    <p>Geçici şifreyle giriş yaptınız. Devam etmek için kendi şifrenizi oluşturun.</p>
+    <div class="in"><label for="pw1">Yeni şifre (en az 6 karakter)</label><input id="pw1" type="password" autocomplete="new-password" minlength="6" required></div>
+    <div class="in"><label for="pw2">Yeni şifre (tekrar)</label><input id="pw2" type="password" autocomplete="new-password" minlength="6" required></div>
+    <div class="err" id="pwErr" hidden></div>
+    <button class="pbtn" type="submit">Kaydet ve devam et</button>
+  </form>
+</div>
+
+<div id="adminSheet" class="sheet" hidden>
+  <div class="sheet-hdr"><div class="in gut">
+    <button class="lnk quiet" id="adClose">Kapat</button>
+    <h2>Yönetim</h2>
+    <button class="lnk" id="adNew">+ Firma</button>
+  </div></div>
+  <div class="sheet-body gut">
+    <div class="astats" id="adStats">
+      <button data-f="all" aria-pressed="true"><span class="n" id="asAll">0</span><span class="l">Firma</span></button>
+      <button data-f="active"><span class="n" id="asActive">0</span><span class="l">Aktif</span></button>
+      <button data-f="soon"><span class="n" id="asSoon">0</span><span class="l">Yaklaşan</span></button>
+      <button data-f="exp"><span class="n" id="asExp">0</span><span class="l">Dolmuş</span></button>
+    </div>
+    <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="adQ" type="search" placeholder="Firma, kullanıcı adı, plaka, telefon" autocomplete="off"></label>
+    <div class="plist" id="adList"></div>
+    <fieldset>
+      <div class="sec-t">Platform ayarları</div>
+      <div class="f"><label for="psWa">Destek WhatsApp numaranız (süresi dolan firmalar buraya yazar)</label><input id="psWa" type="tel" placeholder="+90 5xx xxx xx xx"></div>
+      <div class="row2">
+        <div class="f"><label for="psM">Aylık fiyat (TL)</label><input id="psM" type="number" inputmode="numeric"></div>
+        <div class="f"><label for="psY">Yıllık fiyat (TL)</label><input id="psY" type="number" inputmode="numeric"></div>
+      </div>
+      <div class="row2">
+        <div class="f"><label for="psTrial">Deneme süresi (gün)</label><input id="psTrial" type="number" inputmode="numeric"></div>
+        <div class="f"><label for="psUrl">Uygulama adresi (davet mesajında)</label><input id="psUrl" placeholder="https://transferdefteri.net"></div>
+      </div>
+      <div class="f"><label for="psIban">IBAN (ödeme için)</label><input id="psIban" placeholder="TR.."></div>
+      <div class="f"><label for="psIbanName">Hesap sahibi</label><input id="psIbanName"></div>
+      <div style="padding:10px 14px"><button class="btn gold" id="psSave">Ayarları kaydet</button> <span class="err" id="psErr" hidden></span></div>
+    </fieldset>
+  </div>
+</div>
+
+<div id="coSheet" class="sheet" hidden>
+  <div class="sheet-hdr"><div class="in gut">
+    <button class="lnk quiet" id="coClose">Geri</button>
+    <h2 id="coTitle">Firma</h2>
+    <button class="lnk" id="coSave">Kaydet</button>
+  </div></div>
+  <div class="sheet-body gut">
+    <div class="err" id="coErr" hidden></div>
+    <div id="coNewBox">
+      <fieldset>
+        <div class="sec-t">Giriş bilgileri</div>
+        <div class="f"><label for="cnUser">Kullanıcı adı (harf/rakam, örn. 07abc123 veya mehmettur)</label><input id="cnUser" autocapitalize="off" autocomplete="off" spellcheck="false"></div>
+        <div class="f"><label for="cnPass">Geçici şifre (ilk girişte değiştirmesi istenir)</label><div class="inline"><input id="cnPass" autocomplete="off" spellcheck="false"><button type="button" class="btn sm" id="cnGen">Üret</button></div></div>
+      </fieldset>
+    </div>
+    <fieldset>
+      <div class="sec-t">Firma</div>
+      <div class="f"><label for="cnCompany">Firma adı</label><input id="cnCompany" autocomplete="off"></div>
+      <div class="f"><label for="cnContact">Yetkili adı</label><input id="cnContact" autocomplete="off"></div>
+      <div class="f"><label for="cnPhone">WhatsApp / telefon</label><input id="cnPhone" type="tel" inputmode="tel" placeholder="+90 5xx xxx xx xx"></div>
+      <div class="f"><label for="cnEmail">E‑posta (isteğe bağlı)</label><input id="cnEmail" type="email" inputmode="email"></div>
+      <div class="f"><label for="cnPlate">Plaka (isteğe bağlı)</label><input id="cnPlate" autocapitalize="characters" autocomplete="off" placeholder="07 ABC 123"></div>
+      <div class="f"><label for="cnNotes">Not</label><textarea id="cnNotes" placeholder="Sadece siz görürsünüz"></textarea></div>
+    </fieldset>
+    <div id="coExistBox" hidden>
+      <fieldset>
+        <div class="sec-t">Üyelik</div>
+        <div class="kvs" id="coKv"></div>
+        <div class="btnrow">
+          <button type="button" class="btn sm ok" id="coPayM">Aylık ödeme al</button>
+          <button type="button" class="btn sm ok" id="coPayY">Yıllık ödeme al</button>
+          <button type="button" class="btn sm" id="coExt">+1 ay ücretsiz</button>
+          <button type="button" class="btn sm warn" id="coSusp">Askıya al</button>
+        </div>
+        <div id="coPays"></div>
+      </fieldset>
+      <fieldset>
+        <div class="sec-t">Giriş</div>
+        <div class="kvs" id="coLogin"></div>
+        <div class="btnrow">
+          <button type="button" class="btn sm" id="coNewPass">Yeni geçici şifre</button>
+          <a class="btn sm" id="coWa" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn sm" id="coLink" target="_blank" rel="noopener">Müşteri formu</a>
+        </div>
+        <div class="invite" id="coInvite" hidden></div>
+        <div class="btnrow" id="coInviteBtns" hidden><button type="button" class="btn sm" id="coCopyInv">Metni kopyala</button><a class="btn sm ok" id="coSendInv" target="_blank" rel="noopener">WhatsApp ile gönder</a></div>
+      </fieldset>
+      <button class="danger" id="coDel">Firmayı sil</button>
+      <div class="confirm" id="coDelConfirm" hidden><button class="btn" id="coDelNo">Vazgeç</button><button class="btn red" id="coDelYes">Evet, kalıcı olarak sil</button></div>
+    </div>
   </div>
 </div>
 
@@ -466,7 +616,7 @@ const STATUS={pending:["Beklemede","warn"],confirmed:["Onaylandı","info"],done:
 const SYM={EUR:"€",USD:"$",GBP:"£",TRY:"₺"};
 const LANG={tr:"Türkçe",en:"English",ru:"Русский",de:"Deutsch"};
 
-let session=null, company=null, settings={}, bookings=[], userPlaces=[];
+let session=null, company=null, settings={}, bookings=[], userPlaces=[], access=null;
 let tab="upcoming", query="", editing=null, photos=[], dismissed={}, seenLink={};
 const signed={}; // storage path -> signed url
 
@@ -482,7 +632,9 @@ const errMsg=e=>{const m=(e&&e.message)||String(e);if(/Invalid login/i.test(m))r
 /* ---------- auth ---------- */
 $("loginForm").addEventListener("submit",async e=>{
   e.preventDefault();$("lErr").hidden=true;$("lOk").hidden=true;$("lBtn").disabled=true;
-  const {error}=await sb.auth.signInWithPassword({email:$("lEmail").value.trim(),password:$("lPass").value});
+  let ident=$("lEmail").value.trim();
+  if(!ident.includes("@"))ident=ident.toLocaleLowerCase("tr-TR").replace(/ı/g,"i").replace(/ş/g,"s").replace(/ğ/g,"g").replace(/ü/g,"u").replace(/ö/g,"o").replace(/ç/g,"c").replace(/[^a-z0-9._-]/g,"")+"@firma.transferdefteri.net";
+  const {error}=await sb.auth.signInWithPassword({email:ident,password:$("lPass").value});
   $("lBtn").disabled=false;
   if(error){$("lErr").textContent=errMsg(error);$("lErr").hidden=false;}
 });
@@ -503,7 +655,7 @@ $("signupForm").addEventListener("submit",async e=>{
   else{$("sOk2").textContent="Hesabınız oluşturuldu. E‑postanıza gelen onay bağlantısına tıklayıp giriş yapın.";$("sOk2").hidden=false;}
 });
 $("lForgot").addEventListener("click",async()=>{
-  const email=$("lEmail").value.trim();if(!email){$("lErr").textContent="Önce e‑posta adresinizi yazın.";$("lErr").hidden=false;return;}
+  const email=$("lEmail").value.trim();if(!email||!email.includes("@")){$("lErr").textContent="Kullanıcı adıyla giriş yapıyorsanız yeni şifre için bize yazın; e‑posta ile girdiyseniz e‑postanızı yazın.";$("lErr").hidden=false;return;}
   const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+BASE});
   if(error){$("lErr").textContent=errMsg(error);$("lErr").hidden=false;}else{$("lOk").textContent="Şifre sıfırlama bağlantısı e‑postanıza gönderildi.";$("lOk").hidden=false;}
 });
@@ -537,6 +689,10 @@ async function loadAll(){
   company=co;settings=st||{};bookings=(bk||[]).map(fromDb);userPlaces=pl||[];
   try{seenLink=JSON.parse(localStorage.getItem("td_seen")||"{}");}catch(e){}
   $("coName").textContent=company.name||"Transfer Defteri";
+  renderPlate();
+  const {data:acc}=await sb.rpc("my_access");access=acc||{};
+  $("btnAdmin").hidden=!access.is_admin;
+  if(!access.access&&!access.is_admin){showWall();return;}
   $("loadNote").hidden=true;
   render();renderReview();
   subscribeRealtime();
@@ -829,6 +985,122 @@ function renderPlaces(){
   else if(list.length>300){const n=document.createElement("div");n.className="note";n.textContent="İlk 300 kayıt gösteriliyor, aramayı daraltın.";host.appendChild(n);}
 }
 
+/* ---------- plaka, duvar, şifre ---------- */
+function renderPlate(){const p=(company&&company.plate||"").trim();$("plateBadge").hidden=!p;$("plateNo").textContent=p.toUpperCase();}
+function fmtTL(v){return Number(v||0).toLocaleString("tr-TR")+" TL";}
+function showWall(){
+  $("appView").hidden=true;$("wallView").hidden=false;
+  $("wallCo").textContent=company.name||"";
+  const sus=access.status==="suspended";
+  $("wallT").textContent=sus?"Hesabınız askıya alındı":(access.plan==="trial"?"Deneme süreniz doldu":"Üyelik süreniz doldu");
+  $("wallP").textContent=sus?"Devam etmek için bizimle iletişime geçin.":"Kayıtlarınız güvende; yenileme yapıldığında kaldığınız yerden devam edersiniz.";
+  $("wallPlans").innerHTML=`<div><span>Aylık üyelik</span><b>${fmtTL(access.price_monthly)}</b></div><div><span>Yıllık üyelik</span><b>${fmtTL(access.price_yearly)}</b></div>`;
+  if(access.iban){$("wallIban").hidden=false;$("wallIbanNo").textContent=access.iban;$("wallIbanName").textContent=access.iban_name||"";$("wallUser").textContent=access.username||session?.user?.email||"";}
+  const d=digits(access.support_whatsapp);
+  if(d){$("wallWa").hidden=false;$("wallWa").href="https://wa.me/"+d+"?text="+encodeURIComponent("Merhaba, Transfer Defteri üyeliğimi yenilemek istiyorum. Firma: "+(company.name||"")+" · Kullanıcı: "+(access.username||""));}
+}
+$("wallLogout").addEventListener("click",async()=>{await sb.auth.signOut();location.reload();});
+$("wallCopyIban").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(access.iban);toast("IBAN kopyalandı");}catch(e){}});
+$("pwForm").addEventListener("submit",async e=>{
+  e.preventDefault();const a=$("pw1").value,b=$("pw2").value;$("pwErr").hidden=true;
+  if(a.length<6){$("pwErr").textContent="En az 6 karakter.";$("pwErr").hidden=false;return;}
+  if(a!==b){$("pwErr").textContent="Şifreler aynı değil.";$("pwErr").hidden=false;return;}
+  const {error}=await sb.auth.updateUser({password:a,data:{must_change:false}});
+  if(error){$("pwErr").textContent=errMsg(error);$("pwErr").hidden=false;return;}
+  $("pwView").hidden=true;toast("Şifreniz kaydedildi");await showApp();
+});
+
+/* ---------- yönetim paneli ---------- */
+let adRows=[],adFilter="all",adQ="",coCur=null,psettings={};
+const dayLeft=r=>{const end=r.plan==="trial"?r.trial_ends_at:r.paid_until;if(r.plan==="lifetime")return Infinity;if(!end)return -1;return Math.ceil((new Date(end).getTime()-Date.now())/86400000);};
+const stateOf=r=>{if(r.status==="suspended")return {k:"sus",t:"Askıda",c:"bad"};const d=dayLeft(r);if(d===Infinity)return {k:"ok",t:"Süresiz",c:"ok"};if(d<0)return {k:"exp",t:"Süresi doldu",c:"bad"};const pl=({trial:"Deneme",monthly:"Aylık",yearly:"Yıllık"})[r.plan]||r.plan;return {k:d<=7?"soon":"ok",t:pl+" · "+d+" gün",c:d<=7?"warn":(r.plan==="trial"?"info":"ok")};};
+async function openAdmin(){
+  $("adminSheet").hidden=false;document.body.style.overflow="hidden";
+  await loadAdmin();
+}
+async function loadAdmin(){
+  const [{data:rows,error},{data:ps}]=await Promise.all([sb.rpc("admin_overview"),sb.rpc("admin_settings")]);
+  if(error){toast("Yüklenemedi: "+errMsg(error));return;}
+  adRows=rows||[];psettings=ps||{};
+  $("psWa").value=psettings.support_whatsapp||"";$("psM").value=psettings.price_monthly||"";$("psY").value=psettings.price_yearly||"";$("psTrial").value=psettings.trial_days||"";$("psUrl").value=psettings.app_url||"";$("psIban").value=psettings.iban||"";$("psIbanName").value=psettings.iban_name||"";
+  renderAdmin();
+}
+function renderAdmin(){
+  const others=adRows.filter(r=>r.id!==company.id);
+  $("asAll").textContent=others.length;
+  $("asActive").textContent=others.filter(r=>["ok","soon"].includes(stateOf(r).k)).length;
+  $("asSoon").textContent=others.filter(r=>stateOf(r).k==="soon").length;
+  $("asExp").textContent=others.filter(r=>["exp","sus"].includes(stateOf(r).k)).length;
+  const soonOrExp=others.filter(r=>["soon","exp"].includes(stateOf(r).k)).length;$("adminDot").hidden=!soonOrExp;
+  const q=norm(adQ);
+  let list=others.filter(r=>{const st=stateOf(r).k;if(adFilter==="active"&&!["ok","soon"].includes(st))return false;if(adFilter==="soon"&&st!=="soon")return false;if(adFilter==="exp"&&!["exp","sus"].includes(st))return false;if(q&&!norm([r.name,r.username,r.plate,r.whatsapp,r.contact_name,r.owner_email].join(" ")).includes(q))return false;return true;});
+  const order={exp:0,soon:1,sus:2,ok:3};list.sort((a,b)=>order[stateOf(a).k]-order[stateOf(b).k]||(a.name||"").localeCompare(b.name||"","tr"));
+  const host=$("adList");host.innerHTML="";
+  if(!list.length){host.innerHTML=`<div class="note">${adRows.length<=1?"Henüz firma yok. Sağ üstteki + Firma ile ekleyin.":"Eşleşen firma yok."}</div>`;return;}
+  list.forEach(r=>{const st=stateOf(r);const el=document.createElement("button");el.type="button";el.className="crow "+st.k;
+    el.innerHTML=`<div class="nm">${esc(r.name||r.username)}${r.plate?` <span class="plate" style="height:20px;font-size:11px;vertical-align:middle"><span class="tr">TR</span><span class="no">${esc(r.plate)}</span></span>`:""}</div><div class="st"><span class="chip ${st.c}">${esc(st.t)}</span><span class="chip">${r.bookings_count} kayıt</span></div><div class="sub">${esc(r.username||"")}${r.contact_name?" · "+esc(r.contact_name):""}${r.whatsapp?" · "+esc(r.whatsapp):""}${r.last_sign_in_at?"":" · hiç giriş yapmadı"}</div>`;
+    el.addEventListener("click",()=>openCompany(r));host.appendChild(el);});
+}
+$("btnAdmin").addEventListener("click",openAdmin);
+$("adClose").addEventListener("click",()=>{$("adminSheet").hidden=true;document.body.style.overflow="";});
+$("adQ").addEventListener("input",e=>{adQ=e.target.value;renderAdmin();});
+$("adStats").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{adFilter=b.dataset.f;$("adStats").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));renderAdmin();}));
+$("psSave").addEventListener("click",async()=>{
+  const pairs=[["support_whatsapp",$("psWa").value.trim()],["price_monthly",$("psM").value.trim()],["price_yearly",$("psY").value.trim()],["trial_days",$("psTrial").value.trim()],["app_url",$("psUrl").value.trim()],["iban",$("psIban").value.trim()],["iban_name",$("psIbanName").value.trim()]];
+  for(const [k,v] of pairs){const {error}=await sb.rpc("admin_set_setting",{p_key:k,p_value:v});if(error){$("psErr").textContent=errMsg(error);$("psErr").hidden=false;return;}}
+  $("psErr").hidden=true;toast("Ayarlar kaydedildi");await loadAdmin();
+});
+const genPass=()=>{const a="abcdefghjkmnpqrstuvwxyz",n="23456789";let p="";for(let i=0;i<4;i++)p+=a[Math.floor(Math.random()*a.length)];for(let i=0;i<4;i++)p+=n[Math.floor(Math.random()*n.length)];return p;};
+$("cnGen").addEventListener("click",()=>{$("cnPass").value=genPass();});
+function appUrl(){return (psettings.app_url||"").replace(/\/+$/,"")||(location.origin+BASE.replace(/\/$/,""));}
+function inviteText(r,pass){return `Merhaba ${r.contact_name||r.name||""},\nTransfer Defteri giriş bilgileriniz:\n\nUygulama: ${appUrl()}\nKullanıcı adı: ${r.username}\n${pass?"Geçici şifre: "+pass+"\n\nİlk girişte kendi şifrenizi belirleyeceksiniz.":"Şifreniz: kendi belirlediğiniz şifre (unuttuysanız yazın, yenisini verelim)."}\n\nMüşterilerinize göndereceğiniz rezervasyon linki:\n${appUrl()}/r/?c=${r.slug}\n\nTelefonda tarayıcı menüsünden "Ana ekrana ekle" derseniz uygulama gibi açılır.`;}
+function openCompany(r){
+  coCur=r;const isNew=!r;
+  $("coTitle").textContent=isNew?"Yeni firma":(r.name||r.username);
+  $("coErr").hidden=true;$("coNewBox").hidden=!isNew;$("coExistBox").hidden=isNew;$("coInvite").hidden=true;$("coInviteBtns").hidden=true;$("coDelConfirm").hidden=true;
+  $("cnUser").value="";$("cnPass").value=isNew?genPass():"";
+  $("cnCompany").value=r?.name||"";$("cnContact").value=r?.contact_name||"";$("cnPhone").value=r?.whatsapp||"";$("cnEmail").value=r?.owner_email&&!/@firma\.transferdefteri\.net$/.test(r.owner_email)?r.owner_email:"";$("cnPlate").value=r?.plate||"";$("cnNotes").value=r?.notes||"";
+  if(r){
+    const st=stateOf(r);const end=r.plan==="trial"?r.trial_ends_at:r.paid_until;
+    $("coKv").innerHTML=`<div><span>Durum</span><b class="chip ${st.c}">${esc(st.t)}</b></div><div><span>Plan</span><b>${esc(({trial:"Deneme",monthly:"Aylık",yearly:"Yıllık",lifetime:"Süresiz"})[r.plan]||r.plan)}</b></div><div><span>Bitiş</span><b>${end?new Date(end).toLocaleDateString("tr-TR"):"-"}</b></div><div><span>Toplam ödeme</span><b>${fmtTL(r.total_paid)}</b></div><div><span>Kayıt / linkten</span><b>${r.bookings_count} / ${r.link_bookings_count}</b></div><div><span>Kayıt tarihi</span><b>${new Date(r.created_at).toLocaleDateString("tr-TR")}</b></div>`;
+    $("coSusp").textContent=r.status==="suspended"?"Askıdan çıkar":"Askıya al";
+    $("coPayM").textContent="Aylık ödeme al ("+fmtTL(psettings.price_monthly)+")";$("coPayY").textContent="Yıllık ödeme al ("+fmtTL(psettings.price_yearly)+")";
+    $("coLogin").innerHTML=`<div><span>Kullanıcı adı</span><b>${esc(r.username||"-")}</b></div><div><span>Son giriş</span><b>${r.last_sign_in_at?new Date(r.last_sign_in_at).toLocaleString("tr-TR"):"Henüz girmedi"}</b></div><div><span>Şifre</span><b>${r.must_change?"Geçici (değiştirmedi)":"Kendi şifresi"}</b></div>`;
+    const d=digits(r.whatsapp);$("coWa").hidden=!d;$("coWa").href="https://wa.me/"+d;
+    $("coLink").href=appUrl()+"/r/?c="+r.slug;
+    sb.rpc("admin_payments",{p_company:r.id}).then(({data})=>{$("coPays").innerHTML=(data||[]).map(p=>`<div class="pay"><span>${new Date(p.created_at).toLocaleDateString("tr-TR")} · ${({monthly:"Aylık",yearly:"Yıllık",custom:"Uzatma"})[p.plan]||p.plan}</span><b>${fmtTL(p.amount)}</b><span>→ ${new Date(p.period_end).toLocaleDateString("tr-TR")}</span></div>`).join("")||"";});
+  }
+  $("coSheet").hidden=false;$("coSheet").querySelector(".sheet-body").scrollTop=0;
+}
+$("adNew").addEventListener("click",()=>openCompany(null));
+$("coClose").addEventListener("click",()=>{$("coSheet").hidden=true;});
+function coErr(m){$("coErr").textContent=m;$("coErr").hidden=false;$("coSheet").querySelector(".sheet-body").scrollTop=0;}
+$("coSave").addEventListener("click",async()=>{
+  const v=id=>$(id).value.trim();$("coSave").disabled=true;
+  try{
+    if(!coCur){
+      const {data,error}=await sb.rpc("admin_create_company",{p:{username:v("cnUser"),password:v("cnPass"),company:v("cnCompany"),contact:v("cnContact"),whatsapp:v("cnPhone"),email:v("cnEmail"),plate:v("cnPlate")}});
+      if(error)throw error;
+      if(v("cnNotes"))await sb.rpc("admin_set_company",{p_id:data.company_id,p:{notes:v("cnNotes")}});
+      await loadAdmin();const r=adRows.find(x=>x.id===data.company_id);toast("Firma oluşturuldu");
+      openCompany(r);showInvite(r,v("cnPass"));
+    }else{
+      const {error}=await sb.rpc("admin_set_company",{p_id:coCur.id,p:{name:v("cnCompany")||coCur.name,contact_name:v("cnContact"),whatsapp:v("cnPhone"),owner_email:v("cnEmail")||coCur.owner_email,plate:v("cnPlate"),notes:v("cnNotes")}});
+      if(error)throw error;await loadAdmin();toast("Kaydedildi");openCompany(adRows.find(x=>x.id===coCur.id));
+    }
+  }catch(e){coErr(errMsg(e));}finally{$("coSave").disabled=false;}
+});
+function showInvite(r,pass){const t=inviteText(r,pass);$("coInvite").textContent=t;$("coInvite").hidden=false;$("coInviteBtns").hidden=false;const d=digits(r.whatsapp);$("coSendInv").href="https://wa.me/"+(d||"")+"?text="+encodeURIComponent(t);$("coCopyInv").onclick=async()=>{try{await navigator.clipboard.writeText(t);toast("Kopyalandı");}catch(e){}};}
+$("coNewPass").addEventListener("click",async()=>{const p=genPass();const {error}=await sb.rpc("admin_set_password",{p_user:coCur.owner_user_id,p_pass:p});if(error)return coErr(errMsg(error));toast("Geçici şifre verildi");showInvite(coCur,p);});
+async function pay(plan,months,amount){const {data,error}=await sb.rpc("admin_add_payment",{p_company:coCur.id,p_amount:amount,p_plan:plan,p_months:months,p_note:null});if(error)return coErr(errMsg(error));toast("Kaydedildi · bitiş "+new Date(data).toLocaleDateString("tr-TR"));await loadAdmin();openCompany(adRows.find(x=>x.id===coCur.id));}
+$("coPayM").addEventListener("click",()=>pay("monthly",1,+psettings.price_monthly||0));
+$("coPayY").addEventListener("click",()=>pay("yearly",12,+psettings.price_yearly||0));
+$("coExt").addEventListener("click",()=>pay(coCur.plan==="trial"?"monthly":coCur.plan,1,0));
+$("coSusp").addEventListener("click",async()=>{const {error}=await sb.rpc("admin_set_company",{p_id:coCur.id,p:{status:coCur.status==="suspended"?"active":"suspended"}});if(error)return coErr(errMsg(error));await loadAdmin();openCompany(adRows.find(x=>x.id===coCur.id));});
+$("coDel").addEventListener("click",()=>{$("coDelConfirm").hidden=false;});
+$("coDelNo").addEventListener("click",()=>{$("coDelConfirm").hidden=true;});
+$("coDelYes").addEventListener("click",async()=>{const {error}=await sb.rpc("admin_delete_company",{p_id:coCur.id});if(error)return coErr(errMsg(error));toast("Firma silindi");$("coSheet").hidden=true;await loadAdmin();});
+
 /* ---------- settings ---------- */
 function custLink(){return location.origin+BASE+"r/?c="+(company.slug||"");}
 function openSettings(){
@@ -836,10 +1108,11 @@ function openSettings(){
   $("custLink").textContent=custLink();
   $("waLink").href="https://wa.me/?text="+encodeURIComponent("Transfer rezervasyon formu: "+custLink());
   $("openLink").href=custLink();
-  $("sName").value=company.name||"";$("sWa").value=company.whatsapp||"";$("sSlug").value=company.slug||"";
+  $("sName").value=company.name||"";$("sWa").value=company.whatsapp||"";$("sSlug").value=company.slug||"";$("sPlate").value=company.plate||"";
   $("sEmail").textContent=session?.user?.email||"";
-  $("sPlan").textContent=({trial:"Deneme",monthly:"Aylık",yearly:"Yıllık",cancelled:"İptal"})[company.plan]||company.plan;
-  $("sTrial").textContent=company.trial_ends_at?new Date(company.trial_ends_at).toLocaleDateString("tr-TR"):"-";
+  $("sPlan").textContent=({trial:"Deneme",monthly:"Aylık",yearly:"Yıllık",lifetime:"Süresiz",cancelled:"İptal"})[company.plan]||company.plan;
+  const endD=company.plan==="trial"?company.trial_ends_at:company.paid_until;
+  $("sTrial").textContent=company.plan==="lifetime"?"-":(endD?new Date(endD).toLocaleDateString("tr-TR"):"-");
 }
 $("btnSettings").addEventListener("click",openSettings);
 $("setClose").addEventListener("click",()=>{$("setSheet").hidden=true;document.body.style.overflow="";});
@@ -847,20 +1120,25 @@ $("copyLink").addEventListener("click",async()=>{try{await navigator.clipboard.w
 $("sSave").addEventListener("click",async()=>{
   const slug=$("sSlug").value.trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"");
   if(slug.length<2){$("sErr").textContent="Kısa ad en az 2 karakter olmalı.";$("sErr").hidden=false;return;}
-  const {data,error}=await sb.from("companies").update({name:$("sName").value.trim()||company.name,whatsapp:$("sWa").value.trim(),slug}).eq("id",company.id).select().single();
+  const {data,error}=await sb.from("companies").update({name:$("sName").value.trim()||company.name,whatsapp:$("sWa").value.trim(),slug,plate:$("sPlate").value.trim().toUpperCase()}).eq("id",company.id).select().single();
   if(error){$("sErr").textContent=/duplicate/i.test(error.message)?"Bu kısa ad kullanımda, başka bir tane seçin.":errMsg(error);$("sErr").hidden=false;return;}
-  $("sErr").hidden=true;company=data;$("coName").textContent=company.name;openSettings();toast("Kaydedildi");
+  $("sErr").hidden=true;company=data;$("coName").textContent=company.name;renderPlate();openSettings();toast("Kaydedildi");
 });
 
 /* ---------- ui ---------- */
 document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));render();}));
 $("q").addEventListener("input",e=>{query=e.target.value;render();});
-window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("sheet").hidden)closeSheet();else if(!$("placesSheet").hidden)closePlaces();else if(!$("setSheet").hidden){$("setSheet").hidden=true;document.body.style.overflow="";}}});
+window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("coSheet").hidden)$("coSheet").hidden=true;else if(!$("adminSheet").hidden){$("adminSheet").hidden=true;document.body.style.overflow="";}else if(!$("sheet").hidden)closeSheet();else if(!$("placesSheet").hidden)closePlaces();else if(!$("setSheet").hidden){$("setSheet").hidden=true;document.body.style.overflow="";}}});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&company){sb.from("bookings").select("*").order("date").order("time").then(({data})=>{if(data){bookings=data.map(fromDb);render();}});}});
 
 /* ---------- boot ---------- */
 $("todayLbl").textContent=fmtDateLong(todayStr());
-async function showApp(){$("loginView").hidden=true;$("appView").hidden=false;if(!company)await loadAll();}
+async function showApp(){
+  $("loginView").hidden=true;
+  const u=session?.user||(await sb.auth.getUser()).data.user;
+  if(u&&u.user_metadata&&u.user_metadata.must_change===true){$("pwView").hidden=false;$("appView").hidden=true;return;}
+  $("pwView").hidden=true;$("wallView").hidden=true;$("appView").hidden=false;if(!company)await loadAll();
+}
 (async()=>{
   const {data:{session:s}}=await sb.auth.getSession();session=s;
   if(s)await showApp();else{$("loginView").hidden=false;}
