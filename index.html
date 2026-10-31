@@ -565,9 +565,9 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
     </div>
     <fieldset>
       <div class="sec-t">Firma</div>
-      <div class="f"><label for="cnCompany">Firma adı</label><input id="cnCompany" autocomplete="off"></div>
-      <div class="f"><label for="cnContact">Yetkili adı</label><input id="cnContact" autocomplete="off"></div>
-      <div class="f"><label for="cnPhone">WhatsApp / telefon</label><input id="cnPhone" type="tel" inputmode="tel" placeholder="+90 5xx xxx xx xx"></div>
+      <div class="f" hidden><label for="cnCompany">Firma adı</label><input id="cnCompany" autocomplete="off"></div>
+      <div class="f" hidden><label for="cnContact">Yetkili adı</label><input id="cnContact" autocomplete="off"></div>
+      <div class="f" style="border-top:0"><label for="cnPhone">WhatsApp / telefon</label><input id="cnPhone" type="tel" inputmode="tel" placeholder="+90 5xx xxx xx xx"></div>
       <div class="f"><label for="cnEmail">E‑posta (isteğe bağlı)</label><input id="cnEmail" type="email" inputmode="email"></div>
       <div class="f"><label for="cnPlate">Plaka (isteğe bağlı)</label><input id="cnPlate" autocapitalize="characters" autocomplete="off" placeholder="07 ABC 123"></div>
       <div class="f"><label for="cnNotes">Not</label><textarea id="cnNotes" placeholder="Sadece siz görürsünüz"></textarea></div>
@@ -1038,7 +1038,7 @@ function renderAdmin(){
   const host=$("adList");host.innerHTML="";
   if(!list.length){host.innerHTML=`<div class="note">${adRows.length<=1?"Henüz firma yok. Sağ üstteki + Firma ile ekleyin.":"Eşleşen firma yok."}</div>`;return;}
   list.forEach(r=>{const st=stateOf(r);const el=document.createElement("button");el.type="button";el.className="crow "+st.k;
-    el.innerHTML=`<div class="nm">${esc(r.name||r.username)}${r.plate?` <span class="plate" style="height:20px;font-size:11px;vertical-align:middle"><span class="tr">TR</span><span class="no">${esc(r.plate)}</span></span>`:""}</div><div class="st"><span class="chip ${st.c}">${esc(st.t)}</span><span class="chip">${r.bookings_count} kayıt</span></div><div class="sub">${esc(r.username||"")}${r.contact_name?" · "+esc(r.contact_name):""}${r.whatsapp?" · "+esc(r.whatsapp):""}${r.last_sign_in_at?"":" · hiç giriş yapmadı"}</div>`;
+    el.innerHTML=`<div class="nm">${r.plate?`<span class="plate" style="height:22px;font-size:12px;vertical-align:middle"><span class="tr">TR</span><span class="no">${esc(r.plate)}</span></span> `:""}${esc(r.plate?"":(r.name||r.username))}</div><div class="st"><span class="chip ${st.c}">${esc(st.t)}</span><span class="chip">${r.bookings_count} kayıt</span></div><div class="sub">${esc(r.username||"")}${r.whatsapp?" · "+esc(r.whatsapp):""}${r.last_sign_in_at?"":" · hiç giriş yapmadı"}</div>`;
     el.addEventListener("click",()=>openCompany(r));host.appendChild(el);});
 }
 $("btnAdmin").addEventListener("click",openAdmin);
@@ -1053,10 +1053,10 @@ $("psSave").addEventListener("click",async()=>{
 const genPass=()=>{const a="abcdefghjkmnpqrstuvwxyz",n="23456789";let p="";for(let i=0;i<4;i++)p+=a[Math.floor(Math.random()*a.length)];for(let i=0;i<4;i++)p+=n[Math.floor(Math.random()*n.length)];return p;};
 $("cnGen").addEventListener("click",()=>{$("cnPass").value=genPass();});
 function appUrl(){return (psettings.app_url||"").replace(/\/+$/,"")||(location.origin+BASE.replace(/\/$/,""));}
-function inviteText(r,pass){return `Merhaba ${r.contact_name||r.name||""},\nTransfer Defteri giriş bilgileriniz:\n\nUygulama: ${appUrl()}\nKullanıcı adı: ${r.username}\n${pass?"Geçici şifre: "+pass+"\n\nİlk girişte kendi şifrenizi belirleyeceksiniz.":"Şifreniz: kendi belirlediğiniz şifre (unuttuysanız yazın, yenisini verelim)."}\n\nMüşterilerinize göndereceğiniz rezervasyon linki:\n${appUrl()}/r/?c=${r.slug}\n\nTelefonda tarayıcı menüsünden "Ana ekrana ekle" derseniz uygulama gibi açılır.`;}
+function inviteText(r,pass){return `Merhaba,\nTransfer Defteri giriş bilgileriniz:\n\nUygulama: ${appUrl()}\nKullanıcı adı: ${r.username}\n${pass?"Geçici şifre: "+pass+"\n\nİlk girişte kendi şifrenizi belirleyeceksiniz.":"Şifreniz: kendi belirlediğiniz şifre (unuttuysanız yazın, yenisini verelim)."}\n\nMüşterilerinize göndereceğiniz rezervasyon linki:\n${appUrl()}/r/?c=${r.slug}\n\nTelefonda tarayıcı menüsünden "Ana ekrana ekle" derseniz uygulama gibi açılır.`;}
 function openCompany(r){
   coCur=r;const isNew=!r;
-  $("coTitle").textContent=isNew?"Yeni firma":(r.name||r.username);
+  $("coTitle").textContent=isNew?"Yeni firma":(r.plate||r.username||r.name);
   $("coErr").hidden=true;$("coNewBox").hidden=!isNew;$("coExistBox").hidden=isNew;$("coInvite").hidden=true;$("coInviteBtns").hidden=true;$("coDelConfirm").hidden=true;
   $("cnUser").value="";$("cnPass").value=isNew?genPass():"";
   $("cnCompany").value=r?.name||"";$("cnContact").value=r?.contact_name||"";$("cnPhone").value=r?.whatsapp||"";$("cnEmail").value=r?.owner_email&&!/@firma\.transferdefteri\.net$/.test(r.owner_email)?r.owner_email:"";$("cnPlate").value=r?.plate||"";$("cnNotes").value=r?.notes||"";
@@ -1079,13 +1079,15 @@ $("coSave").addEventListener("click",async()=>{
   const v=id=>$(id).value.trim();$("coSave").disabled=true;
   try{
     if(!coCur){
-      const {data,error}=await sb.rpc("admin_create_company",{p:{username:v("cnUser"),password:v("cnPass"),company:v("cnCompany"),contact:v("cnContact"),whatsapp:v("cnPhone"),email:v("cnEmail"),plate:v("cnPlate")}});
+      const plateV=v("cnPlate").toUpperCase().replace(/\s+/g," ").trim();
+      const {data,error}=await sb.rpc("admin_create_company",{p:{username:v("cnUser"),password:v("cnPass"),company:plateV||v("cnUser"),contact:"",whatsapp:v("cnPhone"),email:v("cnEmail"),plate:plateV}});
       if(error)throw error;
       if(v("cnNotes"))await sb.rpc("admin_set_company",{p_id:data.company_id,p:{notes:v("cnNotes")}});
       await loadAdmin();const r=adRows.find(x=>x.id===data.company_id);toast("Firma oluşturuldu");
       openCompany(r);showInvite(r,v("cnPass"));
     }else{
-      const {error}=await sb.rpc("admin_set_company",{p_id:coCur.id,p:{name:v("cnCompany")||coCur.name,contact_name:v("cnContact"),whatsapp:v("cnPhone"),owner_email:v("cnEmail")||coCur.owner_email,plate:v("cnPlate"),notes:v("cnNotes")}});
+      const plateV=v("cnPlate").toUpperCase().replace(/\s+/g," ").trim();
+      const {error}=await sb.rpc("admin_set_company",{p_id:coCur.id,p:{name:plateV||coCur.username||coCur.name,whatsapp:v("cnPhone"),owner_email:v("cnEmail")||coCur.owner_email,plate:plateV,notes:v("cnNotes")}});
       if(error)throw error;await loadAdmin();toast("Kaydedildi");openCompany(adRows.find(x=>x.id===coCur.id));
     }
   }catch(e){coErr(errMsg(e));}finally{$("coSave").disabled=false;}
