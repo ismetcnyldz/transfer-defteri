@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1b1f2a">
+<title>Transfer Booking</title>
+<link rel="icon" href="../icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="../places-data.js"></script>
+<style>
+:root{--bg:#f6f4ef;--surface:#fff;--surface2:#eeebe3;--line:#d9d4c8;--fg:#1b1f2a;--muted:#6b6f7a;--accent:#9a7417;--accent-fg:#fff;--accent-soft:#f3e8c9;--ok:#1f7a4d;--ok-soft:#dcefe3;--bad:#b3261e;--r:14px;--shadow:0 6px 24px rgba(27,31,42,.08)}
+@media (prefers-color-scheme:dark){:root{--bg:#12141a;--surface:#1b1e26;--surface2:#242832;--line:#333845;--fg:#eceef2;--muted:#9aa0ad;--accent:#e0b860;--accent-fg:#1b1500;--accent-soft:#3a3118;--ok:#5ccb8e;--ok-soft:#163427;--bad:#f28b82;--shadow:0 6px 24px rgba(0,0,0,.4);color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) calc(32px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{margin:0;text-wrap:balance}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;display:grid;gap:14px;padding-top:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.co{display:flex;align-items:center;gap:10px;min-width:0}
+.co .mark{width:40px;height:40px;border-radius:12px;background:#1b1f2a;display:grid;place-items:center;color:#e0b860;font-weight:800;font-size:20px;flex:none}
+.co h1{font-size:17px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.co small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.langs{display:flex;gap:4px;background:var(--surface2);border-radius:999px;padding:3px}
+.langs button{width:38px;height:32px;border-radius:999px;font-size:18px;display:grid;place-items:center}
+.langs button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.intro{color:var(--muted);font-size:14px}
+fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.sec-t{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:12px 14px 0}
+.f{display:grid;gap:3px;padding:10px 14px;border-top:1px solid var(--line);min-width:0;position:relative}
+.sec-t + .f, .sec-t + .row2 > .f{border-top:0}
+.row2{display:grid;grid-template-columns:1fr 1fr}
+.row2 > .f + .f{border-left:1px solid var(--line)}
+.f label{font-size:12px;color:var(--muted);font-weight:600}
+.f input,.f select,.f textarea{border:0;background:none;padding:3px 0;width:100%;min-width:0;outline:none;font-size:16px}
+.f textarea{resize:vertical;min-height:64px}
+.f input::placeholder{color:var(--line)}
+.f.req label::after{content:" *";color:var(--bad)}
+.f.bad{background:#fff3f2}
+@media (prefers-color-scheme:dark){.f.bad{background:#2a1a19}}
+.phone{display:flex;gap:8px;align-items:center}
+.phone select{width:auto;max-width:120px;color:var(--muted);font-size:15px}
+.step{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-top:1px solid var(--line)}
+.step .l{display:grid}
+.step .l b{font-weight:700}
+.step .l small{color:var(--muted);font-size:12px}
+.ctr{display:flex;align-items:center;gap:0;background:var(--surface2);border-radius:999px}
+.ctr button{width:40px;height:36px;font-size:20px;font-weight:700;color:var(--accent)}
+.ctr button:disabled{color:var(--line)}
+.ctr output{min-width:28px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.ages{display:flex;gap:8px;flex-wrap:wrap;padding:0 14px 12px}
+.ages label{display:grid;gap:2px;font-size:11px;color:var(--muted);font-weight:600}
+.ages select{border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--bg);font-size:15px}
+.seg{display:flex;gap:6px;padding:10px 14px 14px}
+.seg button{flex:1;padding:10px;border-radius:10px;background:var(--surface2);font-weight:700;color:var(--muted);border:1px solid transparent}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-top:1px solid var(--line)}
+.tog span{font-weight:600}
+.sw{position:relative;width:46px;height:28px;border-radius:999px;background:var(--line);transition:background .15s;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .15s}
+.sw[aria-checked="true"]{background:var(--ok)}
+.sw[aria-checked="true"]::after{transform:translateX(18px)}
+.ac{position:absolute;left:0;right:0;top:100%;z-index:5;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;max-height:280px;overflow-y:auto}
+.ac button{display:flex;width:100%;text-align:left;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
+.ac button:first-child{border-top:0}
+.ac button:active{background:var(--surface2)}
+.ac .tx{min-width:0;display:grid}
+.ac .tx b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac .tx small{color:var(--muted);font-size:12px}
+.pbtn{background:var(--accent);color:var(--accent-fg);font-weight:800;padding:15px;border-radius:12px;font-size:16px;width:100%;box-shadow:var(--shadow)}
+.pbtn:disabled{opacity:.6}
+.err{font-size:14px;color:var(--bad);font-weight:600}
+.fine{font-size:12px;color:var(--muted);text-align:center}
+.done{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px 18px;display:grid;gap:12px;text-align:center;box-shadow:var(--shadow)}
+.done .ok{width:64px;height:64px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center;font-size:30px;margin:0 auto}
+.done h2{font-size:20px;font-weight:800}
+.done p{margin:0;color:var(--muted)}
+.sum{text-align:left;background:var(--surface2);border-radius:10px;padding:10px 12px;font-size:14px;display:grid;gap:4px}
+.sum div{display:flex;justify-content:space-between;gap:10px}
+.sum span{color:var(--muted)}
+.wa{display:inline-block;background:var(--ok);color:#fff;font-weight:800;padding:12px 18px;border-radius:12px;text-decoration:none}
+.gone{text-align:center;padding:48px 16px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="top">
+    <div class="co"><div class="mark" id="coMark">T</div><div><h1 id="coName">…</h1><small data-t="subtitle"></small></div></div>
+    <div class="langs" id="langs">
+      <button data-l="en" aria-label="English">🇬🇧</button>
+      <button data-l="de" aria-label="Deutsch">🇩🇪</button>
+      <button data-l="ru" aria-label="Русский">🇷🇺</button>
+      <button data-l="tr" aria-label="Türkçe">🇹🇷</button>
+    </div>
+  </div>
+
+  <form id="form" novalidate>
+    <div class="wrap" style="padding-top:0">
+    <p class="intro" data-t="intro"></p>
+
+    <fieldset>
+      <div class="sec-t" data-t="sec_you"></div>
+      <div class="row2">
+        <div class="f req"><label for="first" data-t="first"></label><input id="first" autocomplete="given-name" spellcheck="false" autocapitalize="words"></div>
+        <div class="f req"><label for="last" data-t="last"></label><input id="last" autocomplete="family-name" spellcheck="false" autocapitalize="words"></div>
+      </div>
+      <div class="f req"><label for="phone" data-t="phone"></label>
+        <div class="phone"><select id="cc"></select><input id="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="170 1234567"></div>
+        <small style="color:var(--muted);font-size:12px" data-t="phone_hint"></small></div>
+      <div class="f"><label for="email" data-t="email"></label><input id="email" type="email" inputmode="email" autocomplete="email"></div>
+    </fieldset>
+
+    <fieldset>
+      <div class="sec-t" data-t="sec_arrival"></div>
+      <div class="row2">
+        <div class="f req"><label for="date" data-t="date"></label><input id="date" type="date"></div>
+        <div class="f req"><label for="time" data-t="time"></label><input id="time" type="time"></div>
+      </div>
+      <div class="f"><label for="flight" data-t="flight"></label><input id="flight" placeholder="TK 1234" autocapitalize="characters" autocomplete="off"></div>
+      <div class="f req"><label for="hotel" data-t="hotel"></label><input id="hotel" autocomplete="off" data-ph="hotel_ph"></div>
+      <div class="tog"><span data-t="return_q"></span><button type="button" class="sw" id="retSw" role="switch" aria-checked="false"></button></div>
+      <div id="retBox" hidden>
+        <div class="row2">
+          <div class="f"><label for="rdate" data-t="rdate"></label><input id="rdate" type="date"></div>
+          <div class="f"><label for="rtime" data-t="rtime"></label><input id="rtime" type="time"></div>
+        </div>
+        <div class="f"><label for="rflight" data-t="rflight"></label><input id="rflight" placeholder="TK 1235" autocapitalize="characters" autocomplete="off"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <div class="sec-t" data-t="sec_pax"></div>
+      <div class="step" style="border-top:0"><div class="l"><b data-t="adults"></b><small data-t="adults_h"></small></div><div class="ctr"><button type="button" data-d="adults" data-v="-1">−</button><output id="adults">2</output><button type="button" data-d="adults" data-v="1">+</button></div></div>
+      <div class="step"><div class="l"><b data-t="children"></b><small data-t="children_h"></small></div><div class="ctr"><button type="button" data-d="children" data-v="-1">−</button><output id="children">0</output><button type="button" data-d="children" data-v="1">+</button></div></div>
+      <div class="ages" id="ages" hidden></div>
+      <div class="step"><div class="l"><b data-t="infants"></b><small data-t="infants_h"></small></div><div class="ctr"><button type="button" data-d="infants" data-v="-1">−</button><output id="infants">0</output><button type="button" data-d="infants" data-v="1">+</button></div></div>
+      <div class="step"><div class="l"><b data-t="seat"></b><small data-t="seat_h"></small></div></div>
+      <div class="seg" id="seatSeg"><button type="button" data-s="1" data-t="yes"></button><button type="button" data-s="0" data-t="no" aria-pressed="true"></button></div>
+      <div class="step"><div class="l"><b data-t="luggage"></b><small data-t="luggage_h"></small></div><div class="ctr"><button type="button" data-d="luggage" data-v="-1">−</button><output id="luggage">2</output><button type="button" data-d="luggage" data-v="1">+</button></div></div>
+    </fieldset>
+
+    <fieldset>
+      <div class="sec-t" data-t="sec_note"></div>
+      <div class="f" style="border-top:0"><label for="note" data-t="note"></label><textarea id="note" data-ph="note_ph"></textarea></div>
+    </fieldset>
+
+    <div class="err" id="err" hidden></div>
+    <button class="pbtn" id="send" type="submit" data-t="send"></button>
+    <div class="fine" data-t="fine"></div>
+    </div>
+  </form>
+
+  <div class="done" id="done" hidden>
+    <div class="ok">✓</div>
+    <h2 data-t="done_t"></h2>
+    <p data-t="done_p"></p>
+    <div class="sum" id="sum"></div>
+    <a class="wa" id="waBtn" target="_blank" rel="noopener" hidden data-t="wa"></a>
+    <button class="fine" id="again" style="text-decoration:underline" data-t="again"></button>
+  </div>
+</div>
+<div class="gone" id="gone" hidden>This booking link is not valid.</div>
+
+<script>
+(function(){
+"use strict";
+const SUPABASE_URL="https://ppqfcasjawbbfohjnvjr.supabase.co";
+const SUPABASE_KEY="sb_publishable_1V60UInHZfyvFxSDU5hnjQ_F3cBFGCF";
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false}});
+const slug=(new URLSearchParams(location.search).get("c")||location.hash.slice(1)||(location.pathname.match(/\/r\/([^/?#]+)/)||[])[1]||"").trim();
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const norm=s=>String(s||"").toLocaleLowerCase("tr-TR").replace(/ı/g,"i").replace(/ş/g,"s").replace(/ğ/g,"g").replace(/ü/g,"u").replace(/ö/g,"o").replace(/ç/g,"c").replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();
+
+const T={
+en:{subtitle:"Private transfer booking",intro:"Please fill in your transfer details. We will confirm your booking by WhatsApp or e‑mail.",sec_you:"Your details",first:"First name",last:"Last name",phone:"Mobile / WhatsApp",phone_hint:"We use it only to confirm your transfer.",email:"E‑mail (optional)",sec_arrival:"Arrival",date:"Arrival date",time:"Arrival time",flight:"Flight number (optional)",hotel:"Hotel / destination",hotel_ph:"Start typing the hotel name…",return_q:"Add return transfer",rdate:"Return date",rtime:"Pick‑up time",rflight:"Return flight (optional)",sec_pax:"Passengers",adults:"Adults",adults_h:"12 years and older",children:"Children",children_h:"2–11 years",infants:"Infants",infants_h:"0–2 years",seat:"Baby seat",seat_h:"Do you need a child/baby seat?",yes:"Yes",no:"No",luggage:"Suitcases",luggage_h:"Large pieces of luggage",sec_note:"Notes",note:"Anything we should know?",note_ph:"Wheelchair, extra stop, special request…",send:"Send booking request",fine:"No payment is taken on this page. Your transfer company will confirm the price and details.",done_t:"Request sent!",done_p:"Thank you. We received your details and will confirm shortly.",wa:"Message us on WhatsApp",again:"Make another booking",err_req:"Please fill in the fields marked with *.",err_phone:"Please enter a valid phone number.",err_date:"Please enter a valid date.",err_net:"Could not send. Please check your connection and try again.",s_name:"Name",s_arr:"Arrival",s_hotel:"Hotel",s_pax:"Passengers",s_ret:"Return",pax:(a,c,i)=>[a+" adult"+(a!==1?"s":""),c?c+" child"+(c!==1?"ren":""):"",i?i+" infant"+(i!==1?"s":""):""].filter(Boolean).join(", "),age:"Age"},
+de:{subtitle:"Privattransfer buchen",intro:"Bitte füllen Sie Ihre Transferdaten aus. Wir bestätigen Ihre Buchung per WhatsApp oder E‑Mail.",sec_you:"Ihre Daten",first:"Vorname",last:"Nachname",phone:"Mobil / WhatsApp",phone_hint:"Nur zur Bestätigung Ihres Transfers.",email:"E‑Mail (optional)",sec_arrival:"Ankunft",date:"Ankunftsdatum",time:"Ankunftszeit",flight:"Flugnummer (optional)",hotel:"Hotel / Ziel",hotel_ph:"Hotelnamen eingeben…",return_q:"Rücktransfer hinzufügen",rdate:"Rückreisedatum",rtime:"Abholzeit",rflight:"Rückflug (optional)",sec_pax:"Passagiere",adults:"Erwachsene",adults_h:"ab 12 Jahren",children:"Kinder",children_h:"2–11 Jahre",infants:"Babys",infants_h:"0–2 Jahre",seat:"Kindersitz",seat_h:"Benötigen Sie einen Kinder-/Babysitz?",yes:"Ja",no:"Nein",luggage:"Koffer",luggage_h:"Große Gepäckstücke",sec_note:"Hinweise",note:"Gibt es etwas, das wir wissen sollten?",note_ph:"Rollstuhl, Zwischenstopp, Sonderwunsch…",send:"Buchungsanfrage senden",fine:"Auf dieser Seite wird keine Zahlung verlangt. Ihr Transferunternehmen bestätigt Preis und Details.",done_t:"Anfrage gesendet!",done_p:"Vielen Dank. Wir haben Ihre Daten erhalten und melden uns in Kürze.",wa:"Schreiben Sie uns auf WhatsApp",again:"Weitere Buchung",err_req:"Bitte füllen Sie die mit * markierten Felder aus.",err_phone:"Bitte geben Sie eine gültige Telefonnummer ein.",err_date:"Bitte geben Sie ein gültiges Datum ein.",err_net:"Senden fehlgeschlagen. Bitte Verbindung prüfen und erneut versuchen.",s_name:"Name",s_arr:"Ankunft",s_hotel:"Hotel",s_pax:"Passagiere",s_ret:"Rückfahrt",pax:(a,c,i)=>[a+" Erw.",c?c+" Kind"+(c!==1?"er":""):"",i?i+" Baby"+(i!==1?"s":""):""].filter(Boolean).join(", "),age:"Alter"},
+ru:{subtitle:"Бронирование трансфера",intro:"Заполните, пожалуйста, данные трансфера. Мы подтвердим бронирование в WhatsApp или по e‑mail.",sec_you:"Ваши данные",first:"Имя",last:"Фамилия",phone:"Телефон / WhatsApp",phone_hint:"Только для подтверждения трансфера.",email:"E‑mail (необязательно)",sec_arrival:"Прилёт",date:"Дата прилёта",time:"Время прилёта",flight:"Номер рейса (необязательно)",hotel:"Отель / место назначения",hotel_ph:"Начните вводить название отеля…",return_q:"Добавить обратный трансфер",rdate:"Дата вылета",rtime:"Время выезда",rflight:"Обратный рейс (необязательно)",sec_pax:"Пассажиры",adults:"Взрослые",adults_h:"от 12 лет",children:"Дети",children_h:"2–11 лет",infants:"Младенцы",infants_h:"0–2 года",seat:"Детское кресло",seat_h:"Нужно ли детское/младенческое кресло?",yes:"Да",no:"Нет",luggage:"Чемоданы",luggage_h:"Крупный багаж",sec_note:"Примечания",note:"Что нам важно знать?",note_ph:"Инвалидная коляска, остановка, особые пожелания…",send:"Отправить заявку",fine:"На этой странице оплата не взимается. Транспортная компания подтвердит цену и детали.",done_t:"Заявка отправлена!",done_p:"Спасибо! Мы получили ваши данные и скоро подтвердим.",wa:"Написать в WhatsApp",again:"Новое бронирование",err_req:"Заполните поля, отмеченные *.",err_phone:"Введите корректный номер телефона.",err_date:"Введите корректную дату.",err_net:"Не удалось отправить. Проверьте соединение и попробуйте снова.",s_name:"Имя",s_arr:"Прилёт",s_hotel:"Отель",s_pax:"Пассажиры",s_ret:"Обратно",pax:(a,c,i)=>[a+" взр.",c?c+" реб.":"",i?i+" млад.":""].filter(Boolean).join(", "),age:"Возраст"},
+tr:{subtitle:"Özel transfer rezervasyonu",intro:"Lütfen transfer bilgilerinizi doldurun. Rezervasyonunuzu WhatsApp veya e‑posta ile onaylayacağız.",sec_you:"Bilgileriniz",first:"Ad",last:"Soyad",phone:"Cep / WhatsApp",phone_hint:"Yalnızca transferinizi onaylamak için kullanılır.",email:"E‑posta (isteğe bağlı)",sec_arrival:"Varış",date:"Varış tarihi",time:"Varış saati",flight:"Uçuş numarası (isteğe bağlı)",hotel:"Otel / varış noktası",hotel_ph:"Otel adını yazmaya başlayın…",return_q:"Dönüş transferi ekle",rdate:"Dönüş tarihi",rtime:"Alınış saati",rflight:"Dönüş uçuşu (isteğe bağlı)",sec_pax:"Yolcular",adults:"Yetişkin",adults_h:"12 yaş ve üzeri",children:"Çocuk",children_h:"2–11 yaş",infants:"Bebek",infants_h:"0–2 yaş",seat:"Bebek koltuğu",seat_h:"Çocuk/bebek koltuğu gerekiyor mu?",yes:"Evet",no:"Hayır",luggage:"Valiz",luggage_h:"Büyük bagaj adedi",sec_note:"Notlar",note:"Bilmemiz gereken bir şey var mı?",note_ph:"Tekerlekli sandalye, ara durak, özel istek…",send:"Rezervasyon talebi gönder",fine:"Bu sayfada ödeme alınmaz. Transfer firmanız fiyatı ve detayları onaylayacaktır.",done_t:"Talebiniz alındı!",done_p:"Teşekkürler. Bilgilerinizi aldık, kısa süre içinde onaylayacağız.",wa:"WhatsApp'tan yazın",again:"Yeni rezervasyon",err_req:"Lütfen * ile işaretli alanları doldurun.",err_phone:"Lütfen geçerli bir telefon numarası girin.",err_date:"Lütfen geçerli bir tarih girin.",err_net:"Gönderilemedi. Bağlantınızı kontrol edip tekrar deneyin.",s_name:"Ad",s_arr:"Varış",s_hotel:"Otel",s_pax:"Yolcular",s_ret:"Dönüş",pax:(a,c,i)=>[a+" yetişkin",c?c+" çocuk":"",i?i+" bebek":""].filter(Boolean).join(", "),age:"Yaş"}
+};
+const CC=[["+49","🇩🇪"],["+7","🇷🇺"],["+44","🇬🇧"],["+90","🇹🇷"],["+380","🇺🇦"],["+48","🇵🇱"],["+31","🇳🇱"],["+32","🇧🇪"],["+33","🇫🇷"],["+41","🇨🇭"],["+43","🇦🇹"],["+45","🇩🇰"],["+46","🇸🇪"],["+47","🇳🇴"],["+358","🇫🇮"],["+420","🇨🇿"],["+421","🇸🇰"],["+36","🇭🇺"],["+40","🇷🇴"],["+375","🇧🇾"],["+7 ","🇰🇿"],["+972","🇮🇱"],["+1","🇺🇸"],["+39","🇮🇹"],["+34","🇪🇸"],["+351","🇵🇹"],["+353","🇮🇪"],["+370","🇱🇹"],["+371","🇱🇻"],["+372","🇪🇪"],["+359","🇧🇬"],["+30","🇬🇷"],["+966","🇸🇦"],["+971","🇦🇪"],["+965","🇰🇼"],["+974","🇶🇦"],["+98","🇮🇷"],["+964","🇮🇶"],["+994","🇦🇿"],["+995","🇬🇪"],["+374","🇦🇲"],["+998","🇺🇿"],["+996","🇰🇬"],["+86","🇨🇳"],["+81","🇯🇵"],["+82","🇰🇷"],["+91","🇮🇳"]];
+$("cc").innerHTML=CC.map(([c,f])=>`<option value="${c.trim()}">${f} ${c.trim()}</option>`).join("");
+
+let lang="en",company=null,extraPlaces=[];
+const counts={adults:2,children:0,infants:0,luggage:2};
+const MIN={adults:1,children:0,infants:0,luggage:0},MAX={adults:30,children:20,infants:10,luggage:40};
+let seat=false;
+
+function setLang(l){
+  lang=T[l]?l:"en";document.documentElement.lang=lang;
+  document.querySelectorAll("[data-t]").forEach(el=>{const v=T[lang][el.dataset.t];if(typeof v==="string")el.textContent=v;});
+  document.querySelectorAll("[data-ph]").forEach(el=>{el.placeholder=T[lang][el.dataset.ph]||"";});
+  document.querySelectorAll("#langs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===lang?"true":"false"));
+  document.title=(company?company.name+" · ":"")+T[lang].subtitle;
+  renderAges();
+  const def={en:"+44",de:"+49",ru:"+7",tr:"+90"}[lang];if(!$("phone").value&&def)$("cc").value=def;
+  try{localStorage.setItem("tb_lang",lang);}catch(e){}
+}
+document.querySelectorAll("#langs button").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.l)));
+
+document.querySelectorAll("[data-d]").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.d;counts[k]=Math.max(MIN[k],Math.min(MAX[k],counts[k]+ +b.dataset.v));$(k).textContent=counts[k];if(k==="children")renderAges();}));
+let ages=[];
+function renderAges(){
+  const box=$("ages");ages=ages.slice(0,counts.children);while(ages.length<counts.children)ages.push(6);
+  box.hidden=!counts.children;
+  box.innerHTML=ages.map((a,i)=>`<label>${esc(T[lang].age)} ${i+1}<select data-i="${i}">${Array.from({length:10},(_,n)=>n+2).map(n=>`<option ${n===a?"selected":""}>${n}</option>`).join("")}</select></label>`).join("");
+  box.querySelectorAll("select").forEach(s=>s.addEventListener("change",()=>{ages[+s.dataset.i]=+s.value;}));
+}
+$("seatSeg").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{seat=b.dataset.s==="1";$("seatSeg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));}));
+$("retSw").addEventListener("click",()=>{const on=$("retSw").getAttribute("aria-checked")!=="true";$("retSw").setAttribute("aria-checked",on?"true":"false");$("retBox").hidden=!on;});
+
+/* hotel autocomplete */
+function hotels(){const out=[];const seen=new Set();extraPlaces.forEach(p=>{if(p.type==="hotel"){seen.add(norm(p.name));out.push({name:p.name,area:p.area||"",n:norm(p.name)});}});HOTELS.forEach(([n,a])=>{if(!seen.has(norm(n)))out.push({name:n,area:a,n:norm(n)});});PLACES.forEach(([n,a])=>out.push({name:n,area:a,n:norm(n),place:true}));return out;}
+let HL=null;
+(function(){const input=$("hotel");let box=null;const close=()=>{if(box){box.remove();box=null;}};
+  const open=()=>{const k=norm(input.value);if(k.length<2){close();return;}if(!HL)HL=hotels();const words=k.split(" ");const items=HL.filter(p=>words.every(w=>p.n.includes(w)||norm(p.area).includes(w))).sort((a,b)=>(a.place?1:0)-(b.place?1:0)||(a.n.startsWith(k)?0:1)-(b.n.startsWith(k)?0:1)).slice(0,7);if(!items.length){close();return;}
+    if(!box){box=document.createElement("div");box.className="ac";input.closest(".f").appendChild(box);}
+    box.innerHTML=items.map((p,i)=>`<button type="button" data-i="${i}"><span>${p.place?"📍":"🏨"}</span><span class="tx"><b>${esc(p.name)}</b><small>${esc(p.area)}</small></span></button>`).join("");
+    box.querySelectorAll("button").forEach(b=>b.addEventListener("mousedown",e=>{e.preventDefault();input.value=items[+b.dataset.i].name;input.dataset.area=items[+b.dataset.i].area;close();}));};
+  input.addEventListener("input",()=>{input.dataset.area="";open();});input.addEventListener("focus",open);input.addEventListener("blur",()=>setTimeout(close,120));
+})();
+
+/* submit */
+const mark=(id,bad)=>$(id).closest(".f").classList.toggle("bad",bad);
+$("form").addEventListener("submit",async e=>{
+  e.preventDefault();const t=T[lang];const E=$("err");E.hidden=true;
+  const first=$("first").value.trim(),last=$("last").value.trim(),phoneRaw=$("phone").value.replace(/[^\d]/g,""),date=$("date").value,time=$("time").value,hotel=$("hotel").value.trim();
+  let bad=false;[["first",!first],["last",!last],["phone",phoneRaw.length<6],["date",!date],["time",!time],["hotel",!hotel]].forEach(([id,b])=>{mark(id,b);if(b)bad=true;});
+  if(bad){E.textContent=phoneRaw&&phoneRaw.length<6?t.err_phone:t.err_req;E.hidden=false;E.scrollIntoView({block:"center"});return;}
+  if(date<new Date().toISOString().slice(0,10)){mark("date",true);E.textContent=t.err_date;E.hidden=false;return;}
+  const ret=$("retSw").getAttribute("aria-checked")==="true";
+  const payload={first_name:first,last_name:last,phone:$("cc").value+" "+$("phone").value.trim(),email:$("email").value.trim(),language:lang,date,time,flight:$("flight").value.trim().toUpperCase(),
+    return_date:ret?$("rdate").value:"",return_time:ret?$("rtime").value:"",return_flight:ret?$("rflight").value.trim().toUpperCase():"",
+    adults:counts.adults,children:counts.children,child_ages:ages.slice(0,counts.children),infants:counts.infants,baby_seat:seat,luggage:counts.luggage,
+    hotel,area:$("hotel").dataset.area||"",from_place:"Antalya Havalimanı (AYT) – Dış Hatlar T1",to_place:"Otel",customer_note:$("note").value.trim()};
+  $("send").disabled=true;
+  const {error}=await sb.rpc("submit_booking",{p_slug:slug,p:payload});
+  $("send").disabled=false;
+  if(error){E.textContent=t.err_net+" ("+error.message+")";E.hidden=false;return;}
+  $("form").hidden=true;$("done").hidden=false;window.scrollTo(0,0);
+  $("sum").innerHTML=`<div><span>${t.s_name}</span><b>${esc(first+" "+last)}</b></div><div><span>${t.s_arr}</span><b>${esc(date.split("-").reverse().join("."))} ${esc(time)}${payload.flight?" · "+esc(payload.flight):""}</b></div><div><span>${t.s_hotel}</span><b>${esc(hotel)}</b></div><div><span>${t.s_pax}</span><b>${esc(t.pax(counts.adults,counts.children,counts.infants))}${seat?" · "+t.seat:""}</b></div>${ret&&payload.return_date?`<div><span>${t.s_ret}</span><b>${esc(payload.return_date.split("-").reverse().join("."))} ${esc(payload.return_time)}</b></div>`:""}`;
+  if(company&&company.whatsapp){const d=company.whatsapp.replace(/[^\d]/g,"");$("waBtn").hidden=false;$("waBtn").href="https://wa.me/"+d+"?text="+encodeURIComponent((lang==="tr"?"Merhaba, transfer talebi gönderdim: ":lang==="de"?"Hallo, ich habe eine Transferanfrage gesendet: ":lang==="ru"?"Здравствуйте, я отправил(а) заявку на трансфер: ":"Hello, I sent a transfer request: ")+first+" "+last+", "+date+" "+time);}
+});
+$("again").addEventListener("click",()=>location.reload());
+
+/* boot */
+(async()=>{
+  let saved=null;try{saved=localStorage.getItem("tb_lang");}catch(e){}
+  const nav=(navigator.language||"en").slice(0,2).toLowerCase();
+  setLang(saved||(T[nav]?nav:"en"));
+  $("date").min=new Date().toISOString().slice(0,10);
+  if(!slug){$("app").hidden=true;$("gone").hidden=false;return;}
+  const [{data:co,error},{data:pl}]=await Promise.all([sb.rpc("public_company",{p_slug:slug}),sb.rpc("public_places",{p_slug:slug})]);
+  const c=co&&co[0];
+  if(error||!c){$("app").hidden=true;$("gone").hidden=false;return;}
+  company=c;extraPlaces=pl||[];HL=null;
+  $("coName").textContent=c.name;$("coMark").textContent=(c.name||"T").trim()[0].toUpperCase();
+  document.title=c.name+" · "+T[lang].subtitle;
+})();
+})();
+</script>
+</body>
+</html>

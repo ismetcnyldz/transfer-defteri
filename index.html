@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1b1f2a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Transfer Defteri">
+<title>Transfer Defteri</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="./places-data.js"></script>
+<style>
+:root{
+  --bg:#f6f4ef; --surface:#ffffff; --surface2:#eeebe3; --line:#d9d4c8;
+  --fg:#1b1f2a; --muted:#6b6f7a;
+  --accent:#9a7417; --accent-fg:#ffffff; --accent-soft:#f3e8c9;
+  --ok:#1f7a4d; --ok-soft:#dcefe3; --warn:#b26a00; --warn-soft:#fbe9cf; --bad:#b3261e; --bad-soft:#f7dcd9; --info:#2a5fa8; --info-soft:#dbe6f6;
+  --font-ui:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-num:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:14px; --shadow:0 6px 24px rgba(27,31,42,.08);
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#12141a; --surface:#1b1e26; --surface2:#242832; --line:#333845;
+  --fg:#eceef2; --muted:#9aa0ad;
+  --accent:#e0b860; --accent-fg:#1b1500; --accent-soft:#3a3118;
+  --ok:#5ccb8e; --ok-soft:#163427; --warn:#f0b35a; --warn-soft:#3b2a10; --bad:#f28b82; --bad-soft:#3d1c19; --info:#86aef0; --info-soft:#1b2a44;
+  --shadow:0 6px 24px rgba(0,0,0,.4); color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* login */
+.login{min-height:100%;display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-left,0px))}
+.login .box{width:100%;max-width:380px;display:grid;gap:18px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:48px;height:48px;border-radius:14px;background:#1b1f2a;display:grid;place-items:center;color:#e0b860;font-weight:800;font-size:24px}
+.logo h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.logo small{display:block;color:var(--muted);font-size:13px;font-weight:500}
+.card-f{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;box-shadow:var(--shadow)}
+.in{display:grid;gap:4px}
+.in label{font-size:12px;color:var(--muted);font-weight:600}
+.in input{border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:var(--bg);font-size:16px;width:100%}
+.pbtn{background:var(--accent);color:var(--accent-fg);font-weight:800;padding:13px;border-radius:12px;font-size:15px;width:100%}
+.pbtn:disabled{opacity:.6}
+.sbtn{color:var(--muted);font-weight:600;font-size:13px;text-decoration:underline;justify-self:center}
+.err{font-size:13px;color:var(--bad);padding:0 2px}
+.okmsg{font-size:13px;color:var(--ok)}
+
+/* header */
+.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--surface);border-bottom:1px solid var(--line)}
+.hdr-in{padding-block:10px 8px;display:grid;gap:10px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand h1{font-size:17px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;min-width:0}
+.brand h1 span{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--accent-fg);font-size:13px;font-weight:800;flex:none}
+.brand h1 em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brand .right{display:flex;align-items:center;gap:8px}
+.brand .date{color:var(--muted);font-size:13px;white-space:nowrap}
+.ico{width:38px;height:38px;border-radius:10px;background:var(--surface2);display:grid;place-items:center;color:var(--fg);position:relative}
+.ico svg{width:19px;height:19px}
+.ico .dot{position:absolute;top:6px;right:6px;width:9px;height:9px;border-radius:50%;background:var(--bad);border:2px solid var(--surface)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--surface2);border-radius:10px;padding:8px 10px;min-width:0}
+.stat .lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stat .val{font-size:17px;font-weight:700;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tools{display:flex;gap:8px;align-items:center}
+.search{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:10px;padding:0 10px;height:38px}
+.search input{flex:1;min-width:0;border:0;background:none;height:100%;outline:none}
+.search input::placeholder{color:var(--muted)}
+.tabs{display:flex;background:var(--surface2);border-radius:10px;padding:3px;gap:2px}
+.tabs button{padding:6px 10px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+.band{margin:12px 0 0;border-radius:var(--r);padding:10px 12px;display:grid;gap:6px;font-size:14px}
+.band.remind{background:var(--warn-soft);border:1px solid var(--warn)}
+.band.review{background:var(--info-soft);border:1px solid var(--info)}
+.band.newlink{background:var(--ok-soft);border:1px solid var(--ok)}
+.band .t{font-weight:700;display:flex;align-items:center;gap:8px}
+.band .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.band .row button,.band .acts button{font-size:13px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--surface)}
+.band .acts{display:flex;gap:8px;flex-wrap:wrap}
+
+main{padding-block:0 110px}
+.group{margin-top:18px}
+.group h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;align-items:baseline;padding:0 2px 8px}
+.group h2 small{letter-spacing:0;text-transform:none;font-weight:500}
+.group.today h2{color:var(--accent)}
+.cards{display:grid;gap:10px}
+.card{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;box-shadow:var(--shadow);transition:transform .08s}
+.card:active{transform:scale(.99)}
+.card.cancelled{opacity:.55}
+.card.fresh{border-color:var(--ok)}
+.time{font-size:18px;font-weight:600;line-height:1.1;padding-top:2px}
+.time small{display:block;font-size:11px;color:var(--muted);font-family:var(--font-ui);font-weight:600;margin-top:3px}
+.body{min-width:0;display:grid;gap:4px}
+.name{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);letter-spacing:.02em}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.chip.info{background:var(--info-soft);color:var(--info)}
+.chip.acc{background:var(--accent-soft);color:var(--accent)}
+.side{display:grid;gap:6px;justify-items:end}
+.amt{font-weight:600;font-size:15px}
+.amt.due{color:var(--warn)}
+.amt.got{color:var(--ok)}
+.thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid var(--line);background:var(--surface2)}
+.empty{margin-top:48px;text-align:center;color:var(--muted);display:grid;gap:8px;justify-items:center}
+.empty .ic{width:56px;height:56px;border-radius:16px;background:var(--surface2);display:grid;place-items:center;font-size:26px}
+.empty p{margin:0;max-width:30ch}
+.note{font-size:12px;color:var(--muted);text-align:center;margin-top:24px}
+
+.fab{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(22px + env(safe-area-inset-bottom,0px));height:54px;padding:0 20px 0 16px;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,.25);z-index:8}
+.fab svg{width:20px;height:20px}
+
+.sheet{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+.sheet-hdr{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.sheet-hdr .in{height:52px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sheet-hdr h2{font-size:16px;font-weight:800}
+.lnk{color:var(--accent);font-weight:700;font-size:15px;padding:6px 4px}
+.lnk.quiet{color:var(--muted)}
+.sheet-body{flex:1;overflow:auto;padding-block:14px calc(28px + env(safe-area-inset-bottom,0px));display:grid;gap:14px;align-content:start}
+fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:visible}
+.sec-t{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:10px 14px 0}
+.row2{display:grid;grid-template-columns:1fr 1fr}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr}
+.f{display:grid;gap:3px;padding:10px 14px;border-top:1px solid var(--line);min-width:0;position:relative}
+.sec-t + .f, .sec-t + .row2 > .f, .sec-t + .row3 > .f{border-top:0}
+.row2 > .f + .f, .row3 > .f + .f{border-left:1px solid var(--line)}
+.f label{font-size:12px;color:var(--muted);font-weight:600}
+.f input,.f select,.f textarea{border:0;background:none;padding:2px 0;width:100%;min-width:0;outline:none;font-size:16px}
+.f textarea{resize:vertical;min-height:60px}
+.f input::placeholder{color:var(--line)}
+.inline{display:flex;align-items:center;gap:8px}
+.inline select{width:auto;font-size:14px;color:var(--muted)}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-top:1px solid var(--line)}
+.tog span{font-weight:600}
+.sw{position:relative;width:46px;height:28px;border-radius:999px;background:var(--line);transition:background .15s;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .15s}
+.sw[aria-checked="true"]{background:var(--ok)}
+.sw[aria-checked="true"]::after{transform:translateX(18px)}
+.photos{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px 14px}
+.ph{position:relative;width:84px;height:84px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--surface2)}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph button{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:13px;line-height:1}
+.addph{width:84px;height:84px;border-radius:10px;border:1.5px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:12px;font-weight:600;text-align:center;line-height:1.2;cursor:pointer}
+.addph input{display:none}
+.danger{text-align:center;padding:12px;color:var(--bad);font-weight:700;width:100%}
+.confirm{display:flex;gap:10px;justify-content:center;padding:10px}
+.btn{padding:10px 16px;border-radius:10px;font-weight:700;background:var(--surface2)}
+.btn.red{background:var(--bad);color:#fff}
+.btn.gold{background:var(--accent);color:var(--accent-fg)}
+.contact{display:flex;gap:8px;padding:0 14px 12px;flex-wrap:wrap}
+.contact a,.contact button{padding:7px 12px;border-radius:999px;background:var(--surface2);font-size:13px;font-weight:700;text-decoration:none;color:var(--fg)}
+.contact a.wa{background:var(--ok-soft);color:var(--ok)}
+.status-pick{display:flex;gap:6px;padding:10px 14px 14px;flex-wrap:wrap}
+.status-pick button,.segs button{padding:7px 12px;border-radius:999px;background:var(--surface2);font-size:13px;font-weight:700;color:var(--muted);border:1px solid transparent}
+.status-pick button[aria-pressed="true"],.segs button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.segs{display:flex;gap:6px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;z-index:30;box-shadow:var(--shadow);max-width:90vw;text-align:center}
+.cust{background:var(--info-soft);border-radius:10px;padding:10px 14px;margin:10px 14px 0;font-size:13px;display:grid;gap:4px}
+.cust b{font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+
+.ac{position:absolute;left:0;right:0;top:100%;z-index:5;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;max-height:300px;overflow-y:auto}
+.ac button{display:flex;width:100%;text-align:left;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
+.ac button:first-child{border-top:0}
+.ac button:active,.ac button.hl{background:var(--surface2)}
+.ac .k{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:14px;background:var(--surface2)}
+.ac .k.air{background:var(--info-soft)} .ac .k.hot{background:var(--accent-soft)} .ac .k.pl{background:var(--ok-soft)}
+.ac .tx{min-width:0;display:grid}
+.ac .tx b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac .tx small{color:var(--muted);font-size:12px}
+.ac .add{color:var(--accent);font-weight:700}
+.hint{font-size:12px;color:var(--muted);padding:0 14px 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hint button{color:var(--accent);font-weight:700;text-decoration:underline}
+
+.plist{display:grid;gap:8px}
+.prow{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.prow .tx{flex:1;min-width:0}
+.prow .tx b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prow .tx small{color:var(--muted);font-size:12px}
+.prow.closed .tx b{text-decoration:line-through;color:var(--muted)}
+.prow button{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);flex:none}
+.prow button.on{background:var(--ok-soft);color:var(--ok)}
+.addrow{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;position:relative}
+.addrow input{border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:var(--bg);width:100%;font-size:16px}
+.cnt{font-size:12px;color:var(--muted)}
+.linkbox{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:10px}
+.linkbox code{display:block;background:var(--surface2);padding:10px;border-radius:8px;font-size:13px;word-break:break-all;font-family:var(--font-num)}
+.linkbox .acts{display:flex;gap:8px;flex-wrap:wrap}
+.linkbox a{text-decoration:none;display:inline-block}
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:8px 0;border-top:1px solid var(--line)}
+.kv:first-child{border-top:0}
+.kv span{color:var(--muted)}
+@media (min-width:720px){ .hdr-in,main,.sheet-body,.sheet-hdr .in{max-width:720px;margin-inline:auto} .stats{grid-template-columns:repeat(3,1fr)} }
+</style>
+</head>
+<body>
+
+<div id="loginView" class="login" hidden>
+  <div class="box">
+    <div class="logo"><div class="mark">T</div><div><h1>Transfer Defteri</h1><small>VIP transfer &amp; tur operasyon defteri</small></div></div>
+    <form class="card-f" id="loginForm">
+      <div class="in"><label for="lEmail">E‑posta</label><input id="lEmail" type="email" autocomplete="username" inputmode="email" required></div>
+      <div class="in"><label for="lPass">Şifre</label><input id="lPass" type="password" autocomplete="current-password" required></div>
+      <div class="err" id="lErr" hidden></div>
+      <div class="okmsg" id="lOk" hidden></div>
+      <button class="pbtn" id="lBtn" type="submit">Giriş yap</button>
+      <button class="sbtn" id="lForgot" type="button">Şifremi unuttum</button>
+    </form>
+    <div class="note" style="margin:0">Bir kez giriş yaptığınızda bu cihazda oturumunuz açık kalır.</div>
+  </div>
+</div>
+
+<div id="appView" hidden>
+<header class="hdr">
+  <div class="hdr-in gut">
+    <div class="brand">
+      <h1><span>T</span><em id="coName">Transfer Defteri</em></h1>
+      <div class="right"><div class="date" id="todayLbl"></div>
+      <button class="ico" id="btnPlaces" aria-label="Oteller ve yerler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M8 8h2M8 12h2M8 16h2M17 14h1M17 18h1M3 21h18"/></svg></button>
+      <button class="ico" id="btnSettings" aria-label="Ayarlar ve müşteri linki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="lbl">Bugün</div><div class="val num" id="stToday">–</div></div>
+      <div class="stat"><div class="lbl">Bekleyen tahsilat</div><div class="val num" id="stDue">–</div></div>
+      <div class="stat" id="stNextWrap" hidden><div class="lbl">Sıradaki</div><div class="val" id="stNext">–</div></div>
+    </div>
+    <div class="tools">
+      <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="İsim, otel, telefon ara" autocomplete="off"></label>
+      <div class="tabs" role="tablist">
+        <button role="tab" data-tab="upcoming" aria-selected="true">Yaklaşan</button>
+        <button role="tab" data-tab="past" aria-selected="false">Geçmiş</button>
+        <button role="tab" data-tab="all" aria-selected="false">Tümü</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="gut">
+  <div id="newlink" class="band newlink" hidden></div>
+  <div id="remind" class="band remind" hidden></div>
+  <div id="review" class="band review" hidden>
+    <div><b>Otel listesi gözden geçirilsin mi?</b> Son kontrolün üzerinden <span id="reviewDays">30</span> gün geçti. Yeni açılan veya kapanan otel varsa ekleyin ya da kapalı işaretleyin.</div>
+    <div class="acts"><button id="reviewOpen">Otelleri yönet</button><button id="reviewDone">Kontrol ettim, güncel</button></div>
+  </div>
+  <div id="list"></div>
+  <div id="empty" class="empty" hidden>
+    <div class="ic">🚐</div>
+    <h3 id="emptyT">Henüz rezervasyon yok</h3>
+    <p id="emptyP"></p>
+  </div>
+  <div id="loadNote" class="note">Yükleniyor…</div>
+</main>
+
+<button class="fab" id="fab" aria-label="Yeni rezervasyon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Yeni</button>
+</div>
+
+<!-- rezervasyon formu -->
+<div id="sheet" class="sheet" hidden>
+  <div class="sheet-hdr"><div class="in gut">
+    <button class="lnk quiet" id="btnClose">Kapat</button>
+    <h2 id="sheetTitle">Yeni rezervasyon</h2>
+    <button class="lnk" id="btnSave">Kaydet</button>
+  </div></div>
+  <div class="sheet-body gut" id="form">
+    <div class="err" id="formErr" hidden></div>
+    <fieldset id="custBox" hidden><div class="cust" style="margin:10px 14px"><b>Müşteri formundan geldi</b><div id="custInfo"></div></div><div style="height:10px"></div></fieldset>
+
+    <fieldset>
+      <div class="sec-t">Zaman</div>
+      <div class="row2">
+        <div class="f"><label for="fDate">Tarih</label><input id="fDate" type="date"></div>
+        <div class="f"><label for="fTime">Saat</label><input id="fTime" type="time"></div>
+      </div>
+      <div class="f"><label for="fFlight">Uçuş no (isteğe bağlı)</label><input id="fFlight" placeholder="TK 1234" autocapitalize="characters"></div>
+      <div class="row2">
+        <div class="f"><label for="fRDate">Dönüş tarihi</label><input id="fRDate" type="date"></div>
+        <div class="f"><label for="fRTime">Dönüş saati</label><input id="fRTime" type="time"></div>
+      </div>
+      <div class="f"><label for="fRFlight">Dönüş uçuşu</label><input id="fRFlight" placeholder="isteğe bağlı" autocapitalize="characters"></div>
+    </fieldset>
+
+    <fieldset>
+      <div class="sec-t">Yolcu</div>
+      <div class="row2">
+        <div class="f"><label for="fFirst">Ad</label><input id="fFirst" placeholder="Johann" autocomplete="off" spellcheck="false"></div>
+        <div class="f"><label for="fLast">Soyad</label><input id="fLast" placeholder="Müller" autocomplete="off" spellcheck="false"></div>
+      </div>
+      <div class="f"><label for="fPhone">Telefon / WhatsApp</label><input id="fPhone" type="tel" placeholder="+49 170 1234567" inputmode="tel"></div>
+      <div class="f"><label for="fEmail">E‑posta</label><input id="fEmail" type="email" placeholder="isteğe bağlı" inputmode="email"></div>
+      <div class="contact" id="contactBar" hidden></div>
+      <div class="row3">
+        <div class="f"><label for="fAdults">Yetişkin</label><input id="fAdults" type="number" min="0" inputmode="numeric" value="2"></div>
+        <div class="f"><label for="fChildren">Çocuk</label><input id="fChildren" type="number" min="0" inputmode="numeric" value="0"></div>
+        <div class="f"><label for="fInfants">Bebek</label><input id="fInfants" type="number" min="0" inputmode="numeric" value="0"></div>
+      </div>
+      <div class="f"><label for="fAges">Çocuk yaşları</label><input id="fAges" placeholder="örn. 4, 9" inputmode="numeric"></div>
+      <div class="tog"><span>Bebek koltuğu</span><button class="sw" id="fSeat" role="switch" aria-checked="false" aria-label="Bebek koltuğu"></button></div>
+      <div class="f"><label for="fLug">Bagaj (adet)</label><input id="fLug" type="number" min="0" inputmode="numeric" placeholder="isteğe bağlı"></div>
+    </fieldset>
+
+    <fieldset>
+      <div class="sec-t">Güzergah</div>
+      <div class="f"><label for="fHotel">Otel</label><input id="fHotel" placeholder="Yazmaya başlayın: Rixos, Titanic, Barut…" autocomplete="off"></div>
+      <div class="hint" id="hotelHint" hidden></div>
+      <div class="f"><label for="fArea">Bölge (otel seçilince otomatik dolar)</label><input id="fArea" placeholder="Belek, Lara, Side, Alanya…" autocomplete="off"></div>
+      <div class="row2">
+        <div class="f"><label for="fFrom">Nereden</label><input id="fFrom" placeholder="Havalimanı, otel, ilçe…" autocomplete="off"></div>
+        <div class="f"><label for="fTo">Nereye</label><input id="fTo" placeholder="Havalimanı, otel, ilçe…" autocomplete="off"></div>
+      </div>
+      <div class="f"><label for="fVehicle">Araç / Şoför (isteğe bağlı)</label><input id="fVehicle" placeholder="Vito 07 ABC 123 · Mehmet"></div>
+    </fieldset>
+
+    <fieldset>
+      <div class="sec-t">Ödeme</div>
+      <div class="row2">
+        <div class="f"><label for="fRecv">Alınacak ödeme</label><div class="inline"><input id="fRecv" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"><select id="fRecvCur"><option>EUR</option><option>USD</option><option>GBP</option><option>TRY</option></select></div></div>
+        <div class="f"><label for="fPay">Ödenecek ödeme</label><div class="inline"><input id="fPay" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"><select id="fPayCur"><option>EUR</option><option>USD</option><option>GBP</option><option>TRY</option></select></div></div>
+      </div>
+      <div class="f"><label for="fPayTo">Kime ödenecek (şoför, acenta…)</label><input id="fPayTo" placeholder="isteğe bağlı"></div>
+      <div class="tog"><span>Ödeme alındı</span><button class="sw" id="fReceived" role="switch" aria-checked="false" aria-label="Ödeme alındı"></button></div>
+      <div class="tog"><span>Ödeme yapıldı</span><button class="sw" id="fPaid" role="switch" aria-checked="false" aria-label="Ödeme yapıldı"></button></div>
+    </fieldset>
+
+    <fieldset>
+      <div class="sec-t">Durum &amp; hatırlatma</div>
+      <div class="status-pick" id="statusPick">
+        <button data-s="pending">Beklemede</button>
+        <button data-s="confirmed">Onaylandı</button>
+        <button data-s="done">Tamamlandı</button>
+        <button data-s="cancelled">İptal</button>
+      </div>
+      <div class="f"><label for="fRemind">Hatırlatma</label>
+        <select id="fRemind"><option value="0">Kapalı</option><option value="30">30 dk önce</option><option value="60">1 saat önce</option><option value="120">2 saat önce</option><option value="180">3 saat önce</option><option value="720">12 saat önce</option><option value="1440">1 gün önce</option></select></div>
+      <div class="f"><label for="fNote">Not</label><textarea id="fNote" placeholder="Özel istek, iniş terminali, ek bilgi…"></textarea></div>
+    </fieldset>
+
+    <fieldset>
+      <div class="sec-t">Fotoğraflar</div>
+      <div class="photos" id="photos"></div>
+    </fieldset>
+
+    <div id="delWrap" hidden>
+      <button class="danger" id="btnDel">Rezervasyonu sil</button>
+      <div class="confirm" id="delConfirm" hidden>
+        <button class="btn" id="delNo">Vazgeç</button>
+        <button class="btn red" id="delYes">Evet, sil</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- yerler -->
+<div id="placesSheet" class="sheet" hidden>
+  <div class="sheet-hdr"><div class="in gut">
+    <button class="lnk quiet" id="plClose">Kapat</button>
+    <h2>Oteller &amp; Yerler</h2>
+    <span class="cnt" id="plCount"></span>
+  </div></div>
+  <div class="sheet-body gut">
+    <div class="addrow">
+      <b>Yeni otel ekle</b>
+      <input id="npName" placeholder="Otel adı" autocomplete="off">
+      <div class="f" style="padding:0;border:0"><input id="npArea" placeholder="Bölge (Belek, Lara, Konaklı…)" autocomplete="off" style="border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:var(--bg)"></div>
+      <button class="btn gold" id="npAdd">Listeye ekle</button>
+      <div class="err" id="npErr" hidden></div>
+    </div>
+    <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="plQ" type="search" placeholder="Otel veya bölge ara" autocomplete="off"></label>
+    <div class="segs" id="plSegs">
+      <button data-seg="hotel" aria-pressed="true">Oteller</button>
+      <button data-seg="closed" aria-pressed="false">Kapalı oteller</button>
+      <button data-seg="airport" aria-pressed="false">Havalimanları</button>
+      <button data-seg="place" aria-pressed="false">İlçe &amp; köyler</button>
+    </div>
+    <div class="plist" id="plList"></div>
+    <div class="note">Temel liste uygulamayla gelir; eklediğiniz ve kapattığınız oteller bulutta saklanır, tüm cihazlarınızda ve müşteri formunda görünür.</div>
+  </div>
+</div>
+
+<!-- ayarlar -->
+<div id="setSheet" class="sheet" hidden>
+  <div class="sheet-hdr"><div class="in gut">
+    <button class="lnk quiet" id="setClose">Kapat</button>
+    <h2>Ayarlar</h2>
+    <span></span>
+  </div></div>
+  <div class="sheet-body gut">
+    <div class="linkbox">
+      <b>Müşteri rezervasyon linki</b>
+      <div class="note" style="margin:0;text-align:left">Bu linki müşterilerinize gönderin. Doldurdukları form doğrudan listenize düşer.</div>
+      <code id="custLink"></code>
+      <div class="acts">
+        <button class="btn gold" id="copyLink">Linki kopyala</button>
+        <a class="btn" id="waLink" target="_blank" rel="noopener">WhatsApp ile gönder</a>
+        <a class="btn" id="openLink" target="_blank" rel="noopener">Formu gör</a>
+      </div>
+    </div>
+    <fieldset>
+      <div class="sec-t">Firma</div>
+      <div class="f"><label for="sName">Firma adı (müşteri formunda görünür)</label><input id="sName"></div>
+      <div class="f"><label for="sWa">WhatsApp numaranız (müşteri formunda "bize yazın" düğmesi)</label><input id="sWa" type="tel" placeholder="+90 5xx xxx xx xx"></div>
+      <div class="f"><label for="sSlug">Link kısa adı</label><input id="sSlug" placeholder="vip" autocapitalize="off" autocomplete="off"></div>
+      <div style="padding:10px 14px"><button class="btn gold" id="sSave">Kaydet</button> <span class="err" id="sErr" hidden></span></div>
+    </fieldset>
+    <fieldset>
+      <div class="sec-t">Hesap</div>
+      <div style="padding:6px 14px">
+        <div class="kv"><span>Giriş</span><b id="sEmail"></b></div>
+        <div class="kv"><span>Plan</span><b id="sPlan"></b></div>
+        <div class="kv"><span>Deneme bitişi</span><b id="sTrial"></b></div>
+      </div>
+      <div style="padding:6px 14px 14px"><button class="btn" id="sPass">Şifre değiştir</button> <button class="btn" id="sLogout">Çıkış yap</button></div>
+      <div id="passBox" hidden style="padding:0 14px 14px;display:grid;gap:8px">
+        <input id="newPass" type="password" placeholder="Yeni şifre (en az 6 karakter)" autocomplete="new-password" style="border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:var(--bg);font-size:16px">
+        <button class="btn gold" id="newPassSave">Şifreyi güncelle</button>
+        <div class="err" id="passErr" hidden></div>
+      </div>
+    </fieldset>
+    <div class="note">Transfer Defteri · sürüm 0.3</div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const SUPABASE_URL="https://ppqfcasjawbbfohjnvjr.supabase.co";
+const SUPABASE_KEY="sb_publishable_1V60UInHZfyvFxSDU5hnjQ_F3cBFGCF";
+const BASE=location.pathname.replace(/[^/]*$/,"");
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+
+const $=id=>document.getElementById(id);
+const TR_DAYS=["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
+const TR_MONTHS=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
+const STATUS={pending:["Beklemede","warn"],confirmed:["Onaylandı","info"],done:["Tamamlandı","ok"],cancelled:["İptal","bad"]};
+const SYM={EUR:"€",USD:"$",GBP:"£",TRY:"₺"};
+const LANG={tr:"Türkçe",en:"English",ru:"Русский",de:"Deutsch"};
+
+let session=null, company=null, settings={}, bookings=[], userPlaces=[];
+let tab="upcoming", query="", editing=null, photos=[], dismissed={}, seenLink={};
+const signed={}; // storage path -> signed url
+
+const todayStr=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+const fmtDateLong=s=>{const d=new Date(s+"T12:00:00");return TR_DAYS[d.getDay()]+" "+d.getDate()+" "+TR_MONTHS[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?" "+d.getFullYear():"");};
+const money=(a,c)=>a?((SYM[c]||c)+" "+Number(a).toLocaleString("tr-TR",{minimumFractionDigits:0,maximumFractionDigits:2})):"";
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const digits=p=>String(p||"").replace(/[^\d]/g,"");
+const norm=s=>String(s||"").toLocaleLowerCase("tr-TR").replace(/ı/g,"i").replace(/ş/g,"s").replace(/ğ/g,"g").replace(/ü/g,"u").replace(/ö/g,"o").replace(/ç/g,"c").replace(/â/g,"a").replace(/î/g,"i").replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();
+let toastT;function toast(m){let t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";document.body.appendChild(t);}t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true;},2400);}
+const errMsg=e=>{const m=(e&&e.message)||String(e);if(/Invalid login/i.test(m))return"E‑posta veya şifre hatalı.";if(/Email not confirmed/i.test(m))return"E‑posta henüz onaylanmamış.";if(/rate limit/i.test(m))return"Çok fazla deneme, biraz bekleyin.";if(/Failed to fetch|NetworkError/i.test(m))return"İnternet bağlantısı yok.";return m;};
+
+/* ---------- auth ---------- */
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();$("lErr").hidden=true;$("lOk").hidden=true;$("lBtn").disabled=true;
+  const {error}=await sb.auth.signInWithPassword({email:$("lEmail").value.trim(),password:$("lPass").value});
+  $("lBtn").disabled=false;
+  if(error){$("lErr").textContent=errMsg(error);$("lErr").hidden=false;}
+});
+$("lForgot").addEventListener("click",async()=>{
+  const email=$("lEmail").value.trim();if(!email){$("lErr").textContent="Önce e‑posta adresinizi yazın.";$("lErr").hidden=false;return;}
+  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+BASE});
+  if(error){$("lErr").textContent=errMsg(error);$("lErr").hidden=false;}else{$("lOk").textContent="Şifre sıfırlama bağlantısı e‑postanıza gönderildi.";$("lOk").hidden=false;}
+});
+$("sLogout").addEventListener("click",async()=>{await sb.auth.signOut();location.reload();});
+$("sPass").addEventListener("click",()=>{$("passBox").hidden=!$("passBox").hidden;});
+$("newPassSave").addEventListener("click",async()=>{
+  const p=$("newPass").value;if(p.length<6){$("passErr").textContent="En az 6 karakter.";$("passErr").hidden=false;return;}
+  const {error}=await sb.auth.updateUser({password:p});
+  if(error){$("passErr").textContent=errMsg(error);$("passErr").hidden=false;}else{$("passErr").hidden=true;$("newPass").value="";$("passBox").hidden=true;toast("Şifre güncellendi");}
+});
+sb.auth.onAuthStateChange((ev,s)=>{
+  session=s;
+  if(ev==="PASSWORD_RECOVERY"){showApp().then(()=>{openSettings();$("passBox").hidden=false;toast("Yeni şifrenizi belirleyin");});return;}
+  if(s&&$("appView").hidden)showApp();
+  if(!s){$("appView").hidden=true;$("loginView").hidden=false;}
+});
+
+/* ---------- data layer ---------- */
+const MAP={date:"date",time:"time",flight:"flight",returnDate:"return_date",returnTime:"return_time",returnFlight:"return_flight",firstName:"first_name",lastName:"last_name",phone:"phone",email:"email",language:"language",adults:"adults",children:"children",childAges:"child_ages",infants:"infants",babySeat:"baby_seat",luggage:"luggage",hotel:"hotel",area:"area",from:"from_place",to:"to_place",vehicle:"vehicle",receiveAmount:"receive_amount",receiveCur:"receive_cur",payAmount:"pay_amount",payCur:"pay_cur",payTo:"pay_to",received:"received",paid:"paid",status:"status",reminderMin:"reminder_min",note:"note",customerNote:"customer_note",photos:"photos",source:"source",createdAt:"created_at",updatedAt:"updated_at"};
+const fromDb=r=>{const o={id:r.id};for(const k in MAP)o[k]=r[MAP[k]];if(o.time)o.time=String(o.time).slice(0,5);if(o.returnTime)o.returnTime=String(o.returnTime).slice(0,5);o.childAges=o.childAges||[];o.photos=o.photos||[];return o;};
+const toDb=o=>{const r={};for(const k in MAP){if(k==="createdAt"||k==="updatedAt")continue;let v=o[k];if(v===""||v===undefined)v=null;if(["time","returnTime","returnDate","luggage"].includes(k)&&!v)v=null;r[MAP[k]]=v;}r.company_id=company.id;return r;};
+
+async function loadAll(){
+  const [{data:co,error:e1},{data:st},{data:bk,error:e2},{data:pl}]=await Promise.all([
+    sb.from("companies").select("*").single(),
+    sb.from("settings").select("*").maybeSingle(),
+    sb.from("bookings").select("*").order("date").order("time"),
+    sb.from("places").select("*")
+  ]);
+  if(e1||e2){$("loadNote").textContent="Veriler yüklenemedi: "+errMsg(e1||e2);return;}
+  company=co;settings=st||{};bookings=(bk||[]).map(fromDb);userPlaces=pl||[];
+  try{seenLink=JSON.parse(localStorage.getItem("td_seen")||"{}");}catch(e){}
+  $("coName").textContent=company.name||"Transfer Defteri";
+  $("loadNote").hidden=true;
+  render();renderReview();
+  subscribeRealtime();
+}
+let channel=null;
+function subscribeRealtime(){
+  if(channel)return;
+  channel=sb.channel("bookings-live").on("postgres_changes",{event:"*",schema:"public",table:"bookings"},payload=>{
+    if(payload.eventType==="DELETE"){bookings=bookings.filter(b=>b.id!==payload.old.id);}
+    else{const b=fromDb(payload.new);const i=bookings.findIndex(x=>x.id===b.id);if(i>=0)bookings[i]=b;else{bookings.push(b);if(b.source==="link"&&payload.eventType==="INSERT")toast("Yeni rezervasyon: "+(b.firstName||"")+" "+(b.lastName||""));}}
+    render();
+  }).on("postgres_changes",{event:"*",schema:"public",table:"places"},async()=>{const {data}=await sb.from("places").select("*");userPlaces=data||[];if(!$("placesSheet").hidden)renderPlaces();}).subscribe();
+}
+async function saveBooking(data,id){
+  const row=toDb(data);
+  if(id){const {error}=await sb.from("bookings").update(row).eq("id",id);if(error)throw error;return id;}
+  const {data:ins,error}=await sb.from("bookings").insert(row).select("id").single();if(error)throw error;return ins.id;
+}
+async function deleteBooking(id){const {error}=await sb.from("bookings").delete().eq("id",id);if(error)throw error;}
+
+async function ensureSigned(paths){
+  const need=paths.filter(p=>p&&!signed[p]);if(!need.length)return false;
+  const {data}=await sb.storage.from("photos").createSignedUrls(need,3600);
+  (data||[]).forEach(d=>{if(d.signedUrl)signed[d.path]=d.signedUrl;});return true;
+}
+
+/* ---------- render ---------- */
+function sorted(list){return list.slice().sort((a,b)=>(a.date+" "+(a.time||""))<(b.date+" "+(b.time||""))?-1:1);}
+function render(){
+  const t=todayStr();const q=query.trim().toLowerCase();
+  let list=bookings.filter(b=>{
+    if(tab==="upcoming"&&b.date<t)return false;
+    if(tab==="past"&&b.date>=t)return false;
+    if(q){const hay=[b.firstName,b.lastName,b.hotel,b.phone,b.flight,b.note,b.customerNote].join(" ").toLowerCase();if(!hay.includes(q))return false;}
+    return true;
+  });
+  list=sorted(list);if(tab==="past")list.reverse();
+  const todays=bookings.filter(b=>b.date===t&&b.status!=="cancelled");
+  $("stToday").textContent=todays.length+" transfer";
+  const due={};bookings.forEach(b=>{if(b.status!=="cancelled"&&b.date>=t&&!b.received&&Number(b.receiveAmount)>0){due[b.receiveCur||"EUR"]=(due[b.receiveCur||"EUR"]||0)+Number(b.receiveAmount);}});
+  $("stDue").textContent=Object.keys(due).map(c=>money(due[c],c)).join(" · ")||"–";
+  const now=new Date();const nowKey=t+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+  const next=sorted(bookings.filter(b=>b.status!=="cancelled"&&b.status!=="done")).find(b=>(b.date+" "+(b.time||"00:00"))>=nowKey);
+  $("stNextWrap").hidden=!next;
+  if(next)$("stNext").textContent=(next.date===t?"Bugün ":fmtDateLong(next.date)+" ")+(next.time||"")+" · "+(next.lastName||next.firstName||"");
+
+  const host=$("list");host.innerHTML="";
+  $("empty").hidden=list.length>0;
+  if(!list.length){
+    if(q){$("emptyT").textContent="Eşleşen kayıt yok";$("emptyP").textContent="Aramayı değiştirin veya başka bir sekmeye geçin.";}
+    else if(tab==="past"){$("emptyT").textContent="Geçmiş kayıt yok";$("emptyP").textContent="Tarihi geçen transferler burada toplanır.";}
+    else{$("emptyT").textContent="Henüz rezervasyon yok";$("emptyP").innerHTML="Sağ alttaki <b>Yeni</b> düğmesiyle ekleyin ya da müşterilerinize rezervasyon linkinizi gönderin (sağ üstteki zincir simgesi).";}
+  }
+  const groups=new Map();list.forEach(b=>{if(!groups.has(b.date))groups.set(b.date,[]);groups.get(b.date).push(b);});
+  const tm=new Date();tm.setDate(tm.getDate()+1);const tomorrow=tm.getFullYear()+"-"+String(tm.getMonth()+1).padStart(2,"0")+"-"+String(tm.getDate()).padStart(2,"0");
+  groups.forEach((items,date)=>{
+    const g=document.createElement("section");g.className="group"+(date===t?" today":"");
+    const label=date===t?"Bugün":date===tomorrow?"Yarın":fmtDateLong(date);
+    g.innerHTML=`<h2><span>${label}</span><small>${date===t||date===tomorrow?fmtDateLong(date)+" · ":""}${items.length} transfer</small></h2><div class="cards"></div>`;
+    const cards=g.querySelector(".cards");items.forEach(b=>cards.appendChild(card(b)));host.appendChild(g);
+  });
+  renderReminders();renderNewLink();
+  const paths=list.map(b=>b.photos&&b.photos[0]&&b.photos[0].path).filter(Boolean);
+  ensureSigned(paths).then(ch=>{if(ch)render();});
+}
+const short=(s,b)=>String(s||"").replace(/^(.*?)Havalimanı \((\w+)\)(?: – Dış Hatlar (T\d))?(?: – İç Hatlar)?$/,(m,a,code,t)=>code+(t?" "+t:"")).replace(/^Otel$/,b.area?"Otel ("+b.area+")":"Otel");
+function card(b){
+  const el=document.createElement("button");el.className="card"+(b.status==="cancelled"?" cancelled":"")+(b.source==="link"&&b.status==="pending"&&!seenLink[b.id]?" fresh":"");el.type="button";
+  const pax=[b.adults>0?b.adults+" yetişkin":"",b.children>0?b.children+" çocuk"+(b.childAges&&b.childAges.length?" ("+b.childAges.join(", ")+")":""):"",b.infants>0?b.infants+" bebek":""].filter(Boolean).join(", ");
+  const st=STATUS[b.status]||STATUS.pending;
+  const recv=Number(b.receiveAmount)>0?`<div class="amt num ${b.received?"got":"due"}">${money(b.receiveAmount,b.receiveCur||"EUR")}</div>`:(b.source==="link"&&b.status==="pending"?`<div class="chip warn">Fiyat girilmedi</div>`:"");
+  const pay=Number(b.payAmount)>0?`<div class="chip ${b.paid?"ok":""}">${b.paid?"Ödendi":"Ödenecek"} ${esc(money(b.payAmount,b.payCur||"EUR"))}</div>`:"";
+  const p0=b.photos&&b.photos[0];const ph=p0?`<img class="thumb" alt="" src="${esc(p0.path?(signed[p0.path]||""):(p0.url||p0.dataUrl||""))}">`:"";
+  const route=[short(b.from,b),short(b.to,b)].filter(Boolean).join(" → ");
+  el.innerHTML=`
+    <div class="time num">${esc(b.time||"--:--")}${b.flight?`<small>${esc(b.flight)}</small>`:""}</div>
+    <div class="body">
+      <div class="name">${esc((b.firstName||"")+" "+(b.lastName||"")).trim()||"İsimsiz yolcu"}</div>
+      <div class="meta">${esc(b.hotel||"")}${b.hotel&&route?" · ":""}${esc(route)}</div>
+      <div class="chips">
+        <span class="chip ${st[1]}">${st[0]}</span>
+        ${pax?`<span class="chip">${esc(pax)}</span>`:""}
+        ${b.babySeat?`<span class="chip acc">Bebek koltuğu</span>`:""}
+        ${Number(b.receiveAmount)>0?`<span class="chip ${b.received?"ok":"warn"}">${b.received?"Tahsil edildi":"Tahsilat bekliyor"}</span>`:""}
+        ${pay}
+        ${b.returnDate?`<span class="chip">Dönüş ${esc(b.returnDate.slice(8,10)+"."+b.returnDate.slice(5,7))}</span>`:""}
+        ${Number(b.reminderMin)>0?`<span class="chip">⏰</span>`:""}
+        ${b.source==="link"?`<span class="chip info">Linkten geldi${b.language?" · "+(LANG[b.language]||b.language):""}</span>`:""}
+      </div>
+    </div>
+    <div class="side">${recv}${ph}</div>`;
+  el.addEventListener("click",()=>openSheet(b));
+  return el;
+}
+function renderNewLink(){
+  const fresh=bookings.filter(b=>b.source==="link"&&b.status==="pending"&&!seenLink[b.id]);
+  const box=$("newlink");box.hidden=!fresh.length;if(!fresh.length)return;
+  box.innerHTML=`<div class="t">🆕 ${fresh.length} yeni müşteri rezervasyonu</div>`+fresh.slice(0,5).map(b=>`<div class="row"><span><b>${esc(b.date.slice(8,10)+"."+b.date.slice(5,7))} ${esc(b.time||"")}</b> ${esc((b.firstName||"")+" "+(b.lastName||""))} · ${esc(b.hotel||"")}</span><button data-open="${b.id}">Aç</button></div>`).join("");
+  box.querySelectorAll("[data-open]").forEach(btn=>btn.addEventListener("click",()=>{const b=bookings.find(x=>x.id===btn.dataset.open);if(b)openSheet(b);}));
+}
+function renderReminders(){
+  const now=Date.now();const due=[];
+  bookings.forEach(b=>{const m=Number(b.reminderMin);if(!m||b.status==="cancelled"||b.status==="done"||dismissed[b.id])return;const start=new Date(b.date+"T"+(b.time||"00:00")+":00").getTime();if(now>=start-m*60000&&now<=start+30*60000)due.push({b,start});});
+  const box=$("remind");box.hidden=!due.length;if(!due.length)return;
+  box.innerHTML=`<div class="t">⏰ Yaklaşan transfer${due.length>1?"ler":""}</div>`+due.map(({b,start})=>{const mins=Math.round((start-now)/60000);const when=mins>60?Math.floor(mins/60)+" sa "+(mins%60)+" dk sonra":mins>0?mins+" dk sonra":mins===0?"şimdi":"başladı";return `<div class="row"><span><b>${esc(b.time||"")}</b> ${esc((b.firstName||"")+" "+(b.lastName||""))} · ${esc(b.hotel||"")} <span style="color:var(--muted)">(${when})</span></span><button data-dis="${esc(b.id)}">Gizle</button></div>`;}).join("");
+  box.querySelectorAll("[data-dis]").forEach(btn=>btn.addEventListener("click",()=>{dismissed[btn.dataset.dis]=1;renderReminders();}));
+}
+setInterval(renderReminders,30000);
+
+/* ---------- form ---------- */
+function sw(id,val){$(id).setAttribute("aria-checked",val?"true":"false");}
+function swv(id){return $(id).getAttribute("aria-checked")==="true";}
+["fSeat","fReceived","fPaid"].forEach(id=>$(id).addEventListener("click",()=>sw(id,!swv(id))));
+$("statusPick").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>setStatus(b.dataset.s)));
+function setStatus(s){$("statusPick").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===s?"true":"false"));editing.status=s;}
+function openSheet(b){
+  editing=b?Object.assign({},b):{status:"pending",source:"manual"};
+  $("sheetTitle").textContent=b?"Rezervasyon":"Yeni rezervasyon";
+  $("formErr").hidden=true;
+  $("fDate").value=b?.date||todayStr();$("fTime").value=b?.time||"";$("fFlight").value=b?.flight||"";
+  $("fRDate").value=b?.returnDate||"";$("fRTime").value=b?.returnTime||"";$("fRFlight").value=b?.returnFlight||"";
+  $("fFirst").value=b?.firstName||"";$("fLast").value=b?.lastName||"";$("fPhone").value=b?.phone||"";$("fEmail").value=b?.email||"";
+  $("fAdults").value=b?b.adults??0:2;$("fChildren").value=b?.children??0;$("fInfants").value=b?.infants??0;
+  $("fAges").value=(b?.childAges||[]).join(", ");$("fLug").value=b?.luggage??"";
+  sw("fSeat",!!b?.babySeat);
+  $("fHotel").value=b?.hotel||"";$("fArea").value=b?.area||"";$("hotelHint").hidden=true;
+  $("fFrom").value=b?.from||"Antalya Havalimanı (AYT) – Dış Hatlar T1";$("fTo").value=b?.to||"Otel";
+  $("fVehicle").value=b?.vehicle||"";
+  $("fRecv").value=b?.receiveAmount||"";$("fRecvCur").value=b?.receiveCur||"EUR";$("fPay").value=b?.payAmount||"";$("fPayCur").value=b?.payCur||"EUR";$("fPayTo").value=b?.payTo||"";
+  sw("fReceived",!!b?.received);sw("fPaid",!!b?.paid);
+  setStatus(b?.status||"pending");$("fRemind").value=String(b?.reminderMin||0);$("fNote").value=b?.note||"";
+  photos=(b?.photos||[]).slice();renderPhotos();
+  $("delWrap").hidden=!b;$("delConfirm").hidden=true;
+  const isLink=b&&b.source==="link";$("custBox").hidden=!isLink;
+  if(isLink){$("custInfo").innerHTML=`Dil: ${esc(LANG[b.language]||b.language||"-")} · Gönderim: ${esc(b.createdAt?new Date(b.createdAt).toLocaleString("tr-TR"):"")}${b.customerNote?`<br>Müşteri notu: <i>${esc(b.customerNote)}</i>`:""}<br>Fiyatı girip durumu <b>Onaylandı</b> yapın.`;seenLink[b.id]=1;try{localStorage.setItem("td_seen",JSON.stringify(seenLink));}catch(e){}}
+  updateContact();
+  $("sheet").hidden=false;document.body.style.overflow="hidden";$("sheet").querySelector(".sheet-body").scrollTop=0;
+  if(b&&b.photos&&b.photos.length)ensureSigned(b.photos.map(p=>p.path)).then(()=>renderPhotos());
+}
+function closeSheet(){$("sheet").hidden=true;document.body.style.overflow="";editing=null;render();}
+$("btnClose").addEventListener("click",closeSheet);
+$("fab").addEventListener("click",()=>openSheet(null));
+$("fPhone").addEventListener("input",updateContact);
+function updateContact(){
+  const d=digits($("fPhone").value);const bar=$("contactBar");
+  if(!d||!editing?.id){bar.hidden=true;return;}
+  bar.hidden=false;
+  bar.innerHTML=`<a class="wa" href="https://wa.me/${d}" target="_blank" rel="noopener">WhatsApp</a><a href="tel:+${d}">Ara</a><button type="button" id="cpPhone">Numarayı kopyala</button>`;
+  $("cpPhone").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("fPhone").value);toast("Kopyalandı");}catch(e){$("fPhone").select();}});
+}
+function readForm(){
+  const v=id=>$(id).value.trim();
+  return Object.assign(editing,{
+    date:v("fDate"),time:v("fTime"),flight:v("fFlight").toUpperCase(),returnDate:v("fRDate"),returnTime:v("fRTime"),returnFlight:v("fRFlight").toUpperCase(),
+    firstName:v("fFirst"),lastName:v("fLast"),phone:v("fPhone"),email:v("fEmail"),
+    adults:+$("fAdults").value||0,children:+$("fChildren").value||0,infants:+$("fInfants").value||0,
+    childAges:v("fAges").split(/[,\s]+/).filter(Boolean).map(Number).filter(n=>!isNaN(n)),babySeat:swv("fSeat"),luggage:$("fLug").value===""?null:+$("fLug").value,
+    hotel:v("fHotel"),area:v("fArea"),from:v("fFrom"),to:v("fTo"),vehicle:v("fVehicle"),
+    receiveAmount:+$("fRecv").value||0,receiveCur:$("fRecvCur").value,payAmount:+$("fPay").value||0,payCur:$("fPayCur").value,payTo:v("fPayTo"),
+    received:swv("fReceived"),paid:swv("fPaid"),reminderMin:+$("fRemind").value||0,note:v("fNote"),photos:photos.slice()
+  });
+}
+$("btnSave").addEventListener("click",async()=>{
+  const d=readForm();
+  if(!d.date)return err("Tarih gerekli.");
+  if(!d.firstName&&!d.lastName)return err("Yolcu adı veya soyadı gerekli.");
+  const id=d.id;$("btnSave").disabled=true;
+  try{const nid=await saveBooking(d,id);if(!id){const b=Object.assign({id:nid},d);if(!bookings.some(x=>x.id===nid))bookings.push(b);}else{const i=bookings.findIndex(x=>x.id===id);if(i>=0)bookings[i]=Object.assign({},bookings[i],d);}toast(id?"Güncellendi":"Rezervasyon eklendi");closeSheet();}
+  catch(e){err("Kaydedilemedi: "+errMsg(e));}
+  finally{$("btnSave").disabled=false;}
+});
+function err(m){const e=$("formErr");e.textContent=m;e.hidden=false;e.scrollIntoView({block:"nearest"});}
+$("btnDel").addEventListener("click",()=>{$("delConfirm").hidden=false;});
+$("delNo").addEventListener("click",()=>{$("delConfirm").hidden=true;});
+$("delYes").addEventListener("click",async()=>{try{await deleteBooking(editing.id);bookings=bookings.filter(b=>b.id!==editing.id);toast("Silindi");closeSheet();}catch(e){err("Silinemedi: "+errMsg(e));}});
+
+/* photos */
+function renderPhotos(){
+  const host=$("photos");host.innerHTML="";
+  photos.forEach((p,i)=>{const d=document.createElement("div");d.className="ph";d.innerHTML=`<img alt="Fotoğraf ${i+1}" src="${esc(p.path?(signed[p.path]||""):(p.url||p.dataUrl||""))}"><button type="button" aria-label="Fotoğrafı kaldır">×</button>`;d.querySelector("button").addEventListener("click",()=>{photos.splice(i,1);renderPhotos();});host.appendChild(d);});
+  const add=document.createElement("label");add.className="addph";add.innerHTML=`<span>＋<br>Fotoğraf<br>ekle</span><input type="file" accept="image/*" multiple>`;
+  add.querySelector("input").addEventListener("change",async e=>{for(const f of e.target.files){await addPhoto(f);}renderPhotos();});
+  host.appendChild(add);
+}
+function shrink(file,max){return new Promise(res=>{const img=new Image();const u=URL.createObjectURL(file);img.onload=()=>{const s=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>res(b),"image/jpeg",0.8);};img.onerror=()=>res(null);img.src=u;});}
+async function addPhoto(file){
+  toast("Fotoğraf yükleniyor…");
+  const blob=await shrink(file,1600);if(!blob){toast("Bu dosya okunamadı");return;}
+  const path=company.id+"/"+(editing.id||"new")+"/"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)+".jpg";
+  const {error}=await sb.storage.from("photos").upload(path,blob,{contentType:"image/jpeg"});
+  if(error){toast("Yüklenemedi: "+errMsg(error));return;}
+  const {data}=await sb.storage.from("photos").createSignedUrl(path,3600);if(data)signed[path]=data.signedUrl;
+  photos.push({path});toast("Fotoğraf eklendi");
+}
+
+/* ---------- places ---------- */
+function allPlaces(){
+  const closed=new Set(),extra=new Set();const out=[];
+  userPlaces.forEach(p=>{if(p.type==="hotel"&&p.status==="closed")closed.add(norm(p.name));});
+  AIRPORTS.forEach(([n,a])=>out.push({type:"airport",name:n,area:a,n:norm(n)}));
+  PLACES.forEach(([n,a])=>out.push({type:"place",name:n,area:a,n:norm(n)}));
+  userPlaces.forEach(p=>{if(p.type==="hotel"){extra.add(norm(p.name));out.push({type:"hotel",name:p.name,area:p.area||"",n:norm(p.name),id:p.id,status:p.status||"open",custom:true});}});
+  HOTELS.forEach(([n,a])=>{const k=norm(n);if(extra.has(k))return;out.push({type:"hotel",name:n,area:a,n:k,status:closed.has(k)?"closed":"open"});});
+  return out;
+}
+function suggest(q,kind){
+  const k=norm(q);if(k.length<2)return[];const words=k.split(" ");
+  return allPlaces().filter(p=>{if(kind==="hotel"&&p.type!=="hotel")return false;if(kind==="place"&&p.type==="hotel")return false;if(p.type==="hotel"&&p.status==="closed")return false;return words.every(w=>p.n.includes(w)||norm(p.area).includes(w));})
+    .sort((a,b)=>(a.n.startsWith(k)?0:1)-(b.n.startsWith(k)?0:1)||a.name.localeCompare(b.name,"tr")).slice(0,8);
+}
+function attachAC(input,kind,onPick){
+  let box=null,items=[],hl=-1;const close=()=>{if(box){box.remove();box=null;}};
+  const open=()=>{
+    const q=input.value;items=suggest(q,kind);
+    const unknownHotel=kind==="hotel"&&norm(q).length>=3&&!items.some(i=>i.n===norm(q));
+    if(!items.length&&!unknownHotel){close();return;}
+    if(!box){box=document.createElement("div");box.className="ac";(input.closest(".f")||input.parentElement).appendChild(box);}
+    const ic={airport:"✈️",hotel:"🏨",place:"📍"};
+    box.innerHTML=items.map((p,i)=>`<button type="button" data-i="${i}"><span class="k ${p.type==="airport"?"air":p.type==="hotel"?"hot":"pl"}">${ic[p.type]}</span><span class="tx"><b>${esc(p.name)}</b><small>${esc(p.area)}${p.custom?" · sizin eklediğiniz":""}</small></span></button>`).join("")
+      +(unknownHotel?`<button type="button" data-add="1"><span class="k hot">＋</span><span class="tx"><b class="add">"${esc(q.trim())}" listede yok — yeni otel olarak ekle</b><small>Bir dahaki sefere otomatik çıkar</small></span></button>`:"");
+    hl=-1;
+    box.querySelectorAll("button").forEach(b=>b.addEventListener("mousedown",e=>{e.preventDefault();if(b.dataset.add){close();promptAddHotel(input.value.trim());}else pick(items[+b.dataset.i]);}));
+  };
+  const pick=p=>{input.value=p.name;close();onPick&&onPick(p);input.dispatchEvent(new Event("change"));};
+  input.addEventListener("input",open);input.addEventListener("focus",open);input.addEventListener("blur",()=>setTimeout(close,120));
+  input.addEventListener("keydown",e=>{if(!box)return;const bs=box.querySelectorAll("button");if(e.key==="ArrowDown"){hl=Math.min(hl+1,bs.length-1);}else if(e.key==="ArrowUp"){hl=Math.max(hl-1,0);}else if(e.key==="Enter"){e.preventDefault();if(hl>=0)bs[hl].dispatchEvent(new Event("mousedown"));return;}else if(e.key==="Escape"){close();return;}else return;e.preventDefault();bs.forEach((b,i)=>b.classList.toggle("hl",i===hl));});
+}
+attachAC($("fHotel"),"hotel",p=>{if(p.area)$("fArea").value=p.area;hotelHint(false);});
+attachAC($("fArea"),"place");
+attachAC($("fFrom"),"all",p=>{if(p.type==="hotel"&&!$("fHotel").value){$("fHotel").value=p.name;$("fArea").value=p.area;}});
+attachAC($("fTo"),"all",p=>{if(p.type==="hotel"&&!$("fHotel").value){$("fHotel").value=p.name;$("fArea").value=p.area;}});
+attachAC($("npArea"),"place");
+$("fHotel").addEventListener("change",()=>hotelHint(true));
+function hotelHint(check){
+  const v=$("fHotel").value.trim();const h=$("hotelHint");
+  if(!check||!v||allPlaces().some(p=>p.type==="hotel"&&p.n===norm(v))){h.hidden=true;return;}
+  h.hidden=false;h.innerHTML=`Bu otel listede yok. <button type="button" id="hhAdd">Listeye ekle</button>`;
+  $("hhAdd").addEventListener("click",()=>promptAddHotel(v));
+}
+function promptAddHotel(name){openPlaces();$("npName").value=name;$("npArea").value=$("fArea").value||"";$("npArea").focus();}
+async function savePlace(p,id){
+  if(id){const {error}=await sb.from("places").update(p).eq("id",id);if(error)throw error;const i=userPlaces.findIndex(x=>x.id===id);if(i>=0)Object.assign(userPlaces[i],p);}
+  else{const {data,error}=await sb.from("places").insert(Object.assign({company_id:company.id},p)).select().single();if(error)throw error;userPlaces.push(data);}
+  renderPlaces();
+}
+async function markReviewed(){
+  const now=new Date().toISOString();
+  const {error}=await sb.from("settings").upsert({company_id:company.id,places_reviewed_at:now});
+  if(!error){settings.places_reviewed_at=now;renderReview();}
+}
+function renderReview(){
+  const last=settings.places_reviewed_at?new Date(settings.places_reviewed_at).getTime():0;
+  const days=last?Math.floor((Date.now()-last)/86400000):0;
+  $("review").hidden=!(days>=30);if(days>=30)$("reviewDays").textContent=days;
+}
+$("reviewDone").addEventListener("click",markReviewed);
+$("reviewOpen").addEventListener("click",openPlaces);
+let plSeg="hotel",plQ="";
+function openPlaces(){$("placesSheet").hidden=false;document.body.style.overflow="hidden";$("npErr").hidden=true;renderPlaces();}
+function closePlaces(){$("placesSheet").hidden=true;if($("sheet").hidden)document.body.style.overflow="";hotelHint(true);}
+$("btnPlaces").addEventListener("click",openPlaces);
+$("plClose").addEventListener("click",closePlaces);
+$("plQ").addEventListener("input",e=>{plQ=e.target.value;renderPlaces();});
+$("plSegs").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{plSeg=b.dataset.seg;$("plSegs").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));renderPlaces();}));
+$("npAdd").addEventListener("click",async()=>{
+  const name=$("npName").value.trim(),area=$("npArea").value.trim();
+  if(name.length<3){$("npErr").textContent="Otel adı en az 3 harf olmalı.";$("npErr").hidden=false;return;}
+  const ex=allPlaces().find(p=>p.type==="hotel"&&p.n===norm(name));
+  try{
+    if(ex&&ex.custom)await savePlace({status:"open",area:area||ex.area},ex.id);
+    else if(ex)await savePlace({type:"hotel",name:ex.name,area:area||ex.area,status:"open"});
+    else await savePlace({type:"hotel",name,area,status:"open"});
+    $("npName").value="";$("npArea").value="";$("npErr").hidden=true;toast("Otel listeye eklendi");
+    if(!$("sheet").hidden&&!$("fHotel").value){$("fHotel").value=name;if(area)$("fArea").value=area;}
+  }catch(e){$("npErr").textContent="Kaydedilemedi: "+errMsg(e);$("npErr").hidden=false;}
+});
+async function toggleHotel(p){
+  const closing=p.status!=="closed";
+  try{if(p.custom)await savePlace({status:closing?"closed":"open"},p.id);else await savePlace({type:"hotel",name:p.name,area:p.area,status:closing?"closed":"open"});toast(closing?"Kapalı olarak işaretlendi":"Yeniden açık");}catch(e){toast("Kaydedilemedi");}
+}
+function renderPlaces(){
+  const all=allPlaces();const k=norm(plQ);
+  let list=all.filter(p=>plSeg==="hotel"?(p.type==="hotel"&&p.status!=="closed"):plSeg==="closed"?(p.type==="hotel"&&p.status==="closed"):p.type===plSeg);
+  if(k)list=list.filter(p=>p.n.includes(k)||norm(p.area).includes(k));
+  list.sort((a,b)=>a.name.localeCompare(b.name,"tr"));
+  $("plCount").textContent=all.filter(p=>p.type==="hotel"&&p.status!=="closed").length+" otel";
+  const host=$("plList");host.innerHTML="";
+  list.slice(0,300).forEach(p=>{const r=document.createElement("div");r.className="prow"+(p.status==="closed"?" closed":"");r.innerHTML=`<span class="k">${p.type==="airport"?"✈️":p.type==="hotel"?"🏨":"📍"}</span><div class="tx"><b>${esc(p.name)}</b><small>${esc(p.area)}${p.custom?" · sizin eklediğiniz":""}</small></div>${p.type==="hotel"?`<button type="button" class="${p.status==="closed"?"":"on"}">${p.status==="closed"?"Yeniden aç":"Açık"}</button>`:""}`;const b=r.querySelector("button");if(b)b.addEventListener("click",()=>toggleHotel(p));host.appendChild(r);});
+  if(!list.length)host.innerHTML=`<div class="note">Eşleşen kayıt yok.</div>`;
+  else if(list.length>300){const n=document.createElement("div");n.className="note";n.textContent="İlk 300 kayıt gösteriliyor, aramayı daraltın.";host.appendChild(n);}
+}
+
+/* ---------- settings ---------- */
+function custLink(){return location.origin+BASE+"r/?c="+(company.slug||"");}
+function openSettings(){
+  $("setSheet").hidden=false;document.body.style.overflow="hidden";
+  $("custLink").textContent=custLink();
+  $("waLink").href="https://wa.me/?text="+encodeURIComponent("Transfer rezervasyon formu: "+custLink());
+  $("openLink").href=custLink();
+  $("sName").value=company.name||"";$("sWa").value=company.whatsapp||"";$("sSlug").value=company.slug||"";
+  $("sEmail").textContent=session?.user?.email||"";
+  $("sPlan").textContent=({trial:"Deneme",monthly:"Aylık",yearly:"Yıllık",cancelled:"İptal"})[company.plan]||company.plan;
+  $("sTrial").textContent=company.trial_ends_at?new Date(company.trial_ends_at).toLocaleDateString("tr-TR"):"-";
+}
+$("btnSettings").addEventListener("click",openSettings);
+$("setClose").addEventListener("click",()=>{$("setSheet").hidden=true;document.body.style.overflow="";});
+$("copyLink").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(custLink());toast("Link kopyalandı");}catch(e){const r=document.createRange();r.selectNodeContents($("custLink"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Link seçildi, kopyalayın");}});
+$("sSave").addEventListener("click",async()=>{
+  const slug=$("sSlug").value.trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"");
+  if(slug.length<2){$("sErr").textContent="Kısa ad en az 2 karakter olmalı.";$("sErr").hidden=false;return;}
+  const {data,error}=await sb.from("companies").update({name:$("sName").value.trim()||company.name,whatsapp:$("sWa").value.trim(),slug}).eq("id",company.id).select().single();
+  if(error){$("sErr").textContent=/duplicate/i.test(error.message)?"Bu kısa ad kullanımda, başka bir tane seçin.":errMsg(error);$("sErr").hidden=false;return;}
+  $("sErr").hidden=true;company=data;$("coName").textContent=company.name;openSettings();toast("Kaydedildi");
+});
+
+/* ---------- ui ---------- */
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));render();}));
+$("q").addEventListener("input",e=>{query=e.target.value;render();});
+window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("sheet").hidden)closeSheet();else if(!$("placesSheet").hidden)closePlaces();else if(!$("setSheet").hidden){$("setSheet").hidden=true;document.body.style.overflow="";}}});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&company){sb.from("bookings").select("*").order("date").order("time").then(({data})=>{if(data){bookings=data.map(fromDb);render();}});}});
+
+/* ---------- boot ---------- */
+$("todayLbl").textContent=fmtDateLong(todayStr());
+async function showApp(){$("loginView").hidden=true;$("appView").hidden=false;if(!company)await loadAll();}
+(async()=>{
+  const {data:{session:s}}=await sb.auth.getSession();session=s;
+  if(s)await showApp();else{$("loginView").hidden=false;}
+})();
+})();
+</script>
+</body>
+</html>
