@@ -211,3 +211,24 @@ create policy bookings_delete on bookings for delete to authenticated using (com
 update companies set plan = 'lifetime' where id in (select m.company_id from members m join platform_admins pa on pa.user_id = m.user_id);
 
 select 'ok' as done, (select count(*) from platform_admins) as admins, (select plan from companies limit 1) as owner_plan;
+
+-- Gelir / gider defteri (günlük masraflar, ekstra gelirler)
+create table if not exists ledger (
+  id uuid primary key default gen_random_uuid(),
+  company_id uuid not null references companies(id) on delete cascade,
+  date date not null,
+  kind text not null default 'expense',   -- expense | income
+  category text,
+  amount numeric(12,2) not null default 0,
+  currency text not null default 'TRY',
+  note text,
+  booking_id uuid,
+  created_at timestamptz not null default now()
+);
+create index if not exists ledger_company_date on ledger(company_id, date);
+alter table ledger enable row level security;
+grant select, insert, update, delete on ledger to authenticated;
+grant all on ledger to service_role;
+revoke all on ledger from anon;
+drop policy if exists ledger_all on ledger;
+create policy ledger_all on ledger for all to authenticated using (company_id = my_company_id()) with check (company_id = my_company_id() and company_can_write());

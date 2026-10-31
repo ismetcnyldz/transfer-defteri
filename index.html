@@ -518,7 +518,21 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
     <div class="note" style="margin:0;text-align:left" id="repTitle"></div>
     <div class="rgrid" id="repBoxes"></div>
     <div class="rwrap"><table class="rtable" id="repTable"></table></div>
-    <div class="note" style="margin:0;text-align:left">Alınan = tahsil edildi işaretli tutarlar. Ödenen = ödendi işaretli tutarlar. Kâr = alınacak − ödenecek (tüm kayıtlar, iptaller hariç). Para birimleri ayrı ayrı gösterilir.</div>
+    <div class="note" style="margin:0;text-align:left">Alınan = tahsil edildi işaretli tutarlar. Ödenen = ödendi işaretli tutarlar. Kâr = alınacak − ödenecek. Net kâr = kâr − masraflar + ekstra gelirler. Para birimleri ayrı ayrı gösterilir.</div>
+    <fieldset>
+      <div class="sec-t">Gelir / Gider (masraflar)</div>
+      <div class="row2">
+        <div class="f"><label for="lgDate">Tarih</label><input id="lgDate" type="date"></div>
+        <div class="f"><label for="lgKind">Tür</label><select id="lgKind"><option value="expense">Gider (masraf)</option><option value="income">Ekstra gelir</option></select></div>
+      </div>
+      <div class="row2">
+        <div class="f"><label for="lgCat">Kategori</label><select id="lgCat"><option>Yakıt</option><option>HGS / Otopark</option><option>Yıkama</option><option>Bakım / Lastik</option><option>Yemek</option><option>Şoför ücreti</option><option>Kira / Araç taksidi</option><option>Sigorta / Vergi</option><option>Telefon / İnternet</option><option>Diğer</option></select></div>
+        <div class="f"><label for="lgAmt">Tutar</label><div class="inline"><input id="lgAmt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"><select id="lgCur"><option>TRY</option><option>EUR</option><option>USD</option><option>GBP</option></select></div></div>
+      </div>
+      <div class="f"><label for="lgNote">Açıklama</label><input id="lgNote" placeholder="isteğe bağlı"></div>
+      <div class="btnrow"><button type="button" class="btn gold" id="lgAdd">Ekle</button><span class="err" id="lgErr" hidden></span></div>
+      <div id="lgList"></div>
+    </fieldset>
     <fieldset>
       <div class="sec-t">Eski kayıtları temizle</div>
       <div class="note" style="margin:0;text-align:left;padding:8px 14px">Silinen kayıtlar geri getirilemez. Önce yukarıdan raporunuzu alın. Yaklaşan (ileri tarihli) kayıtlar hiçbir zaman silinmez.</div>
@@ -1195,7 +1209,8 @@ $("coDelNo").addEventListener("click",()=>{$("coDelConfirm").hidden=true;});
 $("coDelYes").addEventListener("click",async()=>{const {error}=await sb.rpc("admin_delete_company",{p_id:coCur.id});if(error)return coErr(errMsg(error));toast("Firma silindi");$("coSheet").hidden=true;await loadAdmin();});
 
 /* ---------- raporlar & toplu silme ---------- */
-let repP="month",delBulkList=[];
+let repP="month",delBulkList=[],ledger=[],ledgerLoaded=false;
+async function loadLedger(){const {data,error}=await sb.from("ledger").select("*").order("date",{ascending:false});if(!error){ledger=data||[];ledgerLoaded=true;}}
 const ymd=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 function repRange(){
   const n=new Date();let a,b,t;
@@ -1218,10 +1233,30 @@ function calcReport(list){
   const profit={};new Set([...Object.keys(recvAll),...Object.keys(payAll)]).forEach(c=>{profit[c]=(recvAll[c]||0)-(payAll[c]||0);});
   return {count:act.length,cancelled:list.length-act.length,link:act.filter(b=>b.source==="link").length,pax:act.reduce((a,b)=>a+(b.adults||0)+(b.children||0)+(b.infants||0),0),recvAll,recvGot,recvDue,payAll,payDone,payDue,profit};
 }
+function calcLedger(from,to){
+  const L=ledger.filter(x=>x.date>=from&&x.date<=to);
+  const exp=sumBy(L.filter(x=>x.kind==="expense"),{cur:x=>x.currency||"TRY",val:x=>x.amount});
+  const inc=sumBy(L.filter(x=>x.kind==="income"),{cur:x=>x.currency||"TRY",val:x=>x.amount});
+  return {L,exp,inc};
+}
+function netProfit(R,Lg){const o={};new Set([...Object.keys(R.profit),...Object.keys(Lg.exp),...Object.keys(Lg.inc)]).forEach(c=>{o[c]=(R.profit[c]||0)-(Lg.exp[c]||0)+(Lg.inc[c]||0);});return o;}
+function renderLedger(from,to){
+  const {L}=calcLedger(from,to);
+  $("lgList").innerHTML=L.length?L.map(x=>`<div class="pay"><span>${esc(x.date.slice(8,10)+"."+x.date.slice(5,7))} · ${esc(x.category||"")}${x.note?" · "+esc(x.note):""}</span><b style="color:${x.kind==="income"?"var(--ok)":"var(--bad)"}">${x.kind==="income"?"+":"−"}${esc(money(x.amount,x.currency))}</b><button type="button" class="btn sm" data-lgdel="${x.id}" style="padding:4px 8px">Sil</button></div>`).join(""):'<div class="note" style="margin:0;padding:6px 14px 12px;text-align:left">Bu aralıkta gelir/gider kaydı yok.</div>';
+  $("lgList").querySelectorAll("[data-lgdel]").forEach(b=>b.addEventListener("click",async()=>{const {error}=await sb.from("ledger").delete().eq("id",b.dataset.lgdel);if(error)return toast("Silinemedi");ledger=ledger.filter(x=>x.id!==b.dataset.lgdel);renderReport();}));
+}
+$("lgAdd").addEventListener("click",async()=>{
+  const amt=+$("lgAmt").value;if(!amt){$("lgErr").textContent="Tutar girin.";$("lgErr").hidden=false;return;}
+  const row={company_id:company.id,date:$("lgDate").value||todayStr(),kind:$("lgKind").value,category:$("lgCat").value,amount:amt,currency:$("lgCur").value,note:$("lgNote").value.trim()};
+  const {data,error}=await sb.from("ledger").insert(row).select().single();
+  if(error){$("lgErr").textContent=errMsg(error);$("lgErr").hidden=false;return;}
+  $("lgErr").hidden=true;ledger.unshift(data);$("lgAmt").value="";$("lgNote").value="";toast("Eklendi");renderReport();
+});
+$("lgKind").addEventListener("change",()=>{const inc=$("lgKind").value==="income";$("lgCat").innerHTML=(inc?["Ekstra transfer","Tur komisyonu","Bahşiş","Diğer gelir"]:["Yakıt","HGS / Otopark","Yıkama","Bakım / Lastik","Yemek","Şoför ücreti","Kira / Araç taksidi","Sigorta / Vergi","Telefon / İnternet","Diğer"]).map(c=>`<option>${c}</option>`).join("");});
 function renderReport(){
   const r=repRange();$("repRange").hidden=repP!=="custom";
   const list=bookings.filter(b=>b.date>=r.from&&b.date<=r.to);
-  const R=calcReport(list);
+  const R=calcReport(list);const Lg=calcLedger(r.from,r.to);const NP=netProfit(R,Lg);
   $("repTitle").innerHTML=`<b>${esc(r.title)}</b> · ${R.count} transfer${R.cancelled?` (+${R.cancelled} iptal)`:""} · ${R.pax} yolcu · ${R.link} linkten`;
   $("repBoxes").innerHTML=`
     <div class="rbox k"><div class="l">Alınan (tahsil edildi)</div><div class="v">${esc(fmtMap(R.recvGot))}</div></div>
@@ -1229,21 +1264,24 @@ function renderReport(){
     <div class="rbox"><div class="l">Ödenen</div><div class="v">${esc(fmtMap(R.payDone))}</div></div>
     <div class="rbox w"><div class="l">Ödenecek</div><div class="v">${esc(fmtMap(R.payDue))}</div></div>
     <div class="rbox"><div class="l">Toplam ciro</div><div class="v">${esc(fmtMap(R.recvAll))}</div></div>
-    <div class="rbox k"><div class="l">Kâr</div><div class="v">${esc(fmtMap(R.profit))}</div></div>`;
+    <div class="rbox"><div class="l">Kâr (transfer)</div><div class="v">${esc(fmtMap(R.profit))}</div></div>
+    <div class="rbox w"><div class="l">Masraflar</div><div class="v">${esc(fmtMap(Lg.exp))}</div></div>
+    <div class="rbox k"><div class="l">Net kâr</div><div class="v">${esc(fmtMap(NP))}</div></div>`;
+  renderLedger(r.from,r.to);
   const groups=new Map();
   list.filter(b=>b.status!=="cancelled").forEach(b=>{const k=repP==="year"?b.date.slice(0,7):b.date;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(b);});
   const rows=[...groups.keys()].sort().map(k=>{const g=calcReport(groups.get(k));const lbl=repP==="year"?TR_MONTHS[+k.slice(5,7)-1]:k.slice(8,10)+"."+k.slice(5,7);return `<tr><td>${lbl}</td><td>${g.count}</td><td>${esc(fmtMap(g.recvAll))}</td><td>${esc(fmtMap(g.payAll))}</td><td>${esc(fmtMap(g.profit))}</td></tr>`;}).join("");
   $("repTable").innerHTML=`<tr><th>${repP==="year"?"Ay":"Gün"}</th><th>Adet</th><th>Alınacak</th><th>Ödenecek</th><th>Kâr</th></tr>${rows||'<tr><td colspan="5" style="text-align:center;color:var(--muted)">Bu aralıkta kayıt yok</td></tr>'}`;
-  window.__rep={r,R};
+  window.__rep={r,R,Lg,NP};
 }
-function openReports(){$("repSheet").hidden=false;document.body.style.overflow="hidden";$("delBulkConfirm").hidden=true;if(!$("repFrom").value){const n=new Date();$("repFrom").value=ymd(new Date(n.getFullYear(),n.getMonth(),1));$("repTo").value=ymd(n);}renderReport();}
+async function openReports(){$("repSheet").hidden=false;document.body.style.overflow="hidden";$("delBulkConfirm").hidden=true;if(!$("lgDate").value)$("lgDate").value=todayStr();if(!ledgerLoaded){await loadLedger();}if(!$("repFrom").value){const n=new Date();$("repFrom").value=ymd(new Date(n.getFullYear(),n.getMonth(),1));$("repTo").value=ymd(n);}renderReport();}
 $("btnReports").addEventListener("click",openReports);
 $("repClose").addEventListener("click",()=>{$("repSheet").hidden=true;document.body.style.overflow="";});
 $("repSegs").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{repP=b.dataset.p;$("repSegs").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));renderReport();}));
 $("repFrom").addEventListener("change",renderReport);$("repTo").addEventListener("change",renderReport);
 $("repShare").addEventListener("click",async()=>{
-  const {r,R}=window.__rep||{};if(!r)return;
-  const t=`${company.name||""} – Rapor (${r.title})\nTransfer: ${R.count} · Yolcu: ${R.pax}\nAlınan: ${fmtMap(R.recvGot)}\nBekleyen tahsilat: ${fmtMap(R.recvDue)}\nÖdenen: ${fmtMap(R.payDone)}\nÖdenecek: ${fmtMap(R.payDue)}\nToplam ciro: ${fmtMap(R.recvAll)}\nKâr: ${fmtMap(R.profit)}`;
+  const {r,R,Lg,NP}=window.__rep||{};if(!r)return;
+  const t=`${company.name||""} – Rapor (${r.title})\nTransfer: ${R.count} · Yolcu: ${R.pax}\nAlınan: ${fmtMap(R.recvGot)}\nBekleyen tahsilat: ${fmtMap(R.recvDue)}\nÖdenen: ${fmtMap(R.payDone)}\nÖdenecek: ${fmtMap(R.payDue)}\nToplam ciro: ${fmtMap(R.recvAll)}\nKâr (transfer): ${fmtMap(R.profit)}\nMasraflar: ${fmtMap(Lg.exp)}\nEkstra gelir: ${fmtMap(Lg.inc)}\nNet kâr: ${fmtMap(NP)}`;
   try{await navigator.clipboard.writeText(t);toast("Rapor metni kopyalandı");}catch(e){}
   window.open("https://wa.me/?text="+encodeURIComponent(t),"_blank");
 });
