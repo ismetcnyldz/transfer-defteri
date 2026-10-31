@@ -294,6 +294,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
     <div class="brand">
       <h1><span class="van" aria-hidden="true"><svg viewBox="0 0 172 104"><defs><linearGradient id="vb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2f3d"/><stop offset="1" stop-color="#14171f"/></linearGradient><linearGradient id="vg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8fb7ff"/><stop offset="1" stop-color="#dbe8ff"/></linearGradient></defs><path d="M12 72V46c0-5 2-9 6-12L52 18c4-4 9-6 15-6h78c8 0 13 5 13 13v47c0 4-3 7-7 7H19c-4 0-7-3-7-7z" fill="url(#vb)"/><path d="M20 46c0-3 1-5 3-7L54 22c3-3 7-4 11-4h21v30H20z" fill="url(#vg)" opacity=".95"/><path d="M92 18h30v30H92zM128 18h22c4 0 6 3 6 7v23h-28z" fill="url(#vg)" opacity=".95"/><rect x="92" y="50" width="64" height="3" fill="#0d0f14" opacity=".6"/><path d="M12 60h146v8H12z" fill="#e0b860"/><circle cx="48" cy="80" r="15" fill="#0d0f14"/><circle cx="48" cy="80" r="8" fill="#9aa0ad"/><circle cx="128" cy="80" r="15" fill="#0d0f14"/><circle cx="128" cy="80" r="8" fill="#9aa0ad"/><rect x="150" y="54" width="10" height="7" rx="2" fill="#ffe08a"/><rect x="12" y="54" width="7" height="7" rx="2" fill="#ff6b6b"/></svg><span class="plate" id="plateBadge" hidden><span class="tr">TR</span><span class="no" id="plateNo"></span></span></span><em id="coName">Transfer Defteri<small>TRANSFER DEFTERİ</small></em></h1>
       <div class="right"><div class="date" id="todayLbl"></div>
+      <button class="ico" id="btnLink" aria-label="Müşteriye rezervasyon linki gönder" style="background:var(--ok-soft);color:var(--ok)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg><span>Link gönder</span></button>
       <button class="ico" id="btnAdmin" aria-label="Firma ekle ve yönet" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M19 8v6M16 11h6"/></svg><span>Firma ekle</span><span class="dot" id="adminDot" hidden></span></button>
       <button class="ico" id="btnPlaces" aria-label="Oteller ve yerler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M8 8h2M8 12h2M8 16h2M17 14h1M17 18h1M3 21h18"/></svg><span>Oteller</span></button>
       <button class="ico" id="btnSettings" aria-label="Ayarlar ve müşteri linki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ayarlar</span></button></div>
@@ -452,6 +453,31 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
     </div>
     <div class="plist" id="plList"></div>
     <div class="note">Temel liste uygulamayla gelir; eklediğiniz ve kapattığınız oteller bulutta saklanır, tüm cihazlarınızda ve müşteri formunda görünür.</div>
+  </div>
+</div>
+
+<!-- link gönder -->
+<div id="linkSheet" class="sheet" hidden>
+  <div class="sheet-hdr"><div class="in gut">
+    <button class="lnk quiet" id="lkClose">Kapat</button>
+    <h2>Müşteriye link gönder</h2>
+    <span></span>
+  </div></div>
+  <div class="sheet-body gut">
+    <div class="linkbox">
+      <b>Rezervasyon linkiniz</b>
+      <div class="note" style="margin:0;text-align:left">Müşteri bu linki açar, dilini seçer, bilgilerini doldurur. Gönderdiği an kayıt listenize düşer; siz sadece kontrol edip fiyat yazarsınız.</div>
+      <code id="lkLink"></code>
+      <div class="acts">
+        <a class="btn gold" id="lkWa" target="_blank" rel="noopener">WhatsApp ile gönder</a>
+        <button class="btn" id="lkCopy">Linki kopyala</button>
+        <a class="btn" id="lkOpen" target="_blank" rel="noopener">Formu gör</a>
+      </div>
+    </div>
+    <fieldset>
+      <div class="sec-t">Hazır mesaj</div>
+      <div class="f"><label for="lkMsg">WhatsApp'ta gidecek metin (düzenleyebilirsiniz)</label><textarea id="lkMsg" style="min-height:110px"></textarea></div>
+    </fieldset>
   </div>
 </div>
 
@@ -1063,7 +1089,7 @@ $("psSave").addEventListener("click",async()=>{
 const genPass=()=>{const a="abcdefghjkmnpqrstuvwxyz",n="23456789";let p="";for(let i=0;i<4;i++)p+=a[Math.floor(Math.random()*a.length)];for(let i=0;i<4;i++)p+=n[Math.floor(Math.random()*n.length)];return p;};
 $("cnGen").addEventListener("click",()=>{$("cnPass").value=genPass();});
 function appUrl(){return (psettings.app_url||"").replace(/\/+$/,"")||(location.origin+BASE.replace(/\/$/,""));}
-function inviteText(r,pass){return `Merhaba,\nTransfer Defteri giriş bilgileriniz:\n\nUygulama: ${appUrl()}\nKullanıcı adı: ${r.username}\n${pass?"Geçici şifre: "+pass+"\n\nİlk girişte kendi şifrenizi belirleyeceksiniz.":"Şifreniz: kendi belirlediğiniz şifre (unuttuysanız yazın, yenisini verelim)."}\n\nMüşterilerinize göndereceğiniz rezervasyon linki:\n${appUrl()}/r/?c=${r.slug}\n\nTelefonda tarayıcı menüsünden "Ana ekrana ekle" derseniz uygulama gibi açılır.`;}
+function inviteText(r,pass){return `Merhaba,\nTransfer Defteri giriş bilgileriniz:\n\nUygulama: ${appUrl()}\nKullanıcı adı: ${r.username}\n${pass?"Geçici şifre: "+pass+"\n\nİlk girişte kendi şifrenizi belirleyeceksiniz.":"Şifreniz: kendi belirlediğiniz şifre (unuttuysanız yazın, yenisini verelim)."}\n\nTelefonda tarayıcı menüsünden "Ana ekrana ekle" derseniz uygulama gibi açılır. Müşterilerinize göndereceğiniz rezervasyon linki uygulamanın içinde "Link gönder" düğmesindedir.`;}
 function openCompany(r){
   coCur=r;const isNew=!r;
   $("coTitle").textContent=isNew?"Yeni firma":(r.plate||r.username||r.name);
@@ -1113,8 +1139,22 @@ $("coDel").addEventListener("click",()=>{$("coDelConfirm").hidden=false;});
 $("coDelNo").addEventListener("click",()=>{$("coDelConfirm").hidden=true;});
 $("coDelYes").addEventListener("click",async()=>{const {error}=await sb.rpc("admin_delete_company",{p_id:coCur.id});if(error)return coErr(errMsg(error));toast("Firma silindi");$("coSheet").hidden=true;await loadAdmin();});
 
-/* ---------- settings ---------- */
+/* ---------- link gönder ---------- */
 function custLink(){return location.origin+BASE+"r/?c="+(company.slug||"");}
+function defaultMsg(){return (company.name||"")+" – transfer rezervasyonunuz için lütfen bu formu doldurun / Please fill in this form for your transfer booking:\n"+custLink();}
+function openLink(){
+  $("linkSheet").hidden=false;document.body.style.overflow="hidden";
+  $("lkLink").textContent=custLink();$("lkOpen").href=custLink();
+  let saved=null;try{saved=localStorage.getItem("td_lkmsg_"+company.id);}catch(e){}
+  $("lkMsg").value=saved||defaultMsg();updLkWa();
+}
+function updLkWa(){$("lkWa").href="https://wa.me/?text="+encodeURIComponent($("lkMsg").value.trim()||custLink());}
+$("lkMsg").addEventListener("input",()=>{updLkWa();try{localStorage.setItem("td_lkmsg_"+company.id,$("lkMsg").value);}catch(e){}});
+$("btnLink").addEventListener("click",openLink);
+$("lkClose").addEventListener("click",()=>{$("linkSheet").hidden=true;document.body.style.overflow="";});
+$("lkCopy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(custLink());toast("Link kopyalandı");}catch(e){toast("Kopyalanamadı, linki seçip kopyalayın");}});
+
+/* ---------- settings ---------- */
 function openSettings(){
   $("setSheet").hidden=false;document.body.style.overflow="hidden";
   $("custLink").textContent=custLink();
@@ -1141,7 +1181,7 @@ $("sSave").addEventListener("click",async()=>{
 /* ---------- ui ---------- */
 document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));render();}));
 $("q").addEventListener("input",e=>{query=e.target.value;render();});
-window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("coSheet").hidden)$("coSheet").hidden=true;else if(!$("adminSheet").hidden){$("adminSheet").hidden=true;document.body.style.overflow="";}else if(!$("sheet").hidden)closeSheet();else if(!$("placesSheet").hidden)closePlaces();else if(!$("setSheet").hidden){$("setSheet").hidden=true;document.body.style.overflow="";}}});
+window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("linkSheet").hidden){$("linkSheet").hidden=true;document.body.style.overflow="";}else if(!$("coSheet").hidden)$("coSheet").hidden=true;else if(!$("adminSheet").hidden){$("adminSheet").hidden=true;document.body.style.overflow="";}else if(!$("sheet").hidden)closeSheet();else if(!$("placesSheet").hidden)closePlaces();else if(!$("setSheet").hidden){$("setSheet").hidden=true;document.body.style.overflow="";}}});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&company){sb.from("bookings").select("*").order("date").order("time").then(({data})=>{if(data){bookings=data.map(fromDb);render();}});}});
 
 /* ---------- boot ---------- */
