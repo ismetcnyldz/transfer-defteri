@@ -262,7 +262,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 <div id="loginView" class="login" hidden>
   <div class="box">
     <div class="logo"><div class="mark">T</div><div><h1>Transfer Defteri</h1><small>VIP transfer &amp; tur operasyon defteri</small></div></div>
-    <div class="tabs" role="tablist" style="justify-self:stretch">
+    <div class="tabs" role="tablist" style="justify-self:stretch" id="authTabs" hidden>
       <button role="tab" id="tabLogin" aria-selected="true" style="flex:1">Giriş yap</button>
       <button role="tab" id="tabSignup" aria-selected="false" style="flex:1">Yeni firma kaydı</button>
     </div>
@@ -649,7 +649,7 @@ $("loginForm").addEventListener("submit",async e=>{
 function showAuthTab(signup){$("loginForm").hidden=signup;$("signupForm").hidden=!signup;$("tabLogin").setAttribute("aria-selected",signup?"false":"true");$("tabSignup").setAttribute("aria-selected",signup?"true":"false");}
 $("tabLogin").addEventListener("click",()=>showAuthTab(false));
 $("tabSignup").addEventListener("click",()=>showAuthTab(true));
-if(location.hash==="#kayit")showAuthTab(true);
+if(location.hash==="#kayit"){$("authTabs").hidden=false;showAuthTab(true);}
 $("signupForm").addEventListener("submit",async e=>{
   e.preventDefault();$("sErr2").hidden=true;$("sOk2").hidden=true;
   const companyName=$("sCompany").value.trim(),email=$("sEmail2").value.trim(),pass=$("sPass2").value,phone=$("sPhone").value.trim();
