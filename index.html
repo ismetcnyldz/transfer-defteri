@@ -63,18 +63,24 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--surface);border-bottom:1px solid var(--line)}
 .hdr-in{padding-block:10px 8px;display:grid;gap:10px}
 .brand{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.brand h1{font-size:17px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;min-width:0}
-.brand h1 span{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--accent-fg);font-size:13px;font-weight:800;flex:none}
-.brand h1 em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.brand .right{display:flex;align-items:center;gap:8px}
-.brand .date{color:var(--muted);font-size:13px;white-space:nowrap}
-.ico{width:38px;height:38px;border-radius:10px;background:var(--surface2);display:grid;place-items:center;color:var(--fg);position:relative}
-.ico svg{width:19px;height:19px}
-.ico .dot{position:absolute;top:6px;right:6px;width:9px;height:9px;border-radius:50%;background:var(--bad);border:2px solid var(--surface)}
+.brand h1{font-size:24px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:12px;min-width:0;text-transform:uppercase}
+.brand h1 .van{position:relative;flex:none;width:86px;height:52px}
+.brand h1 .van svg{width:86px;height:52px;display:block}
+.brand h1 .van .plate{position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);height:18px;font-size:10px;border-width:1.5px;border-radius:4px}
+.brand h1 .van .plate .tr{font-size:6px;padding:0 3px;padding-bottom:2px}
+.brand h1 .van .plate .no{padding:0 5px}
+.brand h1 em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.05}
+.brand h1 em small{display:block;font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:700;margin-top:3px}
+.brand .right{display:flex;align-items:flex-start;gap:6px}
+.brand .date{display:none}
+.ico{width:58px;height:50px;border-radius:12px;background:var(--surface2);display:grid;grid-template-rows:auto auto;justify-items:center;align-content:center;gap:2px;color:var(--fg);position:relative;font-size:10px;font-weight:700;letter-spacing:.02em;padding:0 4px}
+.ico svg{width:20px;height:20px}
+.ico .dot{position:absolute;top:5px;right:6px;width:9px;height:9px;border-radius:50%;background:var(--bad);border:2px solid var(--surface)}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat{background:var(--surface2);border-radius:10px;padding:8px 10px;min-width:0}
-.stat .lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.stat .val{font-size:17px;font-weight:700;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stat{background:var(--surface2);border-radius:12px;padding:10px 12px;min-width:0}
+.stat .lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.stat .val{font-size:26px;font-weight:800;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.1}
+#stNextWrap .val{font-size:15px;font-weight:700;margin-top:6px}
 .tools{display:flex;gap:8px;align-items:center}
 .search{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:10px;padding:0 10px;height:38px}
 .search input{flex:1;min-width:0;border:0;background:none;height:100%;outline:none}
@@ -285,11 +291,11 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 <header class="hdr">
   <div class="hdr-in gut">
     <div class="brand">
-      <h1><span>T</span><em id="coName">Transfer Defteri</em><span class="plate" id="plateBadge" hidden><span class="tr">TR</span><span class="no" id="plateNo"></span></span></h1>
+      <h1><span class="van" aria-hidden="true"><svg viewBox="0 0 172 104"><defs><linearGradient id="vb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2f3d"/><stop offset="1" stop-color="#14171f"/></linearGradient><linearGradient id="vg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8fb7ff"/><stop offset="1" stop-color="#dbe8ff"/></linearGradient></defs><path d="M12 72V46c0-5 2-9 6-12L52 18c4-4 9-6 15-6h78c8 0 13 5 13 13v47c0 4-3 7-7 7H19c-4 0-7-3-7-7z" fill="url(#vb)"/><path d="M20 46c0-3 1-5 3-7L54 22c3-3 7-4 11-4h21v30H20z" fill="url(#vg)" opacity=".95"/><path d="M92 18h30v30H92zM128 18h22c4 0 6 3 6 7v23h-28z" fill="url(#vg)" opacity=".95"/><rect x="92" y="50" width="64" height="3" fill="#0d0f14" opacity=".6"/><path d="M12 60h146v8H12z" fill="#e0b860"/><circle cx="48" cy="80" r="15" fill="#0d0f14"/><circle cx="48" cy="80" r="8" fill="#9aa0ad"/><circle cx="128" cy="80" r="15" fill="#0d0f14"/><circle cx="128" cy="80" r="8" fill="#9aa0ad"/><rect x="150" y="54" width="10" height="7" rx="2" fill="#ffe08a"/><rect x="12" y="54" width="7" height="7" rx="2" fill="#ff6b6b"/></svg><span class="plate" id="plateBadge" hidden><span class="tr">TR</span><span class="no" id="plateNo"></span></span></span><em id="coName">Transfer Defteri<small>TRANSFER DEFTERİ</small></em></h1>
       <div class="right"><div class="date" id="todayLbl"></div>
-      <button class="ico" id="btnAdmin" aria-label="Yönetim paneli" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg><span class="dot" id="adminDot" hidden></span></button>
-      <button class="ico" id="btnPlaces" aria-label="Oteller ve yerler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M8 8h2M8 12h2M8 16h2M17 14h1M17 18h1M3 21h18"/></svg></button>
-      <button class="ico" id="btnSettings" aria-label="Ayarlar ve müşteri linki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button></div>
+      <button class="ico" id="btnAdmin" aria-label="Firma ekle ve yönet" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M19 8v6M16 11h6"/></svg><span>Firma ekle</span><span class="dot" id="adminDot" hidden></span></button>
+      <button class="ico" id="btnPlaces" aria-label="Oteller ve yerler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M8 8h2M8 12h2M8 16h2M17 14h1M17 18h1M3 21h18"/></svg><span>Oteller</span></button>
+      <button class="ico" id="btnSettings" aria-label="Ayarlar ve müşteri linki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ayarlar</span></button></div>
     </div>
     <div class="stats">
       <div class="stat"><div class="lbl">Bugün</div><div class="val num" id="stToday">–</div></div>
@@ -466,6 +472,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <a class="btn" id="openLink" target="_blank" rel="noopener">Formu gör</a>
       </div>
     </div>
+    <div class="linkbox" id="setPlacesBox" hidden><b>Oteller &amp; Yerler</b><div class="acts"><button class="btn" id="setPlaces">Otel listesini yönet</button></div></div>
     <fieldset>
       <div class="sec-t">Firma</div>
       <div class="f"><label for="sName">Firma adı (müşteri formunda görünür)</label><input id="sName"></div>
@@ -688,10 +695,11 @@ async function loadAll(){
   if(e1||e2){$("loadNote").textContent="Veriler yüklenemedi: "+errMsg(e1||e2);return;}
   company=co;settings=st||{};bookings=(bk||[]).map(fromDb);userPlaces=pl||[];
   try{seenLink=JSON.parse(localStorage.getItem("td_seen")||"{}");}catch(e){}
-  $("coName").textContent=company.name||"Transfer Defteri";
+  setCoName();
   renderPlate();
   const {data:acc}=await sb.rpc("my_access");access=acc||{};
   $("btnAdmin").hidden=!access.is_admin;
+  $("btnPlaces").hidden=!!access.is_admin;
   if(!access.access&&!access.is_admin){showWall();return;}
   $("loadNote").hidden=true;
   render();renderReview();
@@ -731,7 +739,7 @@ function render(){
   });
   list=sorted(list);if(tab==="past")list.reverse();
   const todays=bookings.filter(b=>b.date===t&&b.status!=="cancelled");
-  $("stToday").textContent=todays.length+" transfer";
+  $("stToday").innerHTML=todays.length+' <span style="font-size:14px;font-weight:700;color:var(--muted)">transfer</span>';
   const due={};bookings.forEach(b=>{if(b.status!=="cancelled"&&b.date>=t&&!b.received&&Number(b.receiveAmount)>0){due[b.receiveCur||"EUR"]=(due[b.receiveCur||"EUR"]||0)+Number(b.receiveAmount);}});
   $("stDue").textContent=Object.keys(due).map(c=>money(due[c],c)).join(" · ")||"–";
   const now=new Date();const nowKey=t+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
@@ -987,6 +995,7 @@ function renderPlaces(){
 
 /* ---------- plaka, duvar, şifre ---------- */
 function renderPlate(){const p=(company&&company.plate||"").trim();$("plateBadge").hidden=!p;$("plateNo").textContent=p.toUpperCase();}
+function setCoName(){$("coName").innerHTML=esc(company.name||"Transfer Defteri")+"<small>TRANSFER DEFTERİ</small>";}
 function fmtTL(v){return Number(v||0).toLocaleString("tr-TR")+" TL";}
 function showWall(){
   $("appView").hidden=true;$("wallView").hidden=false;
@@ -1116,7 +1125,8 @@ function openSettings(){
   const endD=company.plan==="trial"?company.trial_ends_at:company.paid_until;
   $("sTrial").textContent=company.plan==="lifetime"?"-":(endD?new Date(endD).toLocaleDateString("tr-TR"):"-");
 }
-$("btnSettings").addEventListener("click",openSettings);
+$("btnSettings").addEventListener("click",()=>{openSettings();$("setPlacesBox").hidden=!(access&&access.is_admin);});
+$("setPlaces").addEventListener("click",()=>{$("setSheet").hidden=true;openPlaces();});
 $("setClose").addEventListener("click",()=>{$("setSheet").hidden=true;document.body.style.overflow="";});
 $("copyLink").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(custLink());toast("Link kopyalandı");}catch(e){const r=document.createRange();r.selectNodeContents($("custLink"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Link seçildi, kopyalayın");}});
 $("sSave").addEventListener("click",async()=>{
@@ -1124,7 +1134,7 @@ $("sSave").addEventListener("click",async()=>{
   if(slug.length<2){$("sErr").textContent="Kısa ad en az 2 karakter olmalı.";$("sErr").hidden=false;return;}
   const {data,error}=await sb.from("companies").update({name:$("sName").value.trim()||company.name,whatsapp:$("sWa").value.trim(),slug,plate:$("sPlate").value.trim().toUpperCase()}).eq("id",company.id).select().single();
   if(error){$("sErr").textContent=/duplicate/i.test(error.message)?"Bu kısa ad kullanımda, başka bir tane seçin.":errMsg(error);$("sErr").hidden=false;return;}
-  $("sErr").hidden=true;company=data;$("coName").textContent=company.name;renderPlate();openSettings();toast("Kaydedildi");
+  $("sErr").hidden=true;company=data;setCoName();renderPlate();openSettings();toast("Kaydedildi");
 });
 
 /* ---------- ui ---------- */
