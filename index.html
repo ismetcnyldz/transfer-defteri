@@ -217,6 +217,18 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 .kv{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:8px 0;border-top:1px solid var(--line)}
 .kv:first-child{border-top:0}
 .kv span{color:var(--muted)}
+/* raporlar */
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.rbox .l{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.rbox .v{font-size:20px;font-weight:800;font-family:var(--font-num);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rbox.k .v{color:var(--ok)} .rbox.w .v{color:var(--warn)}
+.rtable{width:100%;border-collapse:collapse;font-size:13px}
+.rtable th{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-align:right;padding:8px 6px;border-bottom:1px solid var(--line)}
+.rtable th:first-child,.rtable td:first-child{text-align:left}
+.rtable td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right;font-family:var(--font-num)}
+.rtable tr:last-child td{border-bottom:0}
+.rwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
 /* plaka rozeti */
 .plate{display:inline-flex;align-items:stretch;border:2px solid #1b1f2a;border-radius:6px;overflow:hidden;background:#fff;color:#111;font-family:var(--font-num);font-weight:600;font-size:13px;letter-spacing:.08em;line-height:1;height:26px;flex:none}
 .plate span.tr{background:#003399;color:#fff;font-family:var(--font-ui);font-size:8px;font-weight:800;letter-spacing:0;display:grid;place-items:center;padding:0 4px;align-content:end;padding-bottom:3px}
@@ -299,6 +311,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <button class="ico" id="btnLink" aria-label="Müşteriye rezervasyon linki gönder" hidden style="background:var(--ok-soft);color:var(--ok)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg><span>Link gönder</span></button>
       <button class="ico" id="btnAdmin" aria-label="Firma ekle ve yönet" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M19 8v6M16 11h6"/></svg><span>Firma ekle</span><span class="dot" id="adminDot" hidden></span></button>
       <button class="ico" id="btnPlaces" aria-label="Oteller ve yerler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M8 8h2M8 12h2M8 16h2M17 14h1M17 18h1M3 21h18"/></svg><span>Oteller</span></button>
+      <button class="ico" id="btnReports" aria-label="Raporlar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Raporlar</span></button>
       <button class="ico" id="btnSettings" aria-label="Ayarlar ve müşteri linki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ayarlar</span></button></div>
     </div>
     <div class="stats">
@@ -484,6 +497,45 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
   </div>
 </div>
 
+<!-- raporlar -->
+<div id="repSheet" class="sheet" hidden>
+  <div class="sheet-hdr"><div class="in gut">
+    <button class="lnk quiet" id="repClose">Kapat</button>
+    <h2>Raporlar</h2>
+    <button class="lnk" id="repShare">Paylaş</button>
+  </div></div>
+  <div class="sheet-body gut">
+    <div class="segs" id="repSegs">
+      <button data-p="month" aria-pressed="true">Bu ay</button>
+      <button data-p="last">Geçen ay</button>
+      <button data-p="year">Bu yıl</button>
+      <button data-p="custom">Tarih aralığı</button>
+    </div>
+    <div class="row2" id="repRange" hidden style="background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden">
+      <div class="f" style="border-top:0"><label for="repFrom">Başlangıç</label><input id="repFrom" type="date"></div>
+      <div class="f" style="border-top:0"><label for="repTo">Bitiş</label><input id="repTo" type="date"></div>
+    </div>
+    <div class="note" style="margin:0;text-align:left" id="repTitle"></div>
+    <div class="rgrid" id="repBoxes"></div>
+    <div class="rwrap"><table class="rtable" id="repTable"></table></div>
+    <div class="note" style="margin:0;text-align:left">Alınan = tahsil edildi işaretli tutarlar. Ödenen = ödendi işaretli tutarlar. Kâr = alınacak − ödenecek (tüm kayıtlar, iptaller hariç). Para birimleri ayrı ayrı gösterilir.</div>
+    <fieldset>
+      <div class="sec-t">Eski kayıtları temizle</div>
+      <div class="note" style="margin:0;text-align:left;padding:8px 14px">Silinen kayıtlar geri getirilemez. Önce yukarıdan raporunuzu alın. Yaklaşan (ileri tarihli) kayıtlar hiçbir zaman silinmez.</div>
+      <div class="btnrow">
+        <button type="button" class="btn sm" data-del="30">1 aydan eski</button>
+        <button type="button" class="btn sm" data-del="90">3 aydan eski</button>
+        <button type="button" class="btn sm" data-del="365">1 yıldan eski</button>
+        <button type="button" class="btn sm" data-del="range">Seçili tarih aralığı</button>
+      </div>
+      <div class="confirm" id="delBulkConfirm" hidden style="flex-direction:column;align-items:center;gap:8px">
+        <div id="delBulkTxt" style="font-weight:700"></div>
+        <div style="display:flex;gap:10px"><button class="btn" id="delBulkNo">Vazgeç</button><button class="btn red" id="delBulkYes">Evet, sil</button></div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
 <!-- ayarlar -->
 <div id="setSheet" class="sheet" hidden>
   <div class="sheet-hdr"><div class="in gut">
@@ -525,7 +577,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 0.4</div>
+    <div class="note">Transfer Defteri · sürüm 0.5</div>
   </div>
 </div>
 
@@ -1142,6 +1194,75 @@ $("coDel").addEventListener("click",()=>{$("coDelConfirm").hidden=false;});
 $("coDelNo").addEventListener("click",()=>{$("coDelConfirm").hidden=true;});
 $("coDelYes").addEventListener("click",async()=>{const {error}=await sb.rpc("admin_delete_company",{p_id:coCur.id});if(error)return coErr(errMsg(error));toast("Firma silindi");$("coSheet").hidden=true;await loadAdmin();});
 
+/* ---------- raporlar & toplu silme ---------- */
+let repP="month",delBulkList=[];
+const ymd=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+function repRange(){
+  const n=new Date();let a,b,t;
+  if(repP==="month"){a=new Date(n.getFullYear(),n.getMonth(),1);b=new Date(n.getFullYear(),n.getMonth()+1,0);t=TR_MONTHS[n.getMonth()]+" "+n.getFullYear();}
+  else if(repP==="last"){a=new Date(n.getFullYear(),n.getMonth()-1,1);b=new Date(n.getFullYear(),n.getMonth(),0);t=TR_MONTHS[a.getMonth()]+" "+a.getFullYear();}
+  else if(repP==="year"){a=new Date(n.getFullYear(),0,1);b=new Date(n.getFullYear(),11,31);t=n.getFullYear()+" yılı";}
+  else{a=$("repFrom").value?new Date($("repFrom").value+"T00:00:00"):new Date(n.getFullYear(),n.getMonth(),1);b=$("repTo").value?new Date($("repTo").value+"T00:00:00"):n;t=a.toLocaleDateString("tr-TR")+" – "+b.toLocaleDateString("tr-TR");}
+  return {from:ymd(a),to:ymd(b),title:t};
+}
+function sumBy(list,fn){const o={};list.forEach(b=>{const c=fn.cur(b);const v=Number(fn.val(b))||0;if(!v)return;o[c]=(o[c]||0)+v;});return o;}
+const fmtMap=o=>Object.keys(o).length?Object.keys(o).map(c=>money(o[c],c)).join(" · "):"–";
+function calcReport(list){
+  const act=list.filter(b=>b.status!=="cancelled");
+  const recvAll=sumBy(act,{cur:b=>b.receiveCur||"EUR",val:b=>b.receiveAmount});
+  const recvGot=sumBy(act.filter(b=>b.received),{cur:b=>b.receiveCur||"EUR",val:b=>b.receiveAmount});
+  const recvDue=sumBy(act.filter(b=>!b.received),{cur:b=>b.receiveCur||"EUR",val:b=>b.receiveAmount});
+  const payAll=sumBy(act,{cur:b=>b.payCur||"EUR",val:b=>b.payAmount});
+  const payDone=sumBy(act.filter(b=>b.paid),{cur:b=>b.payCur||"EUR",val:b=>b.payAmount});
+  const payDue=sumBy(act.filter(b=>!b.paid),{cur:b=>b.payCur||"EUR",val:b=>b.payAmount});
+  const profit={};new Set([...Object.keys(recvAll),...Object.keys(payAll)]).forEach(c=>{profit[c]=(recvAll[c]||0)-(payAll[c]||0);});
+  return {count:act.length,cancelled:list.length-act.length,link:act.filter(b=>b.source==="link").length,pax:act.reduce((a,b)=>a+(b.adults||0)+(b.children||0)+(b.infants||0),0),recvAll,recvGot,recvDue,payAll,payDone,payDue,profit};
+}
+function renderReport(){
+  const r=repRange();$("repRange").hidden=repP!=="custom";
+  const list=bookings.filter(b=>b.date>=r.from&&b.date<=r.to);
+  const R=calcReport(list);
+  $("repTitle").innerHTML=`<b>${esc(r.title)}</b> · ${R.count} transfer${R.cancelled?` (+${R.cancelled} iptal)`:""} · ${R.pax} yolcu · ${R.link} linkten`;
+  $("repBoxes").innerHTML=`
+    <div class="rbox k"><div class="l">Alınan (tahsil edildi)</div><div class="v">${esc(fmtMap(R.recvGot))}</div></div>
+    <div class="rbox w"><div class="l">Bekleyen tahsilat</div><div class="v">${esc(fmtMap(R.recvDue))}</div></div>
+    <div class="rbox"><div class="l">Ödenen</div><div class="v">${esc(fmtMap(R.payDone))}</div></div>
+    <div class="rbox w"><div class="l">Ödenecek</div><div class="v">${esc(fmtMap(R.payDue))}</div></div>
+    <div class="rbox"><div class="l">Toplam ciro</div><div class="v">${esc(fmtMap(R.recvAll))}</div></div>
+    <div class="rbox k"><div class="l">Kâr</div><div class="v">${esc(fmtMap(R.profit))}</div></div>`;
+  const groups=new Map();
+  list.filter(b=>b.status!=="cancelled").forEach(b=>{const k=repP==="year"?b.date.slice(0,7):b.date;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(b);});
+  const rows=[...groups.keys()].sort().map(k=>{const g=calcReport(groups.get(k));const lbl=repP==="year"?TR_MONTHS[+k.slice(5,7)-1]:k.slice(8,10)+"."+k.slice(5,7);return `<tr><td>${lbl}</td><td>${g.count}</td><td>${esc(fmtMap(g.recvAll))}</td><td>${esc(fmtMap(g.payAll))}</td><td>${esc(fmtMap(g.profit))}</td></tr>`;}).join("");
+  $("repTable").innerHTML=`<tr><th>${repP==="year"?"Ay":"Gün"}</th><th>Adet</th><th>Alınacak</th><th>Ödenecek</th><th>Kâr</th></tr>${rows||'<tr><td colspan="5" style="text-align:center;color:var(--muted)">Bu aralıkta kayıt yok</td></tr>'}`;
+  window.__rep={r,R};
+}
+function openReports(){$("repSheet").hidden=false;document.body.style.overflow="hidden";$("delBulkConfirm").hidden=true;if(!$("repFrom").value){const n=new Date();$("repFrom").value=ymd(new Date(n.getFullYear(),n.getMonth(),1));$("repTo").value=ymd(n);}renderReport();}
+$("btnReports").addEventListener("click",openReports);
+$("repClose").addEventListener("click",()=>{$("repSheet").hidden=true;document.body.style.overflow="";});
+$("repSegs").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{repP=b.dataset.p;$("repSegs").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));renderReport();}));
+$("repFrom").addEventListener("change",renderReport);$("repTo").addEventListener("change",renderReport);
+$("repShare").addEventListener("click",async()=>{
+  const {r,R}=window.__rep||{};if(!r)return;
+  const t=`${company.name||""} – Rapor (${r.title})\nTransfer: ${R.count} · Yolcu: ${R.pax}\nAlınan: ${fmtMap(R.recvGot)}\nBekleyen tahsilat: ${fmtMap(R.recvDue)}\nÖdenen: ${fmtMap(R.payDone)}\nÖdenecek: ${fmtMap(R.payDue)}\nToplam ciro: ${fmtMap(R.recvAll)}\nKâr: ${fmtMap(R.profit)}`;
+  try{await navigator.clipboard.writeText(t);toast("Rapor metni kopyalandı");}catch(e){}
+  window.open("https://wa.me/?text="+encodeURIComponent(t),"_blank");
+});
+document.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>{
+  const t=todayStr();let list;
+  if(b.dataset.del==="range"){const f=$("repFrom").value,to=$("repTo").value;if(!f||!to){toast("Önce tarih aralığı seçin");return;}list=bookings.filter(x=>x.date>=f&&x.date<=to&&x.date<t);}
+  else{const d=new Date();d.setDate(d.getDate()-(+b.dataset.del));const cut=ymd(d);list=bookings.filter(x=>x.date<cut);}
+  delBulkList=list;
+  if(!list.length){toast("Silinecek kayıt yok");$("delBulkConfirm").hidden=true;return;}
+  $("delBulkTxt").textContent=list.length+" kayıt kalıcı olarak silinecek. Emin misiniz?";$("delBulkConfirm").hidden=false;$("delBulkConfirm").scrollIntoView({block:"center"});
+}));
+$("delBulkNo").addEventListener("click",()=>{$("delBulkConfirm").hidden=true;});
+$("delBulkYes").addEventListener("click",async()=>{
+  const ids=delBulkList.map(b=>b.id);if(!ids.length)return;$("delBulkYes").disabled=true;
+  try{for(let i=0;i<ids.length;i+=200){const {error}=await sb.from("bookings").delete().in("id",ids.slice(i,i+200));if(error)throw error;}
+    bookings=bookings.filter(b=>!ids.includes(b.id));toast(ids.length+" kayıt silindi");$("delBulkConfirm").hidden=true;renderReport();render();}
+  catch(e){toast("Silinemedi: "+errMsg(e));}finally{$("delBulkYes").disabled=false;}
+});
+
 /* ---------- link gönder ---------- */
 function custLink(){return location.origin+BASE+"r/?c="+(company.slug||"");}
 function defaultMsg(){return (company.name||"")+" – transfer rezervasyonunuz için lütfen bu formu doldurun / Please fill in this form for your transfer booking:\n"+custLink();}
@@ -1184,7 +1305,7 @@ $("sSave").addEventListener("click",async()=>{
 /* ---------- ui ---------- */
 document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));render();}));
 $("q").addEventListener("input",e=>{query=e.target.value;render();});
-window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("linkSheet").hidden){$("linkSheet").hidden=true;document.body.style.overflow="";}else if(!$("coSheet").hidden)$("coSheet").hidden=true;else if(!$("adminSheet").hidden){$("adminSheet").hidden=true;document.body.style.overflow="";}else if(!$("sheet").hidden)closeSheet();else if(!$("placesSheet").hidden)closePlaces();else if(!$("setSheet").hidden){$("setSheet").hidden=true;document.body.style.overflow="";}}});
+window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("repSheet").hidden){$("repSheet").hidden=true;document.body.style.overflow="";}else if(!$("linkSheet").hidden){$("linkSheet").hidden=true;document.body.style.overflow="";}else if(!$("coSheet").hidden)$("coSheet").hidden=true;else if(!$("adminSheet").hidden){$("adminSheet").hidden=true;document.body.style.overflow="";}else if(!$("sheet").hidden)closeSheet();else if(!$("placesSheet").hidden)closePlaces();else if(!$("setSheet").hidden){$("setSheet").hidden=true;document.body.style.overflow="";}}});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&company){sb.from("bookings").select("*").order("date").order("time").then(({data})=>{if(data){bookings=data.map(fromDb);render();}});}});
 
 /* ---------- boot ---------- */
