@@ -216,6 +216,10 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 <div id="loginView" class="login" hidden>
   <div class="box">
     <div class="logo"><div class="mark">T</div><div><h1>Transfer Defteri</h1><small>VIP transfer &amp; tur operasyon defteri</small></div></div>
+    <div class="tabs" role="tablist" style="justify-self:stretch">
+      <button role="tab" id="tabLogin" aria-selected="true" style="flex:1">Giriş yap</button>
+      <button role="tab" id="tabSignup" aria-selected="false" style="flex:1">Yeni firma kaydı</button>
+    </div>
     <form class="card-f" id="loginForm">
       <div class="in"><label for="lEmail">E‑posta</label><input id="lEmail" type="email" autocomplete="username" inputmode="email" required></div>
       <div class="in"><label for="lPass">Şifre</label><input id="lPass" type="password" autocomplete="current-password" required></div>
@@ -223,6 +227,16 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <div class="okmsg" id="lOk" hidden></div>
       <button class="pbtn" id="lBtn" type="submit">Giriş yap</button>
       <button class="sbtn" id="lForgot" type="button">Şifremi unuttum</button>
+    </form>
+    <form class="card-f" id="signupForm" hidden>
+      <div class="in"><label for="sCompany">Firma adı</label><input id="sCompany" autocomplete="organization" placeholder="Örn. Antalya VIP Transfer" required></div>
+      <div class="in"><label for="sEmail2">E‑posta</label><input id="sEmail2" type="email" autocomplete="email" inputmode="email" required></div>
+      <div class="in"><label for="sPhone">WhatsApp numaranız</label><input id="sPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+90 5xx xxx xx xx"></div>
+      <div class="in"><label for="sPass2">Şifre (en az 6 karakter)</label><input id="sPass2" type="password" autocomplete="new-password" minlength="6" required></div>
+      <div class="err" id="sErr2" hidden></div>
+      <div class="okmsg" id="sOk2" hidden></div>
+      <button class="pbtn" id="sBtn2" type="submit">Ücretsiz dene (14 gün)</button>
+      <div class="note" style="margin:0">Kart bilgisi istenmez. Deneme süresi bitince devam etmek isterseniz paket seçersiniz.</div>
     </form>
     <div class="note" style="margin:0">Bir kez giriş yaptığınızda bu cihazda oturumunuz açık kalır.</div>
   </div>
@@ -471,6 +485,22 @@ $("loginForm").addEventListener("submit",async e=>{
   const {error}=await sb.auth.signInWithPassword({email:$("lEmail").value.trim(),password:$("lPass").value});
   $("lBtn").disabled=false;
   if(error){$("lErr").textContent=errMsg(error);$("lErr").hidden=false;}
+});
+function showAuthTab(signup){$("loginForm").hidden=signup;$("signupForm").hidden=!signup;$("tabLogin").setAttribute("aria-selected",signup?"false":"true");$("tabSignup").setAttribute("aria-selected",signup?"true":"false");}
+$("tabLogin").addEventListener("click",()=>showAuthTab(false));
+$("tabSignup").addEventListener("click",()=>showAuthTab(true));
+if(location.hash==="#kayit")showAuthTab(true);
+$("signupForm").addEventListener("submit",async e=>{
+  e.preventDefault();$("sErr2").hidden=true;$("sOk2").hidden=true;
+  const companyName=$("sCompany").value.trim(),email=$("sEmail2").value.trim(),pass=$("sPass2").value,phone=$("sPhone").value.trim();
+  if(companyName.length<2){$("sErr2").textContent="Firma adı gerekli.";$("sErr2").hidden=false;return;}
+  if(pass.length<6){$("sErr2").textContent="Şifre en az 6 karakter olmalı.";$("sErr2").hidden=false;return;}
+  $("sBtn2").disabled=true;
+  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{company:companyName,whatsapp:phone},emailRedirectTo:location.origin+BASE}});
+  $("sBtn2").disabled=false;
+  if(error){$("sErr2").textContent=/already registered|already been registered/i.test(error.message)?"Bu e‑posta zaten kayıtlı. Giriş yap sekmesini kullanın.":errMsg(error);$("sErr2").hidden=false;return;}
+  if(data.session){toast("Hoş geldiniz! Hesabınız hazır.");}
+  else{$("sOk2").textContent="Hesabınız oluşturuldu. E‑postanıza gelen onay bağlantısına tıklayıp giriş yapın.";$("sOk2").hidden=false;}
 });
 $("lForgot").addEventListener("click",async()=>{
   const email=$("lEmail").value.trim();if(!email){$("lErr").textContent="Önce e‑posta adresinizi yazın.";$("lErr").hidden=false;return;}
