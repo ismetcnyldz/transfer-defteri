@@ -680,7 +680,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 1.1</div>
+    <div class="note">Transfer Defteri · sürüm 1.2</div>
   </div>
 </div>
 
@@ -870,11 +870,20 @@ const MAP={passengers:"passengers",booster:"booster",retReceiveAmount:"ret_recei
 const fromDb=r=>{const o={id:r.id};for(const k in MAP)o[k]=r[MAP[k]];if(o.time)o.time=String(o.time).slice(0,5);if(o.returnTime)o.returnTime=String(o.returnTime).slice(0,5);o.childAges=o.childAges||[];o.photos=o.photos||[];return o;};
 const toDb=o=>{const r={};for(const k in MAP){if(k==="createdAt"||k==="updatedAt")continue;let v=o[k];if(v===""||v===undefined)v=null;if(["time","returnTime","returnDate","luggage"].includes(k)&&!v)v=null;r[MAP[k]]=v;}r.company_id=company.id;return r;};
 
+async function fetchAllBookings(){
+  const all=[];const step=1000;
+  for(let from=0;;from+=step){
+    const {data,error}=await sb.from("bookings").select("*").order("date").order("time").order("id").range(from,from+step-1);
+    if(error)return {data:null,error};
+    all.push(...data);if(data.length<step)break;
+  }
+  return {data:all,error:null};
+}
 async function loadAll(){
   const [{data:co,error:e1},{data:st},{data:bk,error:e2},{data:pl}]=await Promise.all([
     sb.from("companies").select("*").single(),
     sb.from("settings").select("*").maybeSingle(),
-    sb.from("bookings").select("*").order("date").order("time"),
+    fetchAllBookings(),
     sb.from("places").select("*")
   ]);
   if(e1||e2){$("loadNote").textContent="Veriler yüklenemedi: "+errMsg(e1||e2);return;}
@@ -897,7 +906,7 @@ function subscribeRealtime(){
   channel=sb.channel("bookings-live").on("postgres_changes",{event:"*",schema:"public",table:"bookings"},payload=>{
     if(payload.eventType==="DELETE"){bookings=bookings.filter(b=>b.id!==payload.old.id);}
     else{const b=fromDb(payload.new);const i=bookings.findIndex(x=>x.id===b.id);if(i>=0)bookings[i]=b;else{bookings.push(b);if(b.source==="link"&&payload.eventType==="INSERT")notifyNew(b);}}
-    render();
+    scheduleRender();
   }).on("postgres_changes",{event:"*",schema:"public",table:"places"},async()=>{const {data}=await sb.from("places").select("*");userPlaces=data||[];if(!$("placesSheet").hidden)renderPlaces();}).subscribe();
 }
 async function saveBooking(data,id){
@@ -914,6 +923,9 @@ async function ensureSigned(paths){
 }
 
 /* ---------- render ---------- */
+let renderQueued=false;
+function scheduleRender(){if(renderQueued)return;renderQueued=true;setTimeout(()=>{renderQueued=false;render();},150);}
+const PAGE=150;let shown=PAGE;
 function sorted(list){return list.slice().sort((a,b)=>(a.date+" "+(a.time||""))<(b.date+" "+(b.time||""))?-1:1);}
 const RET_SHOW_DAYS=2; // dönüş, gününe bu kadar gün kala "Yaklaşan"da görünür
 const ymd=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
@@ -938,6 +950,7 @@ function render(){
     return true;
   });
   list=sorted(list);if(tab==="past")list.reverse();
+  const total=list.length;list=list.slice(0,shown);
   const todays=legs().filter(b=>b.date===t&&b.status!=="cancelled");
   $("stToday").innerHTML=todays.length+' <span style="font-size:14px;font-weight:700;color:var(--muted)">transfer</span>';
   const due={};legs().forEach(b=>{if(b.status!=="cancelled"&&!b.received&&Number(b.receiveAmount)>0){due[b.receiveCur||"EUR"]=(due[b.receiveCur||"EUR"]||0)+Number(b.receiveAmount);}});
@@ -962,6 +975,8 @@ function render(){
     g.innerHTML=`<h2><span>${label}</span><small>${date===t||date===tomorrow?fmtDateLong(date)+" · ":""}${items.length} transfer</small></h2><div class="cards"></div>`;
     const cards=g.querySelector(".cards");items.forEach(b=>cards.appendChild(card(b)));host.appendChild(g);
   });
+  if(total>list.length){const more=document.createElement("button");more.type="button";more.className="btn";more.style.cssText="width:100%;margin:6px 0 90px";
+    more.textContent="Daha fazla göster ("+(total-list.length)+" kayıt daha)";more.addEventListener("click",()=>{shown+=PAGE*2;render();});host.appendChild(more);}
   renderReminders();renderNewLink();
   const paths=list.map(b=>b.photos&&b.photos[0]&&b.photos[0].path).filter(Boolean);
   ensureSigned(paths).then(ch=>{if(ch)render();});
@@ -1624,10 +1639,10 @@ $("sSave").addEventListener("click",async()=>{
 });
 
 /* ---------- ui ---------- */
-document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));render();}));
-$("q").addEventListener("input",e=>{query=e.target.value;render();});
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;shown=PAGE;document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));render();}));
+$("q").addEventListener("input",e=>{query=e.target.value;shown=PAGE;scheduleRender();});
 window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("repSheet").hidden){$("repSheet").hidden=true;document.body.style.overflow="";}else if(!$("linkSheet").hidden){$("linkSheet").hidden=true;document.body.style.overflow="";}else if(!$("coSheet").hidden)$("coSheet").hidden=true;else if(!$("adminSheet").hidden){$("adminSheet").hidden=true;document.body.style.overflow="";}else if(!$("sheet").hidden)closeSheet();else if(!$("placesSheet").hidden)closePlaces();else if(!$("setSheet").hidden){$("setSheet").hidden=true;document.body.style.overflow="";}}});
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&company){sb.from("bookings").select("*").order("date").order("time").then(({data})=>{if(data){bookings=data.map(fromDb);render();}});}});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&company){fetchAllBookings().then(({data})=>{if(data){bookings=data.map(fromDb);render();}});}});
 
 /* ---------- boot ---------- */
 $("todayLbl").textContent=fmtDateLong(todayStr());
