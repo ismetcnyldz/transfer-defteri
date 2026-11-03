@@ -217,6 +217,12 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 .kv{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:8px 0;border-top:1px solid var(--line)}
 .kv:first-child{border-top:0}
 .kv span{color:var(--muted)}
+/* üstten bildirim */
+.flash{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translate(-50%,-140%);z-index:40;width:min(94vw,460px);background:var(--ok);color:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 12px 30px rgba(0,0,0,.3);display:grid;gap:2px;transition:transform .35s cubic-bezier(.2,.9,.3,1.2);cursor:pointer}
+.flash.show{transform:translate(-50%,0)}
+.flash b{font-size:15px}
+.flash span{font-size:13px;opacity:.95}
+@media (prefers-reduced-motion:reduce){.flash{transition:none}}
 /* raporlar */
 .rgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .rbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
@@ -273,6 +279,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 </head>
 <body>
 
+<div id="flash" class="flash" role="status" aria-live="assertive"><b id="flashT"></b><span id="flashS"></span></div>
 <div id="loginView" class="login" hidden>
   <div class="box">
     <div class="logo"><div class="mark">T</div><div><h1>Transfer Defteri</h1><small>VIP transfer &amp; tur operasyon defteri</small></div></div>
@@ -331,6 +338,11 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 </header>
 
 <main class="gut">
+  <div id="notifBand" class="band newlink" hidden>
+    <div class="t">🔔 Yeni rezervasyonlarda sesli bildirim</div>
+    <div>Müşteri formu doldurduğu an zil çalar, ismi sesli okunur ve ekranın üstünde bildirim çıkar. Açmak için bir kez dokunun.</div>
+    <div class="acts"><button id="notifOn">Sesli bildirimi aç</button><button id="notifLater">Şimdi değil</button></div>
+  </div>
   <div id="newlink" class="band newlink" hidden></div>
   <div id="remind" class="band remind" hidden></div>
   <div id="review" class="band review" hidden>
@@ -578,6 +590,13 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <div style="padding:10px 14px"><button class="btn gold" id="sSave">Kaydet</button> <span class="err" id="sErr" hidden></span></div>
     </fieldset>
     <fieldset>
+      <div class="sec-t">Bildirimler</div>
+      <div class="tog"><span>Yeni rezervasyonda zil sesi</span><button class="sw" id="nfSound" role="switch" aria-checked="true" aria-label="Zil sesi"></button></div>
+      <div class="tog"><span>İsmi sesli oku</span><button class="sw" id="nfVoice" role="switch" aria-checked="true" aria-label="Sesli okuma"></button></div>
+      <div class="tog"><span>Ekran üstü bildirim</span><button class="sw" id="nfPush" role="switch" aria-checked="false" aria-label="Ekran üstü bildirim"></button></div>
+      <div style="padding:6px 14px 12px"><button class="btn sm" id="nfTest" type="button">Bildirimi dene</button></div>
+    </fieldset>
+    <fieldset>
       <div class="sec-t">Hesap</div>
       <div style="padding:6px 14px">
         <div class="kv"><span>Giriş</span><b id="sEmail"></b></div>
@@ -591,7 +610,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 0.5</div>
+    <div class="note">Transfer Defteri · sürüm 0.6</div>
   </div>
 </div>
 
@@ -799,6 +818,7 @@ async function loadAll(){
   if(!access.access&&!access.is_admin){showWall();return;}
   $("loadNote").hidden=true;
   render();renderReview();
+  $("notifBand").hidden=!!nf.asked;syncNfUi();
   subscribeRealtime();
 }
 let channel=null;
@@ -806,7 +826,7 @@ function subscribeRealtime(){
   if(channel)return;
   channel=sb.channel("bookings-live").on("postgres_changes",{event:"*",schema:"public",table:"bookings"},payload=>{
     if(payload.eventType==="DELETE"){bookings=bookings.filter(b=>b.id!==payload.old.id);}
-    else{const b=fromDb(payload.new);const i=bookings.findIndex(x=>x.id===b.id);if(i>=0)bookings[i]=b;else{bookings.push(b);if(b.source==="link"&&payload.eventType==="INSERT")toast("Yeni rezervasyon: "+(b.firstName||"")+" "+(b.lastName||""));}}
+    else{const b=fromDb(payload.new);const i=bookings.findIndex(x=>x.id===b.id);if(i>=0)bookings[i]=b;else{bookings.push(b);if(b.source==="link"&&payload.eventType==="INSERT")notifyNew(b);}}
     render();
   }).on("postgres_changes",{event:"*",schema:"public",table:"places"},async()=>{const {data}=await sb.from("places").select("*");userPlaces=data||[];if(!$("placesSheet").hidden)renderPlaces();}).subscribe();
 }
@@ -1207,6 +1227,54 @@ $("coSusp").addEventListener("click",async()=>{const {error}=await sb.rpc("admin
 $("coDel").addEventListener("click",()=>{$("coDelConfirm").hidden=false;});
 $("coDelNo").addEventListener("click",()=>{$("coDelConfirm").hidden=true;});
 $("coDelYes").addEventListener("click",async()=>{const {error}=await sb.rpc("admin_delete_company",{p_id:coCur.id});if(error)return coErr(errMsg(error));toast("Firma silindi");$("coSheet").hidden=true;await loadAdmin();});
+
+/* ---------- sesli bildirim ---------- */
+const NF_KEY="td_notif";
+let nf={sound:true,voice:true,push:false,asked:false};try{nf=Object.assign(nf,JSON.parse(localStorage.getItem(NF_KEY)||"{}"));}catch(e){}
+const saveNf=()=>{try{localStorage.setItem(NF_KEY,JSON.stringify(nf));}catch(e){}};
+let actx=null,swReg=null;
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").then(r=>{swReg=r;}).catch(()=>{});navigator.serviceWorker.addEventListener("message",e=>{if(e.data&&e.data.type==="open-booking"){const b=bookings.find(x=>x.id===e.data.id);if(b)openSheet(b);}});}
+function unlockAudio(){try{if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();}catch(e){}
+  try{if("speechSynthesis" in window){const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u);}}catch(e){}}
+function chime(){
+  try{if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();
+    const t=actx.currentTime;[[880,0],[1175,.16],[1568,.32]].forEach(([f,d])=>{const o=actx.createOscillator(),g=actx.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(.35,t+d+.02);g.gain.exponentialRampToValueAtTime(.001,t+d+.45);o.connect(g);g.connect(actx.destination);o.start(t+d);o.stop(t+d+.5);});
+  }catch(e){}
+}
+function speak(text){try{if(!("speechSynthesis" in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=1;const v=speechSynthesis.getVoices().find(v=>/^tr/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}}
+let flashT;
+function flash(title,sub,b){$("flashT").textContent=title;$("flashS").textContent=sub;const el=$("flash");el.classList.add("show");el.onclick=()=>{el.classList.remove("show");if(b)openSheet(b);};clearTimeout(flashT);flashT=setTimeout(()=>el.classList.remove("show"),9000);}
+async function sysNotify(title,body,b){
+  if(!nf.push||!("Notification" in window)||Notification.permission!=="granted")return;
+  const opt={body,icon:"icon-192.png",badge:"icon-192.png",tag:"td-"+(b?b.id:Date.now()),renotify:true,vibrate:[200,100,200],data:{id:b&&b.id}};
+  try{const reg=swReg||(await navigator.serviceWorker?.getRegistration());if(reg){await reg.showNotification(title,opt);return;}}catch(e){}
+  try{new Notification(title,opt);}catch(e){}
+}
+function notifyNew(b){
+  const name=((b.firstName||"")+" "+(b.lastName||"")).trim()||"Yeni yolcu";
+  const when=(b.date?b.date.slice(8,10)+"."+b.date.slice(5,7):"")+(b.time?" "+b.time:"");
+  const sub=[when,b.hotel,[b.adults?b.adults+" yetişkin":"",b.children?b.children+" çocuk":"",b.infants?b.infants+" bebek":""].filter(Boolean).join(", ")].filter(Boolean).join(" · ");
+  flash("🆕 Yeni rezervasyon: "+name,sub,b);
+  if(nf.sound)chime();
+  try{navigator.vibrate&&navigator.vibrate([250,120,250]);}catch(e){}
+  if(nf.voice)setTimeout(()=>speak("Yeni rezervasyon. "+name+(b.hotel?". "+b.hotel:"")),700);
+  sysNotify("Yeni rezervasyon: "+name,sub,b);
+  try{document.title="🔔 Yeni rezervasyon – Transfer Defteri";setTimeout(()=>{document.title="Transfer Defteri";},15000);}catch(e){}
+}
+async function enableNotif(){
+  unlockAudio();nf.asked=true;
+  if("Notification" in window){try{const p=await Notification.requestPermission();nf.push=(p==="granted");}catch(e){}}
+  saveNf();syncNfUi();$("notifBand").hidden=true;
+  chime();toast(nf.push?"Bildirimler açık":"Ses açık (ekran üstü bildirime izin verilmedi)");
+}
+function syncNfUi(){sw("nfSound",nf.sound);sw("nfVoice",nf.voice);sw("nfPush",nf.push&&("Notification" in window)&&Notification.permission==="granted");}
+$("notifOn").addEventListener("click",enableNotif);
+$("notifLater").addEventListener("click",()=>{nf.asked=true;saveNf();$("notifBand").hidden=true;});
+$("nfSound").addEventListener("click",()=>{nf.sound=!swv("nfSound");sw("nfSound",nf.sound);saveNf();if(nf.sound){unlockAudio();chime();}});
+$("nfVoice").addEventListener("click",()=>{nf.voice=!swv("nfVoice");sw("nfVoice",nf.voice);saveNf();if(nf.voice){unlockAudio();speak("Sesli okuma açık");}});
+$("nfPush").addEventListener("click",async()=>{if(swv("nfPush")){nf.push=false;saveNf();syncNfUi();return;}await enableNotif();});
+$("nfTest").addEventListener("click",()=>{unlockAudio();notifyNew({id:null,firstName:"Johann",lastName:"Müller",date:todayStr(),time:"18:40",hotel:"Örnek Otel",adults:2,children:1});});
+document.addEventListener("pointerdown",unlockAudio,{once:true});
 
 /* ---------- raporlar & toplu silme ---------- */
 let repP="month",delBulkList=[],ledger=[],ledgerLoaded=false;
