@@ -550,8 +550,16 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       </div>
     </div>
     <fieldset>
+      <div class="sec-t">Neler gönderilsin?</div>
+      <div class="tog"><span>📝 Rezervasyon formu linki</span><button class="sw" id="lkForm" role="switch" aria-checked="true" aria-label="Rezervasyon formu linki"></button></div>
+      <div class="tog" id="lkMeetRow"><span>📍 Karşılama sayfası<br><small style="color:var(--muted);font-weight:600">İngilizce/Almanca yazı + görsel + video</small></span><button class="sw" id="lkMeet" role="switch" aria-checked="true" aria-label="Karşılama sayfası"></button></div>
+      <div class="hint" id="lkMeetNone" hidden style="padding:4px 14px 12px">Karşılama sayfanız henüz yok. Ayarlar → Havalimanı karşılama bölümünden yazı, görsel ve video ekleyin.</div>
+      <div class="btnrow"><a class="btn sm" id="lkMeetOpen" target="_blank" rel="noopener">Karşılama sayfasını gör</a></div>
+    </fieldset>
+    <fieldset>
       <div class="sec-t">Hazır mesaj</div>
-      <div class="f"><label for="lkMsg">WhatsApp'ta gidecek metin (düzenleyebilirsiniz)</label><textarea id="lkMsg" style="min-height:110px"></textarea></div>
+      <div class="f"><label for="lkMsg">WhatsApp'ta gidecek metin (düzenleyebilirsiniz)</label><textarea id="lkMsg" style="min-height:150px"></textarea></div>
+      <div class="hint" style="padding:0 14px 12px"><button type="button" id="lkReset">Metni yeniden oluştur</button></div>
     </fieldset>
   </div>
 </div>
@@ -637,6 +645,17 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <div style="padding:10px 14px"><button class="btn gold" id="sSave">Kaydet</button> <span class="err" id="sErr" hidden></span></div>
     </fieldset>
     <fieldset>
+      <div class="sec-t">Havalimanı karşılama (müşteriye gider)</div>
+      <div class="hint" style="padding:6px 14px 0">Müşteri linkte dilini seçer, yazıyı okur, fotoğrafı ve videoyu görür. Dolu olan diller düğme olarak çıkar.</div>
+      <div class="f"><label for="mtEn">🇬🇧 İngilizce yazı</label><textarea id="mtEn" style="min-height:90px"></textarea></div>
+      <div class="f"><label for="mtDe">🇩🇪 Almanca yazı</label><textarea id="mtDe" style="min-height:90px"></textarea></div>
+      <div class="f"><label for="mtTr">🇹🇷 Türkçe yazı (isteğe bağlı)</label><textarea id="mtTr" style="min-height:70px"></textarea></div>
+      <div class="f"><label for="mtRu">🇷🇺 Rusça yazı (isteğe bağlı)</label><textarea id="mtRu" style="min-height:70px"></textarea></div>
+      <div class="f"><label>Görsel</label><div class="inline" style="flex-wrap:wrap"><img id="mtPhotoPv" alt="" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid var(--line)" hidden><label class="btn sm" style="cursor:pointer">Görsel seç<input type="file" id="mtPhoto" accept="image/*" hidden></label><button type="button" class="btn sm" id="mtPhotoDel" hidden>Kaldır</button></div></div>
+      <div class="f"><label>Video</label><div class="inline" style="flex-wrap:wrap"><span id="mtVideoName" class="hint" style="padding:0"></span><label class="btn sm" style="cursor:pointer">Video seç<input type="file" id="mtVideo" accept="video/*" hidden></label><button type="button" class="btn sm" id="mtVideoDel" hidden>Kaldır</button></div></div>
+      <div class="btnrow"><button type="button" class="btn gold" id="mtSave">Karşılama bilgisini kaydet</button><a class="btn sm" id="mtOpen" target="_blank" rel="noopener">Sayfayı gör</a><span class="err" id="mtErr" hidden></span></div>
+    </fieldset>
+    <fieldset>
       <div class="sec-t">Görünüm</div>
       <div class="tog"><span>Koyu tema (renkli)</span><button class="sw" id="themeSw" role="switch" aria-checked="true" aria-label="Koyu tema"></button></div>
     </fieldset>
@@ -661,7 +680,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 1.0</div>
+    <div class="note">Transfer Defteri · sürüm 1.1</div>
   </div>
 </div>
 
@@ -1088,6 +1107,10 @@ function waConfirmText(b){
   if(b.returnDate)lines.push(`↩️ ${T.r}: ${dmy(b.returnDate)} ${b.returnTime||""}${b.returnFlight?" · "+b.returnFlight:""}${rprice?" · "+rprice:""}`);
   if(price)lines.push(`💶 ${T.pr}: ${price}`);
   lines.push("",T.e);
+  if(hasMeet()){const m=company.meeting;const mt=m.texts&&(m.texts[L]||m.texts.en||Object.values(m.texts).find(x=>x));
+    const ml={tr:"📍 Buluşma noktası (fotoğraf ve video):",en:"📍 Meeting point (photo and video):",de:"📍 Treffpunkt (Foto und Video):",ru:"📍 Место встречи (фото и видео):"}[L];
+    if(mt)lines.push("",mt.trim());
+    lines.push("",ml,meetLink()+"&l="+L);}
   return lines.join("\n");
 }
 function waHelloText(b){
@@ -1522,22 +1545,63 @@ $("delBulkYes").addEventListener("click",async()=>{
 
 /* ---------- link gönder ---------- */
 function custLink(){return location.origin+BASE+"r/?c="+(company.slug||"");}
-function defaultMsg(){return (company.name||"")+" – transfer rezervasyonunuz için lütfen bu formu doldurun / Please fill in this form for your transfer booking:\n"+custLink();}
+function meetLink(){return location.origin+BASE+"k/?c="+(company.slug||"");}
+function hasMeet(){const m=company&&company.meeting||{};return !!((m.texts&&Object.values(m.texts).some(x=>x&&x.trim()))||m.photo||m.video);}
+function defaultMsg(){
+  const parts=[(company.name||"")];
+  if(swv("lkForm"))parts.push("📝 Transfer rezervasyonunuz için lütfen bu formu doldurun / Please fill in this form for your transfer booking / Bitte füllen Sie dieses Formular aus:\n"+custLink());
+  if(swv("lkMeet")&&hasMeet())parts.push("📍 Havalimanında buluşma noktası (yazı, fotoğraf, video) / Airport meeting point (text, photo, video) / Treffpunkt am Flughafen (Text, Foto, Video):\n"+meetLink());
+  return parts.join("\n\n");
+}
 function openLink(){
   $("linkSheet").hidden=false;document.body.style.overflow="hidden";
   $("lkLink").textContent=custLink();$("lkOpen").href=custLink();
-  let saved=null;try{saved=localStorage.getItem("td_lkmsg_"+company.id);}catch(e){}
+  const hm=hasMeet();$("lkMeetRow").hidden=!hm;$("lkMeetNone").hidden=hm;$("lkMeetOpen").hidden=!hm;$("lkMeetOpen").href=meetLink();
+  let saved=null;try{saved=localStorage.getItem("td_lkmsg2_"+company.id);}catch(e){}
   $("lkMsg").value=saved||defaultMsg();updLkWa();
 }
+["lkForm","lkMeet"].forEach(id=>$(id).addEventListener("click",()=>{sw(id,!swv(id));$("lkMsg").value=defaultMsg();try{localStorage.removeItem("td_lkmsg2_"+company.id);}catch(e){}updLkWa();}));
+$("lkReset").addEventListener("click",()=>{$("lkMsg").value=defaultMsg();try{localStorage.removeItem("td_lkmsg2_"+company.id);}catch(e){}updLkWa();});
 function updLkWa(){$("lkWa").href="https://wa.me/?text="+encodeURIComponent($("lkMsg").value.trim()||custLink());}
-$("lkMsg").addEventListener("input",()=>{updLkWa();try{localStorage.setItem("td_lkmsg_"+company.id,$("lkMsg").value);}catch(e){}});
+$("lkMsg").addEventListener("input",()=>{updLkWa();try{localStorage.setItem("td_lkmsg2_"+company.id,$("lkMsg").value);}catch(e){}});
 $("btnLink").addEventListener("click",openLink);$("fabLink").addEventListener("click",openLink);
 $("lkClose").addEventListener("click",()=>{$("linkSheet").hidden=true;document.body.style.overflow="";});
 $("lkCopy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(custLink());toast("Link kopyalandı");}catch(e){toast("Kopyalanamadı, linki seçip kopyalayın");}});
 
+/* ---------- karşılama bilgisi ---------- */
+let mtDraft={};
+function fillMeeting(){
+  const m=company.meeting||{};mtDraft={photo:m.photo||"",video:m.video||"",poster:m.poster||""};
+  const t=m.texts||{};$("mtEn").value=t.en||"";$("mtDe").value=t.de||"";$("mtTr").value=t.tr||"";$("mtRu").value=t.ru||"";
+  syncMtMedia();$("mtOpen").href=meetLink();$("mtErr").hidden=true;
+}
+function syncMtMedia(){$("mtPhotoPv").hidden=!mtDraft.photo;if(mtDraft.photo)$("mtPhotoPv").src=mtDraft.photo;$("mtPhotoDel").hidden=!mtDraft.photo;
+  $("mtVideoName").textContent=mtDraft.video?"✓ Video yüklü":"Video yok";$("mtVideoDel").hidden=!mtDraft.video;}
+async function upMedia(file,kind){
+  if(!file)return null;if(file.size>50*1024*1024){toast("Dosya çok büyük (en fazla 50 MB)");return null;}
+  let blob=file,ext=(file.name.split(".").pop()||"bin").toLowerCase();
+  if(kind==="photo"){const b=await shrink(file,1600);if(b){blob=b;ext="jpg";}}
+  const path=company.id+"/karsilama-"+kind+"-"+Date.now().toString(36)+"."+ext;
+  toast(kind==="video"?"Video yükleniyor…":"Görsel yükleniyor…");
+  const {error}=await sb.storage.from("media").upload(path,blob,{contentType:kind==="photo"?"image/jpeg":(file.type||"video/mp4"),upsert:true});
+  if(error){toast("Yüklenemedi: "+errMsg(error));return null;}
+  return sb.storage.from("media").getPublicUrl(path).data.publicUrl;
+}
+$("mtPhoto").addEventListener("change",async e=>{const u=await upMedia(e.target.files[0],"photo");if(u){mtDraft.photo=u;syncMtMedia();toast("Görsel yüklendi, kaydetmeyi unutmayın");}e.target.value="";});
+$("mtVideo").addEventListener("change",async e=>{const u=await upMedia(e.target.files[0],"video");if(u){mtDraft.video=u;mtDraft.poster="";syncMtMedia();toast("Video yüklendi, kaydetmeyi unutmayın");}e.target.value="";});
+$("mtPhotoDel").addEventListener("click",()=>{mtDraft.photo="";syncMtMedia();});
+$("mtVideoDel").addEventListener("click",()=>{mtDraft.video="";mtDraft.poster="";syncMtMedia();});
+$("mtSave").addEventListener("click",async()=>{
+  const texts={};[["en","mtEn"],["de","mtDe"],["tr","mtTr"],["ru","mtRu"]].forEach(([k,id])=>{const v=$(id).value.trim();if(v)texts[k]=v;});
+  const meeting={texts,photo:mtDraft.photo||"",video:mtDraft.video||"",poster:mtDraft.poster||""};
+  const {data,error}=await sb.from("companies").update({meeting}).eq("id",company.id).select().single();
+  if(error){$("mtErr").textContent=errMsg(error);$("mtErr").hidden=false;return;}
+  company=data;$("mtErr").hidden=true;toast("Karşılama bilgisi kaydedildi");
+});
+
 /* ---------- settings ---------- */
 function openSettings(){
-  $("setSheet").hidden=false;document.body.style.overflow="hidden";
+  $("setSheet").hidden=false;document.body.style.overflow="hidden";fillMeeting();
   $("custLink").textContent=custLink();
   $("waLink").href="https://wa.me/?text="+encodeURIComponent("Transfer rezervasyon formu: "+custLink());
   $("openLink").href=custLink();

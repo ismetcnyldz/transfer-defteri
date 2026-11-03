@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1220">
+<title>Meeting point</title>
+<link rel="icon" href="../icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#0d1220;--surface:#151c2e;--surface2:#1e2740;--line:#2b3654;--fg:#eef1f7;--muted:#c2c7d1;--blue:#2563eb;--blue2:#1d4ed8;--amber:#f59e0b;--green:#16a34a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;display:grid;gap:14px;padding-top:16px}
+.top{display:flex;align-items:center;gap:12px}
+.mark{width:44px;height:44px;border-radius:12px;background:linear-gradient(150deg,var(--blue),var(--blue2));display:grid;place-items:center;color:#fff;font-weight:800;font-size:20px;flex:none}
+.top h1{margin:0;font-size:19px;font-weight:800;line-height:1.15;text-transform:uppercase;letter-spacing:-.01em}
+.top small{display:block;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+.langs{display:flex;gap:8px;flex-wrap:wrap}
+.langs button{font:inherit;flex:1 1 0;min-width:120px;border:0;cursor:pointer;padding:12px 10px;border-radius:12px;background:var(--surface2);color:var(--fg);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid transparent}
+.langs button[aria-pressed="true"]{background:linear-gradient(150deg,var(--blue),var(--blue2));color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.35)}
+.langs .fl{font-size:20px}
+.text{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;white-space:pre-wrap;font-size:16px}
+.sec{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);font-weight:800;margin:6px 2px -4px}
+.media{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.media img,.media video{display:block;width:100%;height:auto;max-width:100%;background:#000}
+.media video{max-height:80vh}
+.hint{font-size:13px;color:var(--muted);text-align:center}
+.zoom{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:20;display:grid;place-items:center;padding:12px}
+.zoom img{max-width:100%;max-height:100%;border-radius:8px}
+.wa{display:flex;justify-content:center;align-items:center;gap:8px;background:var(--green);color:#fff;font-weight:800;padding:13px 16px;border-radius:12px;text-decoration:none}
+.gone{text-align:center;padding:48px 16px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="top"><div class="mark" id="mark">T</div><div><h1 id="coName">…</h1><small id="sub">Meeting point</small></div></div>
+  <div class="langs" id="langs"></div>
+  <div class="text" id="text"></div>
+  <div class="sec" id="secPhoto" hidden></div>
+  <div class="media" id="photoBox" hidden><img id="photo" alt=""></div>
+  <div class="hint" id="photoHint" hidden></div>
+  <div class="sec" id="secVideo" hidden></div>
+  <div class="media" id="videoBox" hidden><video id="video" controls playsinline preload="metadata"></video></div>
+  <a class="wa" id="wa" target="_blank" rel="noopener" hidden></a>
+</div>
+<div class="zoom" id="zoom" hidden><img id="zoomImg" alt=""></div>
+<div class="gone" id="gone" hidden>This page is not available.</div>
+<script>
+(function(){
+"use strict";
+const sb=supabase.createClient("https://ppqfcasjawbbfohjnvjr.supabase.co","sb_publishable_1V60UInHZfyvFxSDU5hnjQ_F3cBFGCF",{auth:{persistSession:false}});
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search);
+const slug=(q.get("c")||location.hash.slice(1)||"").trim();
+const L={en:{name:"English",fl:"🇬🇧",sub:"Airport meeting point",photo:"Meeting point",video:"Video guide",tap:"Tap the photo to enlarge",wa:"Message us on WhatsApp"},
+         de:{name:"Deutsch",fl:"🇩🇪",sub:"Treffpunkt am Flughafen",photo:"Treffpunkt",video:"Video-Wegbeschreibung",tap:"Zum Vergrößern auf das Foto tippen",wa:"Schreiben Sie uns auf WhatsApp"},
+         tr:{name:"Türkçe",fl:"🇹🇷",sub:"Havalimanı karşılama noktası",photo:"Karşılama noktası",video:"Video anlatım",tap:"Büyütmek için fotoğrafa dokunun",wa:"WhatsApp'tan yazın"},
+         ru:{name:"Русский",fl:"🇷🇺",sub:"Место встречи в аэропорту",photo:"Место встречи",video:"Видео-инструкция",tap:"Нажмите на фото, чтобы увеличить",wa:"Написать в WhatsApp"}};
+const ORDER=["en","de","tr","ru"];
+let M=null,co=null,cur="en";
+function show(l){
+  cur=l;document.documentElement.lang=l;const t=L[l];
+  document.querySelectorAll("#langs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===l?"true":"false"));
+  $("text").textContent=(M.texts&&M.texts[l])||"";$("text").hidden=!$("text").textContent;
+  $("sub").textContent=t.sub;document.title=(co.name||"")+" · "+t.sub;
+  $("secPhoto").textContent="📍 "+t.photo;$("photoHint").textContent=t.tap;$("secVideo").textContent="🎬 "+t.video;
+  if(co.whatsapp){$("wa").textContent="💬 "+t.wa;}
+  try{localStorage.setItem("tk_lang",l);}catch(e){}
+}
+(async()=>{
+  if(!slug){$("app").hidden=true;$("gone").hidden=false;return;}
+  const {data,error}=await sb.rpc("public_company",{p_slug:slug});
+  co=data&&data[0];M=co&&co.meeting;
+  if(error||!co||!M||(!M.texts&&!M.photo&&!M.video)){$("app").hidden=true;$("gone").hidden=false;return;}
+  $("coName").textContent=co.name||"";$("mark").textContent=(co.name||"T").trim()[0].toUpperCase();
+  const langs=ORDER.filter(l=>M.texts&&M.texts[l]&&M.texts[l].trim());
+  $("langs").innerHTML=langs.map(l=>`<button type="button" data-l="${l}"><span class="fl">${L[l].fl}</span>${L[l].name}</button>`).join("");
+  $("langs").hidden=langs.length<2;
+  $("langs").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.l)));
+  if(M.photo){$("photo").src=M.photo;$("photoBox").hidden=false;$("secPhoto").hidden=false;$("photoHint").hidden=false;
+    $("photo").addEventListener("click",()=>{$("zoomImg").src=M.photo;$("zoom").hidden=false;});}
+  $("zoom").addEventListener("click",()=>{$("zoom").hidden=true;});
+  if(M.video){$("video").src=M.video;if(M.poster)$("video").poster=M.poster;$("videoBox").hidden=false;$("secVideo").hidden=false;}
+  if(co.whatsapp){const d=String(co.whatsapp).replace(/[^\d]/g,"");const n=d.startsWith("0")?"90"+d.slice(1):d;$("wa").href="https://wa.me/"+n;$("wa").hidden=false;}
+  let pref=q.get("l");try{pref=pref||localStorage.getItem("tk_lang");}catch(e){}
+  const nav=(navigator.language||"en").slice(0,2).toLowerCase();
+  const pick=[pref,nav,"en"].find(l=>langs.includes(l))||langs[0]||"en";
+  show(pick);
+})();
+})();
+</script>
+</body>
+</html>

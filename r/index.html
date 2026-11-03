@@ -169,6 +169,13 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
     <h2 data-t="done_t"></h2>
     <p data-t="done_p"></p>
     <div class="sum" id="sum"></div>
+    <div id="meetBox" hidden style="display:grid;gap:10px;text-align:left">
+      <b id="meetT" style="font-size:16px"></b>
+      <div id="meetText" style="white-space:pre-wrap;background:var(--surface2);border-radius:10px;padding:12px;font-size:15px"></div>
+      <img id="meetPhoto" alt="" style="width:100%;border-radius:10px" hidden>
+      <video id="meetVideo" controls playsinline preload="metadata" style="width:100%;border-radius:10px;background:#000" hidden></video>
+      <a id="meetLink" target="_blank" rel="noopener" style="font-weight:700;color:var(--accent)"></a>
+    </div>
     <a class="wa" id="waBtn" target="_blank" rel="noopener" hidden data-t="wa"></a>
     <button class="fine" id="again" style="text-decoration:underline" data-t="again"></button>
   </div>
@@ -266,6 +273,17 @@ $("form").addEventListener("submit",async e=>{
   $("send").disabled=false;
   if(error){E.textContent=t.err_net+" ("+error.message+")";E.hidden=false;return;}
   $("form").hidden=true;$("done").hidden=false;window.scrollTo(0,0);
+  const M=company&&company.meeting;
+  if(M&&((M.texts&&Object.keys(M.texts).length)||M.photo||M.video)){
+    const mt=M.texts&&(M.texts[lang]||M.texts.en||Object.values(M.texts)[0]);
+    $("meetT").textContent={tr:"📍 Havalimanında buluşma noktası",en:"📍 Airport meeting point",de:"📍 Treffpunkt am Flughafen",ru:"📍 Место встречи в аэропорту"}[lang];
+    $("meetText").textContent=mt||"";$("meetText").hidden=!mt;
+    if(M.photo){$("meetPhoto").src=M.photo;$("meetPhoto").hidden=false;}
+    if(M.video){$("meetVideo").src=M.video;if(M.poster)$("meetVideo").poster=M.poster;$("meetVideo").hidden=false;}
+    const ml=location.origin+location.pathname.replace(/r\/?[^/]*$/,"")+"k/?c="+encodeURIComponent(slug)+"&l="+lang;
+    $("meetLink").href=ml;$("meetLink").textContent={tr:"Bu sayfayı açmak için dokunun (diğer diller)",en:"Open this page (other languages)",de:"Diese Seite öffnen (andere Sprachen)",ru:"Открыть страницу (другие языки)"}[lang];
+    $("meetBox").hidden=false;
+  }
   $("sum").innerHTML=`<div><span>${t.s_name}</span><b>${esc(first+" "+last)}</b></div><div><span>${t.s_arr}</span><b>${esc(date.split("-").reverse().join("."))} ${esc(time)}${payload.flight?" · "+esc(payload.flight):""}</b></div><div><span>${t.s_hotel}</span><b>${esc(hotel)}</b></div><div><span>${t.s_pax}</span><b>${esc(t.pax(counts.adults,counts.children,counts.infants))}${seat?" · "+t.seat:""}${booster?" · "+t.booster:""}</b></div>${ret&&payload.return_date?`<div><span>${t.s_ret}</span><b>${esc(payload.return_date.split("-").reverse().join("."))} ${esc(payload.return_time)}</b></div>`:""}`;
   if(company&&company.whatsapp){const d=company.whatsapp.replace(/[^\d]/g,"");$("waBtn").hidden=false;$("waBtn").href="https://wa.me/"+d+"?text="+encodeURIComponent((lang==="tr"?"Merhaba, transfer talebi gönderdim: ":lang==="de"?"Hallo, ich habe eine Transferanfrage gesendet: ":lang==="ru"?"Здравствуйте, я отправил(а) заявку на трансфер: ":"Hello, I sent a transfer request: ")+first+" "+last+", "+date+" "+time);}
 });
