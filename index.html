@@ -602,7 +602,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
     </fieldset>
     <fieldset>
       <div class="sec-t">Eski kayıtları temizle</div>
-      <div class="note" style="margin:0;text-align:left;padding:8px 14px">Silinen kayıtlar geri getirilemez. Önce yukarıdan raporunuzu alın. Yaklaşan (ileri tarihli) kayıtlar hiçbir zaman silinmez.</div>
+      <div class="note" style="margin:0;text-align:left;padding:8px 14px">Eski rezervasyonlar ve fotoğrafları silinir, yer açılır. Raporlardaki rakamlar (ciro, kâr, tahsilat) ve kasa defteri silinmez, aynen kalır. Yaklaşan (ileri tarihli) kayıtlar hiçbir zaman silinmez.</div>
       <div class="btnrow">
         <button type="button" class="btn sm" data-del="30">1 aydan eski</button>
         <button type="button" class="btn sm" data-del="90">3 aydan eski</button>
@@ -618,6 +618,21 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 </div>
 
 <!-- ayarlar -->
+<div id="trashSheet" class="sheet" hidden>
+  <div class="sheet-hdr"><div class="in gut">
+    <button class="lnk quiet" id="trashClose">Kapat</button>
+    <h2>Silinenler</h2>
+    <span></span>
+  </div></div>
+  <div class="sheet-body gut">
+    <div class="note" style="text-align:left">Silinen rezervasyonlar 30 gün burada durur. "Geri al" ile listenize döner. 30 gün dolunca otomatik olarak kalıcı silinir.</div>
+    <div id="trashList"></div>
+    <div style="margin:18px 0 40px">
+      <button class="danger" id="trashAll" hidden>Hepsini şimdi kalıcı sil</button>
+      <div class="confirm" id="trashConfirm" hidden><button class="btn" id="trashNo">Vazgeç</button><button class="btn red" id="trashYes">Evet, kalıcı olarak sil</button></div>
+    </div>
+  </div>
+</div>
 <div id="setSheet" class="sheet" hidden>
   <div class="sheet-hdr"><div class="in gut">
     <button class="lnk quiet" id="setClose">Kapat</button>
@@ -656,6 +671,11 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <div class="btnrow"><button type="button" class="btn gold" id="mtSave">Karşılama bilgisini kaydet</button><a class="btn sm" id="mtOpen" target="_blank" rel="noopener">Sayfayı gör</a><span class="err" id="mtErr" hidden></span></div>
     </fieldset>
     <fieldset>
+      <div class="sec-t">Silinenler</div>
+      <div class="hint" style="padding:6px 14px 0">Silinen rezervasyonlar 30 gün burada durur, geri alınabilir. 30 gün sonra fotoğraflarıyla birlikte kalıcı silinir.</div>
+      <div class="btnrow"><button type="button" class="btn" id="btnTrash">🗑 Silinenleri aç</button></div>
+    </fieldset>
+    <fieldset>
       <div class="sec-t">Görünüm</div>
       <div class="tog"><span>Koyu tema (renkli)</span><button class="sw" id="themeSw" role="switch" aria-checked="true" aria-label="Koyu tema"></button></div>
     </fieldset>
@@ -680,7 +700,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 1.2</div>
+    <div class="note">Transfer Defteri · sürüm 1.4</div>
   </div>
 </div>
 
@@ -873,7 +893,7 @@ const toDb=o=>{const r={};for(const k in MAP){if(k==="createdAt"||k==="updatedAt
 async function fetchAllBookings(){
   const all=[];const step=1000;
   for(let from=0;;from+=step){
-    const {data,error}=await sb.from("bookings").select("*").order("date").order("time").order("id").range(from,from+step-1);
+    const {data,error}=await sb.from("bookings").select("*").is("deleted_at",null).order("date").order("time").order("id").range(from,from+step-1);
     if(error)return {data:null,error};
     all.push(...data);if(data.length<step)break;
   }
@@ -897,6 +917,7 @@ async function loadAll(){
   if(!access.access&&!access.is_admin){showWall();return;}
   $("loadNote").hidden=true;
   render();renderReview();
+  setTimeout(purgeTrash,5000);
   $("notifBand").hidden=!!nf.asked;syncNfUi();
   subscribeRealtime();
 }
@@ -904,7 +925,7 @@ let channel=null;
 function subscribeRealtime(){
   if(channel)return;
   channel=sb.channel("bookings-live").on("postgres_changes",{event:"*",schema:"public",table:"bookings",filter:"company_id=eq."+company.id},payload=>{
-    if(payload.eventType==="DELETE"){bookings=bookings.filter(b=>b.id!==payload.old.id);}
+    if(payload.eventType==="DELETE"||(payload.new&&payload.new.deleted_at)){const did=(payload.old&&payload.old.id)||payload.new.id;bookings=bookings.filter(b=>b.id!==did);}
     else{const b=fromDb(payload.new);const i=bookings.findIndex(x=>x.id===b.id);if(i>=0)bookings[i]=b;else{bookings.push(b);if(b.source==="link"&&payload.eventType==="INSERT")notifyNew(b);}}
     scheduleRender();
   }).on("postgres_changes",{event:"*",schema:"public",table:"places"},async()=>{const {data}=await sb.from("places").select("*");userPlaces=data||[];if(!$("placesSheet").hidden)renderPlaces();}).subscribe();
@@ -917,7 +938,53 @@ async function saveBooking(data,id){
 /* kayıt silinince fotoğrafları da depodan silinsin (yer kaplamasın) */
 async function removePhotos(list){const paths=[];list.forEach(b=>(b&&b.photos||[]).forEach(p=>{if(p&&p.path)paths.push(p.path);}));
   for(let i=0;i<paths.length;i+=100){try{await sb.storage.from("photos").remove(paths.slice(i,i+100));}catch(e){}}}
-async function deleteBooking(id){const b=bookings.find(x=>x.id===id);const {error}=await sb.from("bookings").delete().eq("id",id);if(error)throw error;removePhotos([b]);}
+const TRASH_DAYS=30;
+async function deleteBooking(id){const {error}=await sb.from("bookings").update({deleted_at:new Date().toISOString()}).eq("id",id);if(error)throw error;}
+/* 30 günü geçen silinenleri fotoğraflarıyla birlikte kalıcı sil */
+async function purgeTrash(){
+  try{const lim=new Date(Date.now()-TRASH_DAYS*864e5).toISOString();
+    const {data}=await sb.from("bookings").select("id,photos").not("deleted_at","is",null).lt("deleted_at",lim).limit(500);
+    if(!data||!data.length)return;
+    await removePhotos(data);
+    const ids=data.map(r=>r.id);for(let i=0;i<ids.length;i+=200)await sb.from("bookings").delete().in("id",ids.slice(i,i+200));
+  }catch(e){}
+}
+/* Silinenler */
+let trash=[];
+async function openTrash(){
+  $("trashSheet").hidden=false;document.body.style.overflow="hidden";$("trashList").innerHTML='<div class="note">Yükleniyor…</div>';
+  const {data,error}=await sb.from("bookings").select("*").not("deleted_at","is",null).order("deleted_at",{ascending:false}).limit(1000);
+  if(error){$("trashList").innerHTML='<div class="note">Yüklenemedi: '+esc(errMsg(error))+'</div>';return;}
+  trash=data||[];renderTrash();
+}
+function renderTrash(){
+  const host=$("trashList");
+  if(!trash.length){host.innerHTML='<div class="note" style="text-align:center;padding:30px 0">Silinen kayıt yok.</div>';$("trashAll").hidden=true;return;}
+  $("trashAll").hidden=false;
+  host.innerHTML=trash.map(r=>{const b=fromDb(r);const left=Math.max(0,TRASH_DAYS-Math.floor((Date.now()-new Date(r.deleted_at))/864e5));
+    return `<div class="trow" style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)">
+      <div style="flex:1;min-width:0"><b>${esc(((b.firstName||"")+" "+(b.lastName||"")).trim()||"İsimsiz yolcu")}</b>
+      <div style="font-size:13px;color:var(--muted)">${esc(fmtDateLong(b.date))} ${esc(b.time||"")}${b.hotel?" · "+esc(b.hotel):""}</div>
+      <div style="font-size:12px;color:var(--c-orange);font-weight:700">${left} gün sonra kalıcı silinecek</div></div>
+      <button class="btn sm" data-restore="${r.id}">Geri al</button></div>`;}).join("");
+  host.querySelectorAll("[data-restore]").forEach(btn=>btn.addEventListener("click",async()=>{
+    const id=btn.dataset.restore;btn.disabled=true;
+    const {data,error}=await sb.from("bookings").update({deleted_at:null}).eq("id",id).select().single();
+    if(error){btn.disabled=false;return toast("Geri alınamadı: "+errMsg(error));}
+    trash=trash.filter(x=>x.id!==id);if(!bookings.some(b=>b.id===id))bookings.push(fromDb(data));renderTrash();render();toast("Kayıt geri alındı");
+  }));
+}
+$("trashClose").addEventListener("click",()=>{$("trashSheet").hidden=true;document.body.style.overflow="";});
+$("btnTrash").addEventListener("click",()=>{$("setSheet").hidden=true;openTrash();});
+$("trashAll").addEventListener("click",()=>{$("trashConfirm").hidden=false;});
+$("trashNo").addEventListener("click",()=>{$("trashConfirm").hidden=true;});
+$("trashYes").addEventListener("click",async()=>{
+  $("trashYes").disabled=true;
+  try{await removePhotos(trash);const ids=trash.map(r=>r.id);
+    for(let i=0;i<ids.length;i+=200){const {error}=await sb.from("bookings").delete().in("id",ids.slice(i,i+200));if(error)throw error;}
+    trash=[];renderTrash();toast("Silinenler boşaltıldı");}
+  catch(e){toast("Silinemedi: "+errMsg(e));}finally{$("trashYes").disabled=false;$("trashConfirm").hidden=true;}
+});
 
 async function ensureSigned(paths){
   const need=paths.filter(p=>p&&!signed[p]);if(!need.length)return false;
@@ -1181,7 +1248,7 @@ $("fPhone").addEventListener("input",()=>{if(editing)setStatus(editing.status);}
 function err(m){const e=$("formErr");e.textContent=m;e.hidden=false;e.scrollIntoView({block:"nearest"});}
 $("btnDel").addEventListener("click",()=>{$("delConfirm").hidden=false;});
 $("delNo").addEventListener("click",()=>{$("delConfirm").hidden=true;});
-$("delYes").addEventListener("click",async()=>{try{await deleteBooking(editing.id);bookings=bookings.filter(b=>b.id!==editing.id);toast("Silindi");closeSheet();}catch(e){err("Silinemedi: "+errMsg(e));}});
+$("delYes").addEventListener("click",async()=>{try{await deleteBooking(editing.id);bookings=bookings.filter(b=>b.id!==editing.id);toast("Silindi · 30 gün içinde Ayarlar → Silinenler'den geri alabilirsiniz");closeSheet();}catch(e){err("Silinemedi: "+errMsg(e));}});
 
 /* photos */
 function renderPhotos(){
@@ -1471,7 +1538,25 @@ document.addEventListener("pointerdown",unlockAudio,{once:true});
 
 /* ---------- raporlar & toplu silme ---------- */
 let repP="month",delBulkList=[],ledger=[],ledgerLoaded=false;
-async function loadLedger(){const {data,error}=await sb.from("ledger").select("*").order("date",{ascending:false});if(!error){ledger=data||[];ledgerLoaded=true;}}
+async function fetchPaged(table,order){const all=[];for(let f=0;;f+=1000){const {data,error}=await sb.from(table).select("*").order(order,{ascending:false}).range(f,f+999);if(error)return null;all.push(...data);if(data.length<1000)break;}return all;}
+let archive=[];
+async function loadLedger(){const [lg,ar]=await Promise.all([fetchPaged("ledger","date"),fetchPaged("report_days","day")]);if(lg){ledger=lg;ledgerLoaded=true;}if(ar)archive=ar;}
+/* rapor özetlerini birleştir */
+const MAPKEYS=["recvAll","recvGot","recvDue","payAll","payDone","payDue","profit"];
+function mergeR(a,b){const o={count:(a.count||0)+(b.count||0),cancelled:(a.cancelled||0)+(b.cancelled||0),link:(a.link||0)+(b.link||0),pax:(a.pax||0)+(b.pax||0)};
+  MAPKEYS.forEach(k=>{const m=Object.assign({},a[k]||{});Object.entries(b[k]||{}).forEach(([c,v])=>{m[c]=(m[c]||0)+Number(v||0);});o[k]=m;});return o;}
+function archiveIn(from,to){return archive.filter(x=>x.day>=from&&x.day<=to);}
+/* toplu silmeden önce: silinecek kayıtların rakamlarını gün gün arşive ekle */
+async function archiveBookings(list){
+  const ids=new Set(list.map(b=>b.id));const byDay=new Map();
+  legs().filter(l=>ids.has(l.id)).forEach(l=>{if(!byDay.has(l.date))byDay.set(l.date,[]);byDay.get(l.date).push(l);});
+  if(!byDay.size)return;
+  const days=[...byDay.keys()];const old={};
+  for(let i=0;i<days.length;i+=200){const {data,error}=await sb.from("report_days").select("*").in("day",days.slice(i,i+200));if(error)throw error;(data||[]).forEach(r=>old[r.day]=r.data);}
+  const rows=days.map(d=>({company_id:company.id,day:d,data:mergeR(old[d]||{},calcReport(byDay.get(d))),updated_at:new Date().toISOString()}));
+  for(let i=0;i<rows.length;i+=200){const {error}=await sb.from("report_days").upsert(rows.slice(i,i+200));if(error)throw error;}
+  rows.forEach(r=>{const i=archive.findIndex(x=>x.day===r.day);if(i>=0)archive[i]=r;else archive.push(r);});
+}
 function repRange(){
   const n=new Date();let a,b,t;
   if(repP==="month"){a=new Date(n.getFullYear(),n.getMonth(),1);b=new Date(n.getFullYear(),n.getMonth()+1,0);t=TR_MONTHS[n.getMonth()]+" "+n.getFullYear();}
@@ -1516,7 +1601,8 @@ $("lgKind").addEventListener("change",()=>{const inc=$("lgKind").value==="income
 function renderReport(){
   const r=repRange();$("repRange").hidden=repP!=="custom";
   const list=legs().filter(b=>b.date>=r.from&&b.date<=r.to);
-  const R=calcReport(list);const Lg=calcLedger(r.from,r.to);const NP=netProfit(R,Lg);
+  const AR=archiveIn(r.from,r.to);
+  const R=AR.reduce((acc,x)=>mergeR(acc,x.data||{}),calcReport(list));const Lg=calcLedger(r.from,r.to);const NP=netProfit(R,Lg);
   $("repTitle").innerHTML=`<b>${esc(r.title)}</b> · ${R.count} transfer${R.cancelled?` (+${R.cancelled} iptal)`:""} · ${R.pax} yolcu · ${R.link} linkten`;
   $("repBoxes").innerHTML=`
     <div class="rbox k"><div class="l">Alınan (tahsil edildi)</div><div class="v">${esc(fmtMap(R.recvGot))}</div></div>
@@ -1530,7 +1616,8 @@ function renderReport(){
   renderLedger(r.from,r.to);
   const groups=new Map();
   list.filter(b=>b.status!=="cancelled").forEach(b=>{const k=repP==="year"?b.date.slice(0,7):b.date;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(b);});
-  const rows=[...groups.keys()].sort().map(k=>{const g=calcReport(groups.get(k));const lbl=repP==="year"?TR_MONTHS[+k.slice(5,7)-1]:k.slice(8,10)+"."+k.slice(5,7);return `<tr><td>${lbl}</td><td>${g.count}</td><td>${esc(fmtMap(g.recvAll))}</td><td>${esc(fmtMap(g.payAll))}</td><td>${esc(fmtMap(g.profit))}</td></tr>`;}).join("");
+  const arch=new Map();AR.forEach(x=>{const k=repP==="year"?x.day.slice(0,7):x.day;arch.set(k,arch.has(k)?mergeR(arch.get(k),x.data||{}):(x.data||{}));if(!groups.has(k))groups.set(k,[]);});
+  const rows=[...groups.keys()].sort().map(k=>{let g=calcReport(groups.get(k));if(arch.has(k))g=mergeR(g,arch.get(k));const lbl=repP==="year"?TR_MONTHS[+k.slice(5,7)-1]:k.slice(8,10)+"."+k.slice(5,7);return `<tr><td>${lbl}</td><td>${g.count}</td><td>${esc(fmtMap(g.recvAll))}</td><td>${esc(fmtMap(g.payAll))}</td><td>${esc(fmtMap(g.profit))}</td></tr>`;}).join("");
   $("repTable").innerHTML=`<tr><th>${repP==="year"?"Ay":"Gün"}</th><th>Adet</th><th>Alınacak</th><th>Ödenecek</th><th>Kâr</th></tr>${rows||'<tr><td colspan="5" style="text-align:center;color:var(--muted)">Bu aralıkta kayıt yok</td></tr>'}`;
   window.__rep={r,R,Lg,NP};
 }
@@ -1551,14 +1638,16 @@ document.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()
   else{const d=new Date();d.setDate(d.getDate()-(+b.dataset.del));const cut=ymd(d);list=bookings.filter(x=>x.date<cut&&(!x.returnDate||x.returnDate<cut));}
   delBulkList=list;
   if(!list.length){toast("Silinecek kayıt yok");$("delBulkConfirm").hidden=true;return;}
-  $("delBulkTxt").textContent=list.length+" kayıt kalıcı olarak silinecek. Emin misiniz?";$("delBulkConfirm").hidden=false;$("delBulkConfirm").scrollIntoView({block:"center"});
+  $("delBulkTxt").textContent=list.length+" eski kayıt fotoğraflarıyla birlikte kalıcı silinecek. Raporlardaki tutarlar (ciro, kâr, tahsilat) ve kasa defteri silinmez, aynen kalır. Emin misiniz?";$("delBulkConfirm").hidden=false;$("delBulkConfirm").scrollIntoView({block:"center"});
 }));
 $("delBulkNo").addEventListener("click",()=>{$("delBulkConfirm").hidden=true;});
 $("delBulkYes").addEventListener("click",async()=>{
   const ids=delBulkList.map(b=>b.id);if(!ids.length)return;$("delBulkYes").disabled=true;
-  try{for(let i=0;i<ids.length;i+=200){const {error}=await sb.from("bookings").delete().in("id",ids.slice(i,i+200));if(error)throw error;}
+  try{if(!ledgerLoaded)await loadLedger();
+    await archiveBookings(delBulkList);
+    for(let i=0;i<ids.length;i+=200){const {error}=await sb.from("bookings").delete().in("id",ids.slice(i,i+200));if(error)throw error;}
     removePhotos(delBulkList);
-    bookings=bookings.filter(b=>!ids.includes(b.id));toast(ids.length+" kayıt silindi");$("delBulkConfirm").hidden=true;renderReport();render();}
+    bookings=bookings.filter(b=>!ids.includes(b.id));toast(ids.length+" kayıt silindi · rapor ve kasa rakamları korundu");$("delBulkConfirm").hidden=true;renderReport();render();}
   catch(e){toast("Silinemedi: "+errMsg(e));}finally{$("delBulkYes").disabled=false;}
 });
 
