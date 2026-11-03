@@ -17,7 +17,7 @@
 <style>
 :root{
   --bg:#f6f4ef; --surface:#ffffff; --surface2:#eeebe3; --line:#d9d4c8;
-  --fg:#1b1f2a; --muted:#6b6f7a;
+  --fg:#1b1f2a; --muted:#4a4f5c;
   --accent:#9a7417; --accent-fg:#ffffff; --accent-soft:#f3e8c9;
   --ok:#1f7a4d; --ok-soft:#dcefe3; --warn:#b26a00; --warn-soft:#fbe9cf; --bad:#b3261e; --bad-soft:#f7dcd9; --info:#2a5fa8; --info-soft:#dbe6f6;
   --font-ui:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -26,7 +26,7 @@
 }
 @media (prefers-color-scheme: dark){:root{
   --bg:#12141a; --surface:#1b1e26; --surface2:#242832; --line:#333845;
-  --fg:#eceef2; --muted:#9aa0ad;
+  --fg:#eceef2; --muted:#c2c7d1;
   --accent:#e0b860; --accent-fg:#1b1500; --accent-soft:#3a3118;
   --ok:#5ccb8e; --ok-soft:#163427; --warn:#f0b35a; --warn-soft:#3b2a10; --bad:#f28b82; --bad-soft:#3d1c19; --info:#86aef0; --info-soft:#1b2a44;
   --shadow:0 6px 24px rgba(0,0,0,.4); color-scheme:dark}}
@@ -155,7 +155,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 .f label{font-size:12px;color:var(--muted);font-weight:600}
 .f input,.f select,.f textarea{border:0;background:none;padding:2px 0;width:100%;min-width:0;outline:none;font-size:16px}
 .f textarea{resize:vertical;min-height:60px}
-.f input::placeholder{color:var(--line)}
+.f input::placeholder,.f textarea::placeholder{color:#8a8e98;opacity:1}
 .inline{display:flex;align-items:center;gap:8px}
 .inline select{width:auto;font-size:14px;color:var(--muted)}
 .tog{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-top:1px solid var(--line)}
