@@ -374,15 +374,16 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
     <fieldset id="custBox" hidden><div class="cust" style="margin:10px 14px"><b>Müşteri formundan geldi</b><div id="custInfo"></div></div><div style="height:10px"></div></fieldset>
 
     <fieldset>
-      <div class="sec-t">Zaman</div>
+      <div class="sec-t">Geliş</div>
       <div class="row2">
         <div class="f"><label for="fDate">Tarih</label><input id="fDate" type="date"></div>
         <div class="f"><label for="fTime">Saat</label><input id="fTime" type="time"></div>
       </div>
       <div class="f"><label for="fFlight">Uçuş no (isteğe bağlı)</label><input id="fFlight" placeholder="TK 1234" autocapitalize="characters"></div>
+      <div class="sec-t" style="border-top:1px solid var(--line);padding-top:12px">Dönüş (aynı kayıt — boş bırakılırsa tek yön)</div>
       <div class="row2">
-        <div class="f"><label for="fRDate">Dönüş tarihi</label><input id="fRDate" type="date"></div>
-        <div class="f"><label for="fRTime">Dönüş saati</label><input id="fRTime" type="time"></div>
+        <div class="f" style="border-top:0"><label for="fRDate">Dönüş tarihi</label><input id="fRDate" type="date"></div>
+        <div class="f" style="border-top:0"><label for="fRTime">Dönüş saati</label><input id="fRTime" type="time"></div>
       </div>
       <div class="f"><label for="fRFlight">Dönüş uçuşu</label><input id="fRFlight" placeholder="isteğe bağlı" autocapitalize="characters"></div>
     </fieldset>
@@ -610,7 +611,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 0.6</div>
+    <div class="note">Transfer Defteri · sürüm 0.7</div>
   </div>
 </div>
 
@@ -845,21 +846,31 @@ async function ensureSigned(paths){
 
 /* ---------- render ---------- */
 function sorted(list){return list.slice().sort((a,b)=>(a.date+" "+(a.time||""))<(b.date+" "+(b.time||""))?-1:1);}
+/* tek kayıt = geliş + dönüş: listede iki ayağı ayrı satır olarak göster */
+function legs(){
+  const out=[];
+  bookings.forEach(b=>{
+    out.push(b.returnDate?Object.assign({},b,{_leg:"arr"}):b);
+    if(b.returnDate)out.push(Object.assign({},b,{_leg:"ret",_rid:b.id,date:b.returnDate,time:b.returnTime||"",flight:b.returnFlight||"",from:b.hotel||b.to||"Otel",to:(b.from&&/Havalimanı|Airport|AYT|GZP|DLM/i.test(b.from))?b.from:"Havalimanı"}));
+  });
+  return out;
+}
+const baseOf=b=>b&&b._leg?bookings.find(x=>x.id===b.id)||b:b;
 function render(){
   const t=todayStr();const q=query.trim().toLowerCase();
-  let list=bookings.filter(b=>{
+  let list=legs().filter(b=>{
     if(tab==="upcoming"&&b.date<t)return false;
     if(tab==="past"&&b.date>=t)return false;
     if(q){const hay=[b.firstName,b.lastName,b.hotel,b.phone,b.flight,b.note,b.customerNote].join(" ").toLowerCase();if(!hay.includes(q))return false;}
     return true;
   });
   list=sorted(list);if(tab==="past")list.reverse();
-  const todays=bookings.filter(b=>b.date===t&&b.status!=="cancelled");
+  const todays=legs().filter(b=>b.date===t&&b.status!=="cancelled");
   $("stToday").innerHTML=todays.length+' <span style="font-size:14px;font-weight:700;color:var(--muted)">transfer</span>';
   const due={};bookings.forEach(b=>{if(b.status!=="cancelled"&&b.date>=t&&!b.received&&Number(b.receiveAmount)>0){due[b.receiveCur||"EUR"]=(due[b.receiveCur||"EUR"]||0)+Number(b.receiveAmount);}});
   $("stDue").textContent=Object.keys(due).map(c=>money(due[c],c)).join(" · ")||"–";
   const now=new Date();const nowKey=t+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
-  const next=sorted(bookings.filter(b=>b.status!=="cancelled"&&b.status!=="done")).find(b=>(b.date+" "+(b.time||"00:00"))>=nowKey);
+  const next=sorted(legs().filter(b=>b.status!=="cancelled"&&b.status!=="done")).find(b=>(b.date+" "+(b.time||"00:00"))>=nowKey);
   $("stNextWrap").hidden=!next;
   if(next)$("stNext").textContent=(next.date===t?"Bugün ":fmtDateLong(next.date)+" ")+(next.time||"")+" · "+(next.lastName||next.firstName||"");
 
@@ -887,7 +898,7 @@ function card(b){
   const el=document.createElement("button");el.className="card"+(b.status==="cancelled"?" cancelled":"")+(b.source==="link"&&b.status==="pending"&&!seenLink[b.id]?" fresh":"");el.type="button";
   const pax=[b.adults>0?b.adults+" yetişkin":"",b.children>0?b.children+" çocuk"+(b.childAges&&b.childAges.length?" ("+b.childAges.join(", ")+")":""):"",b.infants>0?b.infants+" bebek":""].filter(Boolean).join(", ");
   const st=STATUS[b.status]||STATUS.pending;
-  const recv=Number(b.receiveAmount)>0?`<div class="amt num ${b.received?"got":"due"}">${money(b.receiveAmount,b.receiveCur||"EUR")}</div>`:(b.source==="link"&&b.status==="pending"?`<div class="chip warn">Fiyat girilmedi</div>`:"");
+  const recv=b._leg==="ret"?`<div class="chip">Ödeme gelişte</div>`:Number(b.receiveAmount)>0?`<div class="amt num ${b.received?"got":"due"}">${money(b.receiveAmount,b.receiveCur||"EUR")}</div>`:(b.source==="link"&&b.status==="pending"?`<div class="chip warn">Fiyat girilmedi</div>`:"");
   const pay=Number(b.payAmount)>0?`<div class="chip ${b.paid?"ok":""}">${b.paid?"Ödendi":"Ödenecek"} ${esc(money(b.payAmount,b.payCur||"EUR"))}</div>`:"";
   const p0=b.photos&&b.photos[0];const ph=p0?`<img class="thumb" alt="" src="${esc(p0.path?(signed[p0.path]||""):(p0.url||p0.dataUrl||""))}">`:"";
   const route=[short(b.from,b),short(b.to,b)].filter(Boolean).join(" → ");
@@ -902,13 +913,14 @@ function card(b){
         ${b.babySeat?`<span class="chip acc">Bebek koltuğu</span>`:""}
         ${Number(b.receiveAmount)>0?`<span class="chip ${b.received?"ok":"warn"}">${b.received?"Tahsil edildi":"Tahsilat bekliyor"}</span>`:""}
         ${pay}
-        ${b.returnDate?`<span class="chip">Dönüş ${esc(b.returnDate.slice(8,10)+"."+b.returnDate.slice(5,7))}</span>`:""}
+        ${b._leg==="arr"?`<span class="chip acc">✈︎ Geliş · dönüş ${esc(b.returnDate.slice(8,10)+"."+b.returnDate.slice(5,7))}</span>`:""}
+        ${b._leg==="ret"?`<span class="chip info">↩︎ Dönüş · geliş ${esc((baseOf(b).date||"").slice(8,10)+"."+(baseOf(b).date||"").slice(5,7))}</span>`:""}
         ${Number(b.reminderMin)>0?`<span class="chip">⏰</span>`:""}
         ${b.source==="link"?`<span class="chip info">Linkten geldi${b.language?" · "+(LANG[b.language]||b.language):""}</span>`:""}
       </div>
     </div>
     <div class="side">${recv}${ph}</div>`;
-  el.addEventListener("click",()=>openSheet(b));
+  el.addEventListener("click",()=>openSheet(baseOf(b)));
   return el;
 }
 function renderNewLink(){
@@ -919,9 +931,9 @@ function renderNewLink(){
 }
 function renderReminders(){
   const now=Date.now();const due=[];
-  bookings.forEach(b=>{const m=Number(b.reminderMin);if(!m||b.status==="cancelled"||b.status==="done"||dismissed[b.id])return;const start=new Date(b.date+"T"+(b.time||"00:00")+":00").getTime();if(now>=start-m*60000&&now<=start+30*60000)due.push({b,start});});
+  legs().forEach(b=>{const m=Number(b.reminderMin);const dk=b.id+(b._leg==="ret"?"r":"");if(!m||b.status==="cancelled"||b.status==="done"||dismissed[dk])return;const start=new Date(b.date+"T"+(b.time||"00:00")+":00").getTime();if(now>=start-m*60000&&now<=start+30*60000)due.push({b,start});});
   const box=$("remind");box.hidden=!due.length;if(!due.length)return;
-  box.innerHTML=`<div class="t">⏰ Yaklaşan transfer${due.length>1?"ler":""}</div>`+due.map(({b,start})=>{const mins=Math.round((start-now)/60000);const when=mins>60?Math.floor(mins/60)+" sa "+(mins%60)+" dk sonra":mins>0?mins+" dk sonra":mins===0?"şimdi":"başladı";return `<div class="row"><span><b>${esc(b.time||"")}</b> ${esc((b.firstName||"")+" "+(b.lastName||""))} · ${esc(b.hotel||"")} <span style="color:var(--muted)">(${when})</span></span><button data-dis="${esc(b.id)}">Gizle</button></div>`;}).join("");
+  box.innerHTML=`<div class="t">⏰ Yaklaşan transfer${due.length>1?"ler":""}</div>`+due.map(({b,start})=>{const mins=Math.round((start-now)/60000);const when=mins>60?Math.floor(mins/60)+" sa "+(mins%60)+" dk sonra":mins>0?mins+" dk sonra":mins===0?"şimdi":"başladı";return `<div class="row"><span><b>${esc(b.time||"")}</b> ${esc((b.firstName||"")+" "+(b.lastName||""))} · ${esc(b.hotel||"")} ${b._leg==="ret"?"· ↩︎ Dönüş ":""}<span style="color:var(--muted)">(${when})</span></span><button data-dis="${esc(b.id+(b._leg==="ret"?"r":""))}">Gizle</button></div>`;}).join("");
   box.querySelectorAll("[data-dis]").forEach(btn=>btn.addEventListener("click",()=>{dismissed[btn.dataset.dis]=1;renderReminders();}));
 }
 setInterval(renderReminders,30000);
