@@ -299,7 +299,7 @@ $("again").addEventListener("click",()=>location.reload());
   const [{data:co,error},{data:pl}]=await Promise.all([sb.rpc("public_company",{p_slug:slug}),sb.rpc("public_places",{p_slug:slug})]);
   const c=co&&co[0];
   if(error||!c){$("app").hidden=true;$("gone").hidden=false;return;}
-  company=c;extraPlaces=pl||[];HL=null;
+  company=c;extraPlaces=pl||[];
   $("coName").textContent=c.name;$("coMark").textContent=(c.name||"T").trim()[0].toUpperCase();
   document.title=c.name+" · "+T[lang].subtitle;
 })();
