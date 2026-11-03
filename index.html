@@ -223,6 +223,9 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 .flash b{font-size:15px}
 .flash span{font-size:13px;opacity:.95}
 @media (prefers-reduced-motion:reduce){.flash{transition:none}}
+.ages{display:flex;gap:8px;flex-wrap:wrap}
+.ages label{display:grid;gap:2px;font-size:11px;color:var(--muted);font-weight:600}
+.ages select{border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--bg);font-size:15px;color:var(--fg)}
 /* raporlar */
 .rgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .rbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
@@ -402,7 +405,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="f"><label for="fChildren">Çocuk</label><input id="fChildren" type="number" min="0" inputmode="numeric" value="0"></div>
         <div class="f"><label for="fInfants">Bebek</label><input id="fInfants" type="number" min="0" inputmode="numeric" value="0"></div>
       </div>
-      <div class="f"><label for="fAges">Çocuk yaşları</label><input id="fAges" placeholder="örn. 4, 9" inputmode="numeric"></div>
+      <div class="f" id="fAgesWrap" hidden><label>Çocuk yaşları</label><div class="ages" id="fAges" style="padding:4px 0 0"></div></div>
       <div class="tog"><span>Bebek koltuğu</span><button class="sw" id="fSeat" role="switch" aria-checked="false" aria-label="Bebek koltuğu"></button></div>
       <div class="tog"><span>Yükseltici</span><button class="sw" id="fBooster" role="switch" aria-checked="false" aria-label="Yükseltici"></button></div>
       <div class="f"><label for="fLug">Bagaj (adet)</label><input id="fLug" type="number" min="0" inputmode="numeric" placeholder="isteğe bağlı"></div>
@@ -958,6 +961,13 @@ setInterval(renderReminders,30000);
 function sw(id,val){$(id).setAttribute("aria-checked",val?"true":"false");}
 function swv(id){return $(id).getAttribute("aria-checked")==="true";}
 ["fSeat","fBooster","fReceived","fPaid","fRReceived","fRPaid"].forEach(id=>$(id).addEventListener("click",()=>sw(id,!swv(id))));
+function renderAgeInputs(prev){
+  const n=Math.max(0,Math.min(20,+$("fChildren").value||0));
+  const cur=prev||[...$("fAges").querySelectorAll("select")].map(x=>+x.value);
+  $("fAgesWrap").hidden=!n;
+  $("fAges").innerHTML=Array.from({length:n},(_,i)=>{const a=cur[i]??6;return `<label>${i+1}. çocuk<select data-i="${i}">${Array.from({length:18},(_,k)=>`<option value="${k}" ${k===a?"selected":""}>${k} yaş</option>`).join("")}</select></label>`;}).join("");
+}
+$("fChildren").addEventListener("input",()=>renderAgeInputs());
 function syncRetPay(){const on=!!$("fRDate").value;$("retPayBox").hidden=!on;$("payTitle").textContent=on?"Geliş ödemesi":"Ödeme";
   document.querySelector('label[for="fRecv"]').textContent=on?"Alınacak (geliş)":"Alınacak ödeme";document.querySelector('label[for="fPay"]').textContent=on?"Ödenecek (geliş)":"Ödenecek ödeme";}
 $("fRDate").addEventListener("input",syncRetPay);$("fRDate").addEventListener("change",syncRetPay);
@@ -974,7 +984,7 @@ function openSheet(b){
   $("fRDate").value=b?.returnDate||"";$("fRTime").value=b?.returnTime||"";$("fRFlight").value=b?.returnFlight||"";
   $("fFirst").value=b?.firstName||"";$("fLast").value=b?.lastName||"";$("fPhone").value=b?.phone||"";$("fEmail").value=b?.email||"";
   $("fAdults").value=b?b.adults??0:2;$("fChildren").value=b?.children??0;$("fInfants").value=b?.infants??0;
-  $("fAges").value=(b?.childAges||[]).join(", ");$("fLug").value=b?.luggage??"";
+  renderAgeInputs(b?.childAges||[]);$("fLug").value=b?.luggage??"";
   sw("fSeat",!!b?.babySeat);sw("fBooster",!!b?.booster);
   $("fHotel").value=b?.hotel||"";$("fArea").value=b?.area||"";$("hotelHint").hidden=true;
   $("fFrom").value=b?.from||"Antalya Havalimanı (AYT) – Dış Hatlar T1";$("fTo").value=b?.to||"Otel";
@@ -1009,7 +1019,7 @@ function readForm(){
     date:v("fDate"),time:v("fTime"),flight:v("fFlight").toUpperCase(),returnDate:v("fRDate"),returnTime:v("fRTime"),returnFlight:v("fRFlight").toUpperCase(),
     firstName:v("fFirst"),lastName:v("fLast"),phone:v("fPhone"),email:v("fEmail"),
     adults:+$("fAdults").value||0,children:+$("fChildren").value||0,infants:+$("fInfants").value||0,
-    childAges:v("fAges").split(/[,\s]+/).filter(Boolean).map(Number).filter(n=>!isNaN(n)),babySeat:swv("fSeat"),booster:swv("fBooster"),luggage:$("fLug").value===""?null:+$("fLug").value,
+    childAges:[...$("fAges").querySelectorAll("select")].map(x=>+x.value),babySeat:swv("fSeat"),booster:swv("fBooster"),luggage:$("fLug").value===""?null:+$("fLug").value,
     hotel:v("fHotel"),area:v("fArea"),from:v("fFrom"),to:v("fTo"),vehicle:v("fVehicle"),
     receiveAmount:+$("fRecv").value||0,receiveCur:$("fRecvCur").value,payAmount:+$("fPay").value||0,payCur:$("fPayCur").value,payTo:v("fPayTo"),
     retReceiveAmount:v("fRDate")?(+$("fRRecv").value||0):0,retReceiveCur:$("fRRecvCur").value,retPayAmount:v("fRDate")?(+$("fRPay").value||0):0,retPayCur:$("fRPayCur").value,retReceived:v("fRDate")?swv("fRReceived"):false,retPaid:v("fRDate")?swv("fRPaid"):false,
