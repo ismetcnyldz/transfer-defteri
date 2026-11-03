@@ -914,7 +914,10 @@ async function saveBooking(data,id){
   if(id){const {error}=await sb.from("bookings").update(row).eq("id",id);if(error)throw error;return id;}
   const {data:ins,error}=await sb.from("bookings").insert(row).select("id").single();if(error)throw error;return ins.id;
 }
-async function deleteBooking(id){const {error}=await sb.from("bookings").delete().eq("id",id);if(error)throw error;}
+/* kayıt silinince fotoğrafları da depodan silinsin (yer kaplamasın) */
+async function removePhotos(list){const paths=[];list.forEach(b=>(b&&b.photos||[]).forEach(p=>{if(p&&p.path)paths.push(p.path);}));
+  for(let i=0;i<paths.length;i+=100){try{await sb.storage.from("photos").remove(paths.slice(i,i+100));}catch(e){}}}
+async function deleteBooking(id){const b=bookings.find(x=>x.id===id);const {error}=await sb.from("bookings").delete().eq("id",id);if(error)throw error;removePhotos([b]);}
 
 async function ensureSigned(paths){
   const need=paths.filter(p=>p&&!signed[p]);if(!need.length)return false;
@@ -1554,6 +1557,7 @@ $("delBulkNo").addEventListener("click",()=>{$("delBulkConfirm").hidden=true;});
 $("delBulkYes").addEventListener("click",async()=>{
   const ids=delBulkList.map(b=>b.id);if(!ids.length)return;$("delBulkYes").disabled=true;
   try{for(let i=0;i<ids.length;i+=200){const {error}=await sb.from("bookings").delete().in("id",ids.slice(i,i+200));if(error)throw error;}
+    removePhotos(delBulkList);
     bookings=bookings.filter(b=>!ids.includes(b.id));toast(ids.length+" kayıt silindi");$("delBulkConfirm").hidden=true;renderReport();render();}
   catch(e){toast("Silinemedi: "+errMsg(e));}finally{$("delBulkYes").disabled=false;}
 });
