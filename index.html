@@ -903,7 +903,7 @@ async function loadAll(){
 let channel=null;
 function subscribeRealtime(){
   if(channel)return;
-  channel=sb.channel("bookings-live").on("postgres_changes",{event:"*",schema:"public",table:"bookings"},payload=>{
+  channel=sb.channel("bookings-live").on("postgres_changes",{event:"*",schema:"public",table:"bookings",filter:"company_id=eq."+company.id},payload=>{
     if(payload.eventType==="DELETE"){bookings=bookings.filter(b=>b.id!==payload.old.id);}
     else{const b=fromDb(payload.new);const i=bookings.findIndex(x=>x.id===b.id);if(i>=0)bookings[i]=b;else{bookings.push(b);if(b.source==="link"&&payload.eventType==="INSERT")notifyNew(b);}}
     scheduleRender();
