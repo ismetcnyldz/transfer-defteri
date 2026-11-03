@@ -310,7 +310,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <div class="right"><div class="date" id="todayLbl"></div>
       <button class="ico" id="btnLink" aria-label="Müşteriye rezervasyon linki gönder" hidden style="background:var(--ok-soft);color:var(--ok)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg><span>Link gönder</span></button>
       <button class="ico" id="btnAdmin" aria-label="Firma ekle ve yönet" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M19 8v6M16 11h6"/></svg><span>Firma ekle</span><span class="dot" id="adminDot" hidden></span></button>
-      <button class="ico" id="btnPlaces" aria-label="Oteller ve yerler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M8 8h2M8 12h2M8 16h2M17 14h1M17 18h1M3 21h18"/></svg><span>Oteller</span></button>
+      <button class="ico" id="btnPlaces" aria-label="Oteller ve yerler" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M8 8h2M8 12h2M8 16h2M17 14h1M17 18h1M3 21h18"/></svg><span>Oteller</span></button>
       <button class="ico" id="btnReports" aria-label="Raporlar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Raporlar</span></button>
       <button class="ico" id="btnSettings" aria-label="Ayarlar ve müşteri linki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ayarlar</span></button></div>
     </div>
@@ -396,9 +396,9 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 
     <fieldset>
       <div class="sec-t">Güzergah</div>
-      <div class="f"><label for="fHotel">Otel</label><input id="fHotel" placeholder="Yazmaya başlayın: Rixos, Titanic, Barut…" autocomplete="off"></div>
+      <div class="f"><label for="fHotel">Otel</label><input id="fHotel" placeholder="Otel adını yazın" autocomplete="off"></div>
       <div class="hint" id="hotelHint" hidden></div>
-      <div class="f"><label for="fArea">Bölge (otel seçilince otomatik dolar)</label><input id="fArea" placeholder="Belek, Lara, Side, Alanya…" autocomplete="off"></div>
+      <div class="f"><label for="fArea">Bölge</label><input id="fArea" placeholder="Belek, Lara, Side, Alanya…" autocomplete="off"></div>
       <div class="row2">
         <div class="f"><label for="fFrom">Nereden</label><input id="fFrom" placeholder="Havalimanı, otel, ilçe…" autocomplete="off"></div>
         <div class="f"><label for="fTo">Nereye</label><input id="fTo" placeholder="Havalimanı, otel, ilçe…" autocomplete="off"></div>
@@ -795,7 +795,7 @@ async function loadAll(){
   renderPlate();
   const {data:acc}=await sb.rpc("my_access");access=acc||{};
   $("btnAdmin").hidden=!access.is_admin;
-  $("btnPlaces").hidden=!!access.is_admin;
+  $("btnPlaces").hidden=true;
   if(!access.access&&!access.is_admin){showWall();return;}
   $("loadNote").hidden=true;
   render();renderReview();
@@ -1024,12 +1024,12 @@ function attachAC(input,kind,onPick){
   input.addEventListener("input",open);input.addEventListener("focus",open);input.addEventListener("blur",()=>setTimeout(close,120));
   input.addEventListener("keydown",e=>{if(!box)return;const bs=box.querySelectorAll("button");if(e.key==="ArrowDown"){hl=Math.min(hl+1,bs.length-1);}else if(e.key==="ArrowUp"){hl=Math.max(hl-1,0);}else if(e.key==="Enter"){e.preventDefault();if(hl>=0)bs[hl].dispatchEvent(new Event("mousedown"));return;}else if(e.key==="Escape"){close();return;}else return;e.preventDefault();bs.forEach((b,i)=>b.classList.toggle("hl",i===hl));});
 }
-attachAC($("fHotel"),"hotel",p=>{if(p.area)$("fArea").value=p.area;hotelHint(false);});
+
 attachAC($("fArea"),"place");
-attachAC($("fFrom"),"all",p=>{if(p.type==="hotel"&&!$("fHotel").value){$("fHotel").value=p.name;$("fArea").value=p.area;}});
-attachAC($("fTo"),"all",p=>{if(p.type==="hotel"&&!$("fHotel").value){$("fHotel").value=p.name;$("fArea").value=p.area;}});
+attachAC($("fFrom"),"place");
+attachAC($("fTo"),"place");
 attachAC($("npArea"),"place");
-$("fHotel").addEventListener("change",()=>hotelHint(true));
+
 function hotelHint(check){
   const v=$("fHotel").value.trim();const h=$("hotelHint");
   if(!check||!v||allPlaces().some(p=>p.type==="hotel"&&p.n===norm(v))){h.hidden=true;return;}
@@ -1047,7 +1047,7 @@ async function markReviewed(){
   const {error}=await sb.from("settings").upsert({company_id:company.id,places_reviewed_at:now});
   if(!error){settings.places_reviewed_at=now;renderReview();}
 }
-function renderReview(){
+function renderReview(){$("review").hidden=true;return;
   const last=settings.places_reviewed_at?new Date(settings.places_reviewed_at).getTime():0;
   const days=last?Math.floor((Date.now()-last)/86400000):0;
   $("review").hidden=!(days>=30);if(days>=30)$("reviewDays").textContent=days;
@@ -1328,7 +1328,7 @@ function openSettings(){
   const endD=company.plan==="trial"?company.trial_ends_at:company.paid_until;
   $("sTrial").textContent=company.plan==="lifetime"?"-":(endD?new Date(endD).toLocaleDateString("tr-TR"):"-");
 }
-$("btnSettings").addEventListener("click",()=>{openSettings();$("setPlacesBox").hidden=!(access&&access.is_admin);});
+$("btnSettings").addEventListener("click",()=>{openSettings();$("setPlacesBox").hidden=true;});
 $("setPlaces").addEventListener("click",()=>{$("setSheet").hidden=true;openPlaces();});
 $("setClose").addEventListener("click",()=>{$("setSheet").hidden=true;document.body.style.overflow="";});
 $("copyLink").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(custLink());toast("Link kopyalandı");}catch(e){const r=document.createRange();r.selectNodeContents($("custLink"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Link seçildi, kopyalayın");}});
