@@ -404,6 +404,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       </div>
       <div class="f"><label for="fAges">Çocuk yaşları</label><input id="fAges" placeholder="örn. 4, 9" inputmode="numeric"></div>
       <div class="tog"><span>Bebek koltuğu</span><button class="sw" id="fSeat" role="switch" aria-checked="false" aria-label="Bebek koltuğu"></button></div>
+      <div class="tog"><span>Yükseltici</span><button class="sw" id="fBooster" role="switch" aria-checked="false" aria-label="Yükseltici"></button></div>
       <div class="f"><label for="fLug">Bagaj (adet)</label><input id="fLug" type="number" min="0" inputmode="numeric" placeholder="isteğe bağlı"></div>
     </fieldset>
 
@@ -807,7 +808,7 @@ sb.auth.onAuthStateChange((ev,s)=>{
 });
 
 /* ---------- data layer ---------- */
-const MAP={retReceiveAmount:"ret_receive_amount",retReceiveCur:"ret_receive_cur",retReceived:"ret_received",retPayAmount:"ret_pay_amount",retPayCur:"ret_pay_cur",retPaid:"ret_paid",date:"date",time:"time",flight:"flight",returnDate:"return_date",returnTime:"return_time",returnFlight:"return_flight",firstName:"first_name",lastName:"last_name",phone:"phone",email:"email",language:"language",adults:"adults",children:"children",childAges:"child_ages",infants:"infants",babySeat:"baby_seat",luggage:"luggage",hotel:"hotel",area:"area",from:"from_place",to:"to_place",vehicle:"vehicle",receiveAmount:"receive_amount",receiveCur:"receive_cur",payAmount:"pay_amount",payCur:"pay_cur",payTo:"pay_to",received:"received",paid:"paid",status:"status",reminderMin:"reminder_min",note:"note",customerNote:"customer_note",photos:"photos",source:"source",createdAt:"created_at",updatedAt:"updated_at"};
+const MAP={booster:"booster",retReceiveAmount:"ret_receive_amount",retReceiveCur:"ret_receive_cur",retReceived:"ret_received",retPayAmount:"ret_pay_amount",retPayCur:"ret_pay_cur",retPaid:"ret_paid",date:"date",time:"time",flight:"flight",returnDate:"return_date",returnTime:"return_time",returnFlight:"return_flight",firstName:"first_name",lastName:"last_name",phone:"phone",email:"email",language:"language",adults:"adults",children:"children",childAges:"child_ages",infants:"infants",babySeat:"baby_seat",luggage:"luggage",hotel:"hotel",area:"area",from:"from_place",to:"to_place",vehicle:"vehicle",receiveAmount:"receive_amount",receiveCur:"receive_cur",payAmount:"pay_amount",payCur:"pay_cur",payTo:"pay_to",received:"received",paid:"paid",status:"status",reminderMin:"reminder_min",note:"note",customerNote:"customer_note",photos:"photos",source:"source",createdAt:"created_at",updatedAt:"updated_at"};
 const fromDb=r=>{const o={id:r.id};for(const k in MAP)o[k]=r[MAP[k]];if(o.time)o.time=String(o.time).slice(0,5);if(o.returnTime)o.returnTime=String(o.returnTime).slice(0,5);o.childAges=o.childAges||[];o.photos=o.photos||[];return o;};
 const toDb=o=>{const r={};for(const k in MAP){if(k==="createdAt"||k==="updatedAt")continue;let v=o[k];if(v===""||v===undefined)v=null;if(["time","returnTime","returnDate","luggage"].includes(k)&&!v)v=null;r[MAP[k]]=v;}r.company_id=company.id;return r;};
 
@@ -925,6 +926,7 @@ function card(b){
         <span class="chip ${st[1]}">${st[0]}</span>
         ${pax?`<span class="chip">${esc(pax)}</span>`:""}
         ${b.babySeat?`<span class="chip acc">Bebek koltuğu</span>`:""}
+        ${b.booster?`<span class="chip acc">Yükseltici</span>`:""}
         ${Number(b.receiveAmount)>0?`<span class="chip ${b.received?"ok":"warn"}">${b.received?"Tahsil edildi":"Tahsilat bekliyor"}</span>`:""}
         ${pay}
         ${b._leg==="arr"?`<span class="chip acc">✈︎ Geliş · dönüş ${esc(b.returnDate.slice(8,10)+"."+b.returnDate.slice(5,7))}</span>`:""}
@@ -955,7 +957,7 @@ setInterval(renderReminders,30000);
 /* ---------- form ---------- */
 function sw(id,val){$(id).setAttribute("aria-checked",val?"true":"false");}
 function swv(id){return $(id).getAttribute("aria-checked")==="true";}
-["fSeat","fReceived","fPaid","fRReceived","fRPaid"].forEach(id=>$(id).addEventListener("click",()=>sw(id,!swv(id))));
+["fSeat","fBooster","fReceived","fPaid","fRReceived","fRPaid"].forEach(id=>$(id).addEventListener("click",()=>sw(id,!swv(id))));
 function syncRetPay(){const on=!!$("fRDate").value;$("retPayBox").hidden=!on;$("payTitle").textContent=on?"Geliş ödemesi":"Ödeme";
   document.querySelector('label[for="fRecv"]').textContent=on?"Alınacak (geliş)":"Alınacak ödeme";document.querySelector('label[for="fPay"]').textContent=on?"Ödenecek (geliş)":"Ödenecek ödeme";}
 $("fRDate").addEventListener("input",syncRetPay);$("fRDate").addEventListener("change",syncRetPay);
@@ -973,7 +975,7 @@ function openSheet(b){
   $("fFirst").value=b?.firstName||"";$("fLast").value=b?.lastName||"";$("fPhone").value=b?.phone||"";$("fEmail").value=b?.email||"";
   $("fAdults").value=b?b.adults??0:2;$("fChildren").value=b?.children??0;$("fInfants").value=b?.infants??0;
   $("fAges").value=(b?.childAges||[]).join(", ");$("fLug").value=b?.luggage??"";
-  sw("fSeat",!!b?.babySeat);
+  sw("fSeat",!!b?.babySeat);sw("fBooster",!!b?.booster);
   $("fHotel").value=b?.hotel||"";$("fArea").value=b?.area||"";$("hotelHint").hidden=true;
   $("fFrom").value=b?.from||"Antalya Havalimanı (AYT) – Dış Hatlar T1";$("fTo").value=b?.to||"Otel";
   $("fVehicle").value=b?.vehicle||"";
@@ -1007,7 +1009,7 @@ function readForm(){
     date:v("fDate"),time:v("fTime"),flight:v("fFlight").toUpperCase(),returnDate:v("fRDate"),returnTime:v("fRTime"),returnFlight:v("fRFlight").toUpperCase(),
     firstName:v("fFirst"),lastName:v("fLast"),phone:v("fPhone"),email:v("fEmail"),
     adults:+$("fAdults").value||0,children:+$("fChildren").value||0,infants:+$("fInfants").value||0,
-    childAges:v("fAges").split(/[,\s]+/).filter(Boolean).map(Number).filter(n=>!isNaN(n)),babySeat:swv("fSeat"),luggage:$("fLug").value===""?null:+$("fLug").value,
+    childAges:v("fAges").split(/[,\s]+/).filter(Boolean).map(Number).filter(n=>!isNaN(n)),babySeat:swv("fSeat"),booster:swv("fBooster"),luggage:$("fLug").value===""?null:+$("fLug").value,
     hotel:v("fHotel"),area:v("fArea"),from:v("fFrom"),to:v("fTo"),vehicle:v("fVehicle"),
     receiveAmount:+$("fRecv").value||0,receiveCur:$("fRecvCur").value,payAmount:+$("fPay").value||0,payCur:$("fPayCur").value,payTo:v("fPayTo"),
     retReceiveAmount:v("fRDate")?(+$("fRRecv").value||0):0,retReceiveCur:$("fRRecvCur").value,retPayAmount:v("fRDate")?(+$("fRPay").value||0):0,retPayCur:$("fRPayCur").value,retReceived:v("fRDate")?swv("fRReceived"):false,retPaid:v("fRDate")?swv("fRPaid"):false,
