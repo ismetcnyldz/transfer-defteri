@@ -423,6 +423,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="f"><label for="fInfants">Bebek</label><input id="fInfants" type="number" min="0" inputmode="numeric" value="0"></div>
       </div>
       <div class="f" id="fAgesWrap" hidden><label>Çocuk yaşları</label><div class="ages" id="fAges" style="padding:4px 0 0"></div></div>
+      <div id="fNamesWrap" hidden><div class="sec-t" style="border-top:1px solid var(--line);padding-top:12px">Yolcu isimleri</div><div id="fNames"></div></div>
       <div class="tog"><span>Bebek koltuğu</span><button class="sw" id="fSeat" role="switch" aria-checked="false" aria-label="Bebek koltuğu"></button></div>
       <div class="tog"><span>Yükseltici</span><button class="sw" id="fBooster" role="switch" aria-checked="false" aria-label="Yükseltici"></button></div>
       <div class="f"><label for="fLug">Bagaj (adet)</label><input id="fLug" type="number" min="0" inputmode="numeric" placeholder="isteğe bağlı"></div>
@@ -468,6 +469,10 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <button data-s="confirmed">Onaylandı</button>
         <button data-s="done">Tamamlandı</button>
         <button data-s="cancelled">İptal</button>
+      </div>
+      <div id="confirmBox" hidden style="padding:0 14px 12px;display:grid;gap:6px">
+        <a class="wa-btn" id="confirmWa" target="_blank" rel="noopener">✓ Kaydet ve müşteriye WhatsApp onayı gönder</a>
+        <span class="note" style="margin:0;text-align:left">Müşterinin dilinde hazır onay mesajı açılır; WhatsApp'ta "Gönder"e basmanız yeterli.</span>
       </div>
       <div class="f"><label for="fRemind">Hatırlatma</label>
         <select id="fRemind"><option value="0">Kapalı</option><option value="30">30 dk önce</option><option value="60">1 saat önce</option><option value="120">2 saat önce</option><option value="180">3 saat önce</option><option value="720">12 saat önce</option><option value="1440">1 gün önce</option></select></div>
@@ -642,7 +647,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 0.8</div>
+    <div class="note">Transfer Defteri · sürüm 0.9</div>
   </div>
 </div>
 
@@ -828,7 +833,7 @@ sb.auth.onAuthStateChange((ev,s)=>{
 });
 
 /* ---------- data layer ---------- */
-const MAP={booster:"booster",retReceiveAmount:"ret_receive_amount",retReceiveCur:"ret_receive_cur",retReceived:"ret_received",retPayAmount:"ret_pay_amount",retPayCur:"ret_pay_cur",retPaid:"ret_paid",date:"date",time:"time",flight:"flight",returnDate:"return_date",returnTime:"return_time",returnFlight:"return_flight",firstName:"first_name",lastName:"last_name",phone:"phone",email:"email",language:"language",adults:"adults",children:"children",childAges:"child_ages",infants:"infants",babySeat:"baby_seat",luggage:"luggage",hotel:"hotel",area:"area",from:"from_place",to:"to_place",vehicle:"vehicle",receiveAmount:"receive_amount",receiveCur:"receive_cur",payAmount:"pay_amount",payCur:"pay_cur",payTo:"pay_to",received:"received",paid:"paid",status:"status",reminderMin:"reminder_min",note:"note",customerNote:"customer_note",photos:"photos",source:"source",createdAt:"created_at",updatedAt:"updated_at"};
+const MAP={passengers:"passengers",booster:"booster",retReceiveAmount:"ret_receive_amount",retReceiveCur:"ret_receive_cur",retReceived:"ret_received",retPayAmount:"ret_pay_amount",retPayCur:"ret_pay_cur",retPaid:"ret_paid",date:"date",time:"time",flight:"flight",returnDate:"return_date",returnTime:"return_time",returnFlight:"return_flight",firstName:"first_name",lastName:"last_name",phone:"phone",email:"email",language:"language",adults:"adults",children:"children",childAges:"child_ages",infants:"infants",babySeat:"baby_seat",luggage:"luggage",hotel:"hotel",area:"area",from:"from_place",to:"to_place",vehicle:"vehicle",receiveAmount:"receive_amount",receiveCur:"receive_cur",payAmount:"pay_amount",payCur:"pay_cur",payTo:"pay_to",received:"received",paid:"paid",status:"status",reminderMin:"reminder_min",note:"note",customerNote:"customer_note",photos:"photos",source:"source",createdAt:"created_at",updatedAt:"updated_at"};
 const fromDb=r=>{const o={id:r.id};for(const k in MAP)o[k]=r[MAP[k]];if(o.time)o.time=String(o.time).slice(0,5);if(o.returnTime)o.returnTime=String(o.returnTime).slice(0,5);o.childAges=o.childAges||[];o.photos=o.photos||[];return o;};
 const toDb=o=>{const r={};for(const k in MAP){if(k==="createdAt"||k==="updatedAt")continue;let v=o[k];if(v===""||v===undefined)v=null;if(["time","returnTime","returnDate","luggage"].includes(k)&&!v)v=null;r[MAP[k]]=v;}r.company_id=company.id;return r;};
 
@@ -947,6 +952,7 @@ function card(b){
         ${pax?`<span class="chip">${esc(pax)}</span>`:""}
         ${b.babySeat?`<span class="chip acc">Bebek koltuğu</span>`:""}
         ${b.booster?`<span class="chip acc">Yükseltici</span>`:""}
+        ${(b.passengers||[]).length>1?`<span class="chip">👥 ${(b.passengers||[]).length} isim</span>`:""}
         ${Number(b.receiveAmount)>0?`<span class="chip ${b.received?"ok":"warn"}">${b.received?"Tahsil edildi":"Tahsilat bekliyor"}</span>`:""}
         ${pay}
         ${b._leg==="arr"?`<span class="chip acc">✈︎ Geliş · dönüş ${esc(b.returnDate.slice(8,10)+"."+b.returnDate.slice(5,7))}</span>`:""}
@@ -978,13 +984,33 @@ setInterval(renderReminders,30000);
 function sw(id,val){$(id).setAttribute("aria-checked",val?"true":"false");}
 function swv(id){return $(id).getAttribute("aria-checked")==="true";}
 ["fSeat","fBooster","fReceived","fPaid","fRReceived","fRPaid"].forEach(id=>$(id).addEventListener("click",()=>sw(id,!swv(id))));
+function renderNameInputs(prev){
+  const box=$("fNames");const keep={};
+  box.querySelectorAll("input[data-k]").forEach(i=>{keep[i.dataset.k]=i.value;});
+  if(prev){const by={adult:[],child:[],infant:[]};(prev||[]).slice(1).forEach(p=>{(by[p.type]||by.adult).push(p.name||"");});
+    by.adult.forEach((n,i)=>keep["a"+(i+2)]=n);by.child.forEach((n,i)=>keep["c"+(i+1)]=n);by.infant.forEach((n,i)=>keep["i"+(i+1)]=n);}
+  const A=+$("fAdults").value||0,C=+$("fChildren").value||0,I=+$("fInfants").value||0;
+  const ages=[...$("fAges").querySelectorAll("select")].map(x=>x.value);
+  const rows=[];
+  for(let i=2;i<=A;i++)rows.push(`<div class="f"><label>${i}. yetişkin</label><input data-k="a${i}" data-type="adult" autocapitalize="words" spellcheck="false" value="${esc(keep["a"+i]||"")}"></div>`);
+  for(let i=1;i<=C;i++)rows.push(`<div class="f"><label>${i}. çocuk${ages[i-1]!=null?" ("+ages[i-1]+" yaş)":""}</label><input data-k="c${i}" data-type="child" autocapitalize="words" spellcheck="false" value="${esc(keep["c"+i]||"")}"></div>`);
+  for(let i=1;i<=I;i++)rows.push(`<div class="f"><label>${i}. bebek</label><input data-k="i${i}" data-type="infant" autocapitalize="words" spellcheck="false" value="${esc(keep["i"+i]||"")}"></div>`);
+  box.innerHTML=rows.join("");$("fNamesWrap").hidden=!rows.length;
+}
+["fAdults","fInfants"].forEach(id=>$(id).addEventListener("input",()=>renderNameInputs()));
+function readNames(){
+  const lead=(($("fFirst").value||"")+" "+($("fLast").value||"")).trim();
+  const ages=[...$("fAges").querySelectorAll("select")].map(x=>+x.value);let ci=0;
+  return [{type:"adult",name:lead}].concat([...$("fNames").querySelectorAll("input[data-k]")].map(i=>({type:i.dataset.type,name:i.value.trim(),age:i.dataset.type==="child"?ages[ci++]:null})));
+}
 function renderAgeInputs(prev){
   const n=Math.max(0,Math.min(20,+$("fChildren").value||0));
   const cur=prev||[...$("fAges").querySelectorAll("select")].map(x=>+x.value);
   $("fAgesWrap").hidden=!n;
   $("fAges").innerHTML=Array.from({length:n},(_,i)=>{const a=cur[i]??6;return `<label>${i+1}. çocuk<select data-i="${i}">${Array.from({length:18},(_,k)=>`<option value="${k}" ${k===a?"selected":""}>${k} yaş</option>`).join("")}</select></label>`;}).join("");
 }
-$("fChildren").addEventListener("input",()=>renderAgeInputs());
+$("fChildren").addEventListener("input",()=>{renderAgeInputs();renderNameInputs();});
+$("fAges").addEventListener("change",()=>renderNameInputs());
 function syncRetPay(){const on=!!$("fRDate").value;$("retPayBox").hidden=!on;$("payTitle").textContent=on?"Geliş ödemesi":"Ödeme";
   document.querySelector('label[for="fRecv"]').textContent=on?"Alınacak (geliş)":"Alınacak ödeme";document.querySelector('label[for="fPay"]').textContent=on?"Ödenecek (geliş)":"Ödenecek ödeme";}
 $("fRDate").addEventListener("input",syncRetPay);$("fRDate").addEventListener("change",syncRetPay);
@@ -992,7 +1018,9 @@ $("splitPay").addEventListener("click",()=>{const r=(+$("fRecv").value||0)+(+$("
   const h=x=>Math.round(x/2*100)/100;if(r){$("fRecv").value=h(r);$("fRRecv").value=Math.round((r-h(r))*100)/100;$("fRRecvCur").value=$("fRecvCur").value;}
   if(p){$("fPay").value=h(p);$("fRPay").value=Math.round((p-h(p))*100)/100;$("fRPayCur").value=$("fPayCur").value;}toast("Tutarlar ikiye bölündü");});
 $("statusPick").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>setStatus(b.dataset.s)));
-function setStatus(s){$("statusPick").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===s?"true":"false"));editing.status=s;}
+function setStatus(s){$("statusPick").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===s?"true":"false"));editing.status=s;
+  const show=s==="confirmed"&&digits($("fPhone").value).length>=8;$("confirmBox").hidden=!show;
+  if(s==="confirmed"&&$("fRemind").value==="0")$("fRemind").value="120";}
 function openSheet(b){
   editing=b?Object.assign({},b):{status:"pending",source:"manual"};
   $("sheetTitle").textContent=b?"Rezervasyon":"Yeni rezervasyon";
@@ -1010,7 +1038,8 @@ function openSheet(b){
   $("fRRecv").value=b?.retReceiveAmount||"";$("fRRecvCur").value=b?.retReceiveCur||b?.receiveCur||"EUR";$("fRPay").value=b?.retPayAmount||"";$("fRPayCur").value=b?.retPayCur||b?.payCur||"EUR";
   sw("fRReceived",!!b?.retReceived);sw("fRPaid",!!b?.retPaid);syncRetPay();
   sw("fReceived",!!b?.received);sw("fPaid",!!b?.paid);
-  setStatus(b?.status||"pending");$("fRemind").value=String(b?.reminderMin||0);$("fNote").value=b?.note||"";
+  setStatus(b?.status||"pending");$("fRemind").value=String(b?b.reminderMin||0:120);
+  $("fNames").innerHTML="";renderNameInputs(b?.passengers||[]);$("fNote").value=b?.note||"";
   photos=(b?.photos||[]).slice();renderPhotos();
   $("delWrap").hidden=!b;$("delConfirm").hidden=true;
   const isLink=b&&b.source==="link";$("custBox").hidden=!isLink;
@@ -1023,13 +1052,48 @@ function closeSheet(){$("sheet").hidden=true;document.body.style.overflow="";edi
 $("btnClose").addEventListener("click",closeSheet);
 $("fab").addEventListener("click",()=>openSheet(null));
 $("fPhone").addEventListener("input",updateContact);
+/* WhatsApp mesajları (müşterinin dilinde) */
+function guessLang(b){if(b.language&&["tr","en","de","ru"].includes(b.language))return b.language;const d=digits(b.phone);if(d.startsWith("90"))return "tr";if(d.startsWith("7"))return "ru";if(/^(49|43|41)/.test(d))return "de";return "en";}
+const dmy=x=>x?x.slice(8,10)+"."+x.slice(5,7)+"."+x.slice(0,4):"";
+function paxText(b,L){const a=b.adults||0,c=b.children||0,i=b.infants||0;
+  const W={tr:["yetişkin","çocuk","bebek"],en:["adult(s)","child(ren)","infant(s)"],de:["Erw.","Kind(er)","Baby(s)"],ru:["взр.","реб.","млад."]}[L];
+  return [a?a+" "+W[0]:"",c?c+" "+W[1]:"",i?i+" "+W[2]:""].filter(Boolean).join(", ");}
+function waConfirmText(b){
+  const L=guessLang(b);const name=((b.firstName||"")+" "+(b.lastName||"")).trim();const co=company?.name||"";
+  const price=Number(b.receiveAmount)>0?money(b.receiveAmount,b.receiveCur||"EUR"):"";
+  const rprice=b.returnDate&&Number(b.retReceiveAmount)>0?money(b.retReceiveAmount,b.retReceiveCur||b.receiveCur||"EUR"):"";
+  const T={
+    tr:{h:`Sayın ${name},\n${co} transfer rezervasyonunuz ONAYLANMIŞTIR ✅`,d:"Tarih",f:"Uçuş",ho:"Otel",p:"Yolcu",pr:"Ücret",r:"Dönüş",bs:"Bebek koltuğu",bo:"Yükseltici",e:"Şoförümüz sizi isminizin yazılı olduğu tabela ile karşılayacaktır. İyi yolculuklar!"},
+    en:{h:`Dear ${name},\nyour transfer booking with ${co} is CONFIRMED ✅`,d:"Date",f:"Flight",ho:"Hotel",p:"Passengers",pr:"Price",r:"Return",bs:"Baby seat",bo:"Booster",e:"Our driver will meet you with a name sign. Have a nice trip!"},
+    de:{h:`Sehr geehrte/r ${name},\nIhre Transferbuchung bei ${co} ist BESTÄTIGT ✅`,d:"Datum",f:"Flug",ho:"Hotel",p:"Reisende",pr:"Preis",r:"Rückfahrt",bs:"Babysitz",bo:"Sitzerhöhung",e:"Unser Fahrer erwartet Sie mit einem Namensschild. Gute Reise!"},
+    ru:{h:`Уважаемый(ая) ${name},\nваш трансфер в ${co} ПОДТВЕРЖДЁН ✅`,d:"Дата",f:"Рейс",ho:"Отель",p:"Пассажиры",pr:"Стоимость",r:"Обратно",bs:"Детское кресло",bo:"Бустер",e:"Водитель встретит вас с табличкой с вашим именем. Хорошей поездки!"}}[L];
+  const lines=[T.h,"",`📅 ${T.d}: ${dmy(b.date)} ${b.time||""}`.trim()];
+  if(b.flight)lines.push(`✈️ ${T.f}: ${b.flight}`);
+  if(b.hotel)lines.push(`🏨 ${T.ho}: ${b.hotel}`);
+  const px=paxText(b,L);if(px)lines.push(`👥 ${T.p}: ${px}${b.babySeat?" · "+T.bs:""}${b.booster?" · "+T.bo:""}`);
+  if(b.returnDate)lines.push(`↩️ ${T.r}: ${dmy(b.returnDate)} ${b.returnTime||""}${b.returnFlight?" · "+b.returnFlight:""}${rprice?" · "+rprice:""}`);
+  if(price)lines.push(`💶 ${T.pr}: ${price}`);
+  lines.push("",T.e);
+  return lines.join("\n");
+}
+function waHelloText(b){
+  const L=guessLang(b);const name=((b.firstName||"")+" "+(b.lastName||"")).trim();const co=company?.name||"";const dt=dmy(b.date)+(b.time?" "+b.time:"");
+  return {tr:`Merhaba ${name}, ${co} transfer firmasından yazıyoruz. ${dt} tarihli transfer rezervasyonunuz hakkında:\n`,
+          en:`Hello ${name}, this is ${co} transfer service writing about your transfer booking on ${dt}:\n`,
+          de:`Hallo ${name}, hier ist ${co} wegen Ihrer Transferbuchung am ${dt}:\n`,
+          ru:`Здравствуйте, ${name}! Пишем из ${co} по поводу вашего трансфера ${dt}:\n`}[L];
+}
+const waUrl=(phone,text)=>"https://wa.me/"+digits(phone)+"?text="+encodeURIComponent(text);
 function updateContact(){
   const d=digits($("fPhone").value);const bar=$("contactBar");
   if(!d||!editing?.id){bar.hidden=true;return;}
   bar.hidden=false;
-  bar.innerHTML=`<a class="wa" href="https://wa.me/${d}" target="_blank" rel="noopener">WhatsApp</a><a href="tel:+${d}">Ara</a><button type="button" id="cpPhone">Numarayı kopyala</button>`;
+  bar.innerHTML=`<a class="wa" id="waHello" target="_blank" rel="noopener">WhatsApp</a>${editing&&editing.status==="confirmed"?`<a class="wa" id="waConfirm2" target="_blank" rel="noopener">Onay mesajı</a>`:""}<a href="tel:+${d}">Ara</a><button type="button" id="cpPhone">Numarayı kopyala</button>`;
+  $("waHello").addEventListener("click",function(){this.href=waUrl($("fPhone").value,waHelloText(readFormFull()));});
+  if($("waConfirm2"))$("waConfirm2").addEventListener("click",function(){this.href=waUrl($("fPhone").value,waConfirmText(readFormFull()));});
   $("cpPhone").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("fPhone").value);toast("Kopyalandı");}catch(e){$("fPhone").select();}});
 }
+function readFormFull(){const d=readForm();d.passengers=readNames();return d;}
 function readForm(){
   const v=id=>$(id).value.trim();
   return Object.assign(editing,{
@@ -1043,15 +1107,22 @@ function readForm(){
     received:swv("fReceived"),paid:swv("fPaid"),reminderMin:+$("fRemind").value||0,note:v("fNote"),photos:photos.slice()
   });
 }
-$("btnSave").addEventListener("click",async()=>{
-  const d=readForm();
+async function saveSheet(){
+  const d=readFormFull();
   if(!d.date)return err("Tarih gerekli.");
   if(!d.firstName&&!d.lastName)return err("Yolcu adı veya soyadı gerekli.");
   const id=d.id;$("btnSave").disabled=true;
   try{const nid=await saveBooking(d,id);if(!id){const b=Object.assign({id:nid},d);if(!bookings.some(x=>x.id===nid))bookings.push(b);}else{const i=bookings.findIndex(x=>x.id===id);if(i>=0)bookings[i]=Object.assign({},bookings[i],d);}toast(id?"Güncellendi":"Rezervasyon eklendi");closeSheet();}
   catch(e){err("Kaydedilemedi: "+errMsg(e));}
   finally{$("btnSave").disabled=false;}
+}
+$("btnSave").addEventListener("click",saveSheet);
+$("confirmWa").addEventListener("click",function(){
+  setStatus("confirmed");if($("fRemind").value==="0")$("fRemind").value="120";
+  this.href=waUrl($("fPhone").value,waConfirmText(readFormFull()));
+  setTimeout(saveSheet,0);
 });
+$("fPhone").addEventListener("input",()=>{if(editing)setStatus(editing.status);});
 function err(m){const e=$("formErr");e.textContent=m;e.hidden=false;e.scrollIntoView({block:"nearest"});}
 $("btnDel").addEventListener("click",()=>{$("delConfirm").hidden=false;});
 $("delNo").addEventListener("click",()=>{$("delConfirm").hidden=true;});
