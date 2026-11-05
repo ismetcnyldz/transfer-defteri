@@ -255,9 +255,11 @@ $("form").addEventListener("submit",async e=>{
   /* uçuş kodu: TK1234, TK 1234, EZY2145, U2 8123, PC-1234 … (2–3 karakter havayolu + rakam) */
   const flightOk=v=>{const c=String(v||"").toUpperCase().replace(/[\s\-\.]/g,"");return /^[A-Z0-9]{2,3}\d{1,5}[A-Z]?$/.test(c)&&/[A-Z]/.test(c)&&c.length<=9;};
   const retOn=$("retSw").getAttribute("aria-checked")==="true";
-  const fBad=!flightOk($("flight").value),rfBad=retOn&&!flightOk($("rflight").value);
+  /* aynı uçuş kodu ikinci kez gönderilirse kabul et: müşteri asla formda takılı kalmasın */
+  const lenient=v=>{const c=String(v||"").trim();return c.length>=2&&window.__fWarned===c;};
+  const fBad=!flightOk($("flight").value)&&!lenient($("flight").value),rfBad=retOn&&!flightOk($("rflight").value)&&!lenient($("rflight").value);
   let bad=false;[["first",!first],["last",!last],["phone",phoneRaw.length<6],["date",!date],["time",!time],["flight",fBad],["hotel",!hotel]].concat(retOn?[["rflight",rfBad]]:[]).forEach(([id,b])=>{mark(id,b);if(b)bad=true;});
-  if(bad&&first&&last&&phoneRaw.length>=6&&date&&time&&hotel&&(fBad||rfBad)){E.textContent=t.err_flight;E.hidden=false;E.scrollIntoView({block:"center"});return;}
+  if(bad&&first&&last&&phoneRaw.length>=6&&date&&time&&hotel&&(fBad||rfBad)){window.__fWarned=(fBad?$("flight").value:$("rflight").value).trim();E.textContent=t.err_flight;E.hidden=false;E.scrollIntoView({block:"center"});return;}
   if(bad){E.textContent=phoneRaw&&phoneRaw.length<6?t.err_phone:t.err_req;E.hidden=false;E.scrollIntoView({block:"center"});return;}
   if(date<new Date().toISOString().slice(0,10)){mark("date",true);E.textContent=t.err_date;E.hidden=false;return;}
   let namesBad=false;const others=[...$("paxNames").querySelectorAll("input[data-k]")];
