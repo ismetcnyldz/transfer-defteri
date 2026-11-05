@@ -252,7 +252,8 @@ const mark=(id,bad)=>$(id).closest(".f").classList.toggle("bad",bad);
 $("form").addEventListener("submit",async e=>{
   e.preventDefault();const t=T[lang];const E=$("err");E.hidden=true;
   const first=$("first").value.trim(),last=$("last").value.trim(),phoneRaw=$("phone").value.replace(/[^\d]/g,""),date=$("date").value,time=$("time").value,hotel=$("hotel").value.trim();
-  const flightOk=v=>/^[A-Za-z0-9]{2}\s?\d{1,5}[A-Za-z]?$/.test(v.trim().replace(/\s+/g," "));
+  /* uçuş kodu: TK1234, TK 1234, EZY2145, U2 8123, PC-1234 … (2–3 karakter havayolu + rakam) */
+  const flightOk=v=>{const c=String(v||"").toUpperCase().replace(/[\s\-\.]/g,"");return /^[A-Z0-9]{2,3}\d{1,5}[A-Z]?$/.test(c)&&/[A-Z]/.test(c)&&c.length<=9;};
   const retOn=$("retSw").getAttribute("aria-checked")==="true";
   const fBad=!flightOk($("flight").value),rfBad=retOn&&!flightOk($("rflight").value);
   let bad=false;[["first",!first],["last",!last],["phone",phoneRaw.length<6],["date",!date],["time",!time],["flight",fBad],["hotel",!hotel]].concat(retOn?[["rflight",rfBad]]:[]).forEach(([id,b])=>{mark(id,b);if(b)bad=true;});
