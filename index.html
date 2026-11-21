@@ -1469,7 +1469,7 @@ $("coSave").addEventListener("click",async()=>{
       openCompany(r);showInvite(r,v("cnPass"));
     }else{
       const plateV=v("cnPlate").toUpperCase().replace(/\s+/g," ").trim();
-      const {error}=await sb.rpc("admin_set_company",{p_id:coCur.id,p:{name:plateV||coCur.username||coCur.name,whatsapp:v("cnPhone"),owner_email:v("cnEmail")||coCur.owner_email,plate:plateV,notes:v("cnNotes")}});
+      const {error}=await sb.rpc("admin_set_company",{p_id:coCur.id,p:{whatsapp:v("cnPhone"),owner_email:v("cnEmail")||coCur.owner_email,plate:plateV,notes:v("cnNotes")}});
       if(error)throw error;await loadAdmin();toast("Kaydedildi");openCompany(adRows.find(x=>x.id===coCur.id));
     }
   }catch(e){coErr(errMsg(e));}finally{$("coSave").disabled=false;}
