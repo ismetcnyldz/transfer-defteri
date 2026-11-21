@@ -29,3 +29,11 @@ Bu dosya yeni bir Claude sohbetinde kaldığımız yerden devam etmek için öze
 - Supabase ücretsiz plan: 1 hafta erişilmezse proje uyur (panelden uyandırılır).
 - Natro .net yenileme ~26,49 $/yıl; DNS servisi 0,10 $/ay.
 - Kod güncellemeleri: Claude GitHub'a push eder, Pages 1–2 dk içinde yayınlar.
+
+## 21 Kasım 2026
+- transferdefteri.net artık tanıtım sitesi (index.html + site/img). Uygulama /app/ altında. Telefona kurulu uygulama (standalone) ve şifre sıfırlama bağlantıları kökten /app/'e yönlendirilir.
+- Müşteri linkleri değişmedi: /r/?c=slug, /k/?c=slug, kısa /slug.
+- Uygulamada ikon seti (IC, ic()), bölüm başlıklarına renkli ikon (decorateSections).
+- Ayarlar: kullanıcı adı değiştirme (change_username RPC), yetkili adı, e-posta, adres, web/instagram.
+- Güvenlik: companies_protect tetikleyicisi — firmalar plan/bitiş/durum/kullanıcı adını REST ile değiştiremez (supabase/008_account.sql).
+- Admin panelinde firma kaydedince firma adı artık ezilmiyor.

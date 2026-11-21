@@ -3,1753 +3,347 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1b1f2a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Transfer Defteri">
-<title>Transfer Defteri</title>
-<script>(function(){var t="dark";try{t=localStorage.getItem("td_theme")||"dark";}catch(e){}document.documentElement.setAttribute("data-theme",t);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="dark"?"#0d1220":"#ffffff");})();</script>
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" href="./icon-192.png">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="./places-data.js"></script>
+<script>
+/* Telefona kurulu uygulama ya da giriş/şifre bağlantısı ile gelindiyse doğrudan uygulamaya geç */
+(function(){try{var h=location.hash||"";var sa=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone;
+if(sa||/access_token|type=recovery|error_description/.test(h)){location.replace("/app/"+location.search+h);}}catch(e){}})();
+</script>
+<title>Transfer Defteri – VIP transfer firmaları için rezervasyon defteri</title>
+<meta name="description" content="Antalya'daki VIP transfer ve tur firmaları için rezervasyon uygulaması. Müşteri 4 dilde formu kendisi doldurur, kayıt telefonunuza düşer, WhatsApp onayı tek dokunuşla gider. İlk 30 gün ücretsiz.">
+<meta name="theme-color" content="#0d1b3e">
+<meta property="og:title" content="Transfer Defteri">
+<meta property="og:description" content="VIP transfer firmaları için rezervasyon defteri. İlk 30 gün ücretsiz.">
+<meta property="og:image" content="https://transferdefteri.net/site/img/og.jpg">
+<meta property="og:url" content="https://transferdefteri.net/">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 :root{
-  --bg:#f6f4ef; --surface:#ffffff; --surface2:#eeebe3; --line:#d9d4c8;
-  --fg:#1b1f2a; --muted:#4a4f5c;
-  --accent:#9a7417; --accent-fg:#ffffff; --accent-soft:#f3e8c9;
-  --ok:#1f7a4d; --ok-soft:#dcefe3; --warn:#b26a00; --warn-soft:#fbe9cf; --bad:#b3261e; --bad-soft:#f7dcd9; --info:#2a5fa8; --info-soft:#dbe6f6;
-  --c-blue:#2563eb; --c-blue2:#1d4ed8; --c-amber:#f59e0b; --c-amber2:#d97706; --c-green:#16a34a; --c-green2:#15803d; --c-violet:#7c3aed; --c-violet2:#6d28d9; --c-teal:#0d9488; --c-teal2:#0f766e; --c-pink:#db2777; --c-orange:#ea580c;
-  --hdr-bg:#ffffff;
-  --font-ui:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --font-num:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  --r:14px; --shadow:0 6px 24px rgba(27,31,42,.08);
+  --ink:#0d1b3e; --ink2:#14275a; --sea:#0fb5c9; --sun:#ffb703; --bloom:#e23c7d; --mint:#22c58b; --sky:#f2f8fc; --paper:#ffffff;
+  --text:#14213d; --muted:#51607a; --line:#dbe6ef;
+  --display:"Bricolage Grotesque",system-ui,sans-serif; --body:"Figtree",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  --wrap:1140px; --g:20px;
 }
-:root[data-theme="dark"]{
-  --bg:#0d1220; --surface:#151c2e; --surface2:#1e2740; --line:#2b3654;
-  --fg:#eceef2; --muted:#c2c7d1; --hdr-bg:linear-gradient(180deg,#141a2e,#10131c);
-  --accent:#e0b860; --accent-fg:#1b1500; --accent-soft:#3a3118;
-  --ok:#5ccb8e; --ok-soft:#163427; --warn:#f0b35a; --warn-soft:#3b2a10; --bad:#f28b82; --bad-soft:#3d1c19; --info:#86aef0; --info-soft:#1b2a44;
-  --shadow:0 6px 24px rgba(0,0,0,.4); color-scheme:dark}
 *{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px)}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
-button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer;border:0;background:none;padding:0}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-h1,h2,h3{margin:0;text-wrap:balance}
-.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
-[hidden]{display:none!important}
-.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-
-/* login */
-.login{min-height:100%;display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-left,0px))}
-.login .box{width:100%;max-width:380px;display:grid;gap:18px}
-.logo{display:flex;align-items:center;gap:12px}
-.logo .mark{width:48px;height:48px;border-radius:14px;background:#1b1f2a;display:grid;place-items:center;color:#e0b860;font-weight:800;font-size:24px}
-.logo h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
-.logo small{display:block;color:var(--muted);font-size:13px;font-weight:500}
-.card-f{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;box-shadow:var(--shadow)}
-.in{display:grid;gap:4px}
-.in label{font-size:12px;color:var(--muted);font-weight:600}
-.in input{border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:var(--bg);font-size:16px;width:100%}
-.pbtn{background:var(--accent);color:var(--accent-fg);font-weight:800;padding:13px;border-radius:12px;font-size:15px;width:100%}
-.pbtn:disabled{opacity:.6}
-.sbtn{color:var(--muted);font-weight:600;font-size:13px;text-decoration:underline;justify-self:center}
-.err{font-size:13px;color:var(--bad);padding:0 2px}
-.okmsg{font-size:13px;color:var(--ok)}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--sky);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--g)}
+h1,h2,h3{font-family:var(--display);line-height:1.05;letter-spacing:-.02em;margin:0}
+h2{font-size:clamp(32px,5vw,52px);font-weight:800}
+h3{font-size:21px;font-weight:700;letter-spacing:-.01em}
+p{margin:0}
+.lead{font-size:clamp(18px,2.2vw,21px);color:var(--muted);max-width:60ch}
+.btn{display:inline-flex;align-items:center;gap:10px;font:700 17px/1 var(--body);text-decoration:none;border-radius:14px;padding:16px 22px;border:0;cursor:pointer;white-space:nowrap}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-wa{background:var(--mint);color:#06251a;box-shadow:0 10px 30px rgba(34,197,139,.35)}
+.btn-wa:hover{background:#2bd896}
+.btn-ghost{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}
+.btn-ghost:hover{background:rgba(255,255,255,.18)}
+.btn-ink{background:var(--ink);color:#fff}
+svg.i{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
 /* header */
-.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--hdr-bg);border-bottom:1px solid var(--line)}
-.hdr-in{padding-block:10px 8px;display:grid;gap:10px}
-.brand{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.hdr-in > *{min-width:0}
-.brand h1{flex:1 1 0;font-size:clamp(17px,5.2vw,24px);font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;min-width:0;text-transform:uppercase}
-.brand h1 .van{position:relative;flex:none;width:74px;height:46px}
-.brand h1 .van svg{width:74px;height:46px;display:block}
-:root[data-theme="dark"] .brand h1 .van svg{filter:drop-shadow(0 0 1.2px rgba(255,255,255,.85)) drop-shadow(0 0 6px rgba(120,160,255,.35))}
-.brand h1 .van .plate{position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);height:18px;font-size:10px;border-width:1.5px;border-radius:4px}
-.brand h1 .van .plate .tr{font-size:6px;padding:0 3px;padding-bottom:2px}
-.brand h1 .van .plate .no{padding:0 5px}
-.brand h1 em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.05}
-.brand h1 em small{display:block;font-size:10px;letter-spacing:.12em;color:var(--muted);font-weight:700;margin-top:3px}
-.brand .right{display:flex;align-items:flex-start;gap:6px;flex:none}
-.brand .date{display:none}
-.ico{width:54px;height:48px;border-radius:12px;background:var(--c-teal);color:#fff!important;box-shadow:0 4px 12px rgba(0,0,0,.18);display:grid;grid-template-rows:auto auto;justify-items:center;align-content:center;gap:2px;color:var(--fg);position:relative;font-size:10px;font-weight:700;letter-spacing:.02em;padding:0 4px}
-.ico svg{width:20px;height:20px}
-#btnAdmin{background:linear-gradient(160deg,var(--c-blue),var(--c-blue2))}
-#btnReports{background:linear-gradient(160deg,var(--c-violet),var(--c-violet2))}
-#btnSettings{background:linear-gradient(160deg,var(--c-teal),var(--c-teal2))}
-#btnPlaces{background:linear-gradient(160deg,var(--c-orange),#c2410c)}
-#btnLink{background:linear-gradient(160deg,var(--c-green),var(--c-green2))!important;color:#fff!important}
-.ico:active{transform:scale(.96)}
-.ico .dot{position:absolute;top:4px;right:5px;width:11px;height:11px;border-radius:50%;background:#ff3b30;border:2px solid #fff}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat{border-radius:14px;padding:10px 12px;min-width:0;color:#fff;background:linear-gradient(150deg,var(--c-blue),var(--c-blue2));box-shadow:0 6px 16px rgba(37,99,235,.25)}
-.stat + .stat{background:linear-gradient(150deg,var(--c-amber),var(--c-amber2));box-shadow:0 6px 16px rgba(217,119,6,.25)}
-#stNextWrap{background:linear-gradient(150deg,var(--c-green),var(--c-green2));box-shadow:0 6px 16px rgba(22,163,74,.25)}
-.stat .lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.88);font-weight:800}
-.stat .val, .stat .val span{color:#fff!important}
-.stat .val{font-size:26px;font-weight:800;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.1}
-#stNextWrap .val{font-size:15px;font-weight:700;margin-top:6px}
-.tools{display:flex;gap:8px;align-items:center}
-.search{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:10px;padding:0 10px;height:38px}
-.search input{flex:1;min-width:0;border:0;background:none;height:100%;outline:none}
-.search input::placeholder{color:var(--muted)}
-.tabs{display:flex;background:var(--surface2);border-radius:12px;padding:3px;gap:3px}
-.tabs button{padding:7px 11px;border-radius:9px;font-size:13px;font-weight:800;color:var(--c-blue);white-space:nowrap}
-.tabs button[data-tab="past"]{color:var(--c-violet)} .tabs button[data-tab="all"]{color:var(--c-teal)}
-:root[data-theme="dark"] .tabs button{color:#7aa7ff}:root[data-theme="dark"] .tabs button[data-tab="past"]{color:#b794ff}:root[data-theme="dark"] .tabs button[data-tab="all"]{color:#4fd1c5}
-.tabs button[aria-selected="true"]{background:var(--c-blue);color:#fff!important;box-shadow:0 3px 10px rgba(37,99,235,.35)}
-.tabs button[data-tab="past"][aria-selected="true"]{background:var(--c-violet);box-shadow:0 3px 10px rgba(124,58,237,.35)}
-.tabs button[data-tab="all"][aria-selected="true"]{background:var(--c-teal);box-shadow:0 3px 10px rgba(13,148,136,.35)}
+.top{position:sticky;top:0;z-index:20;background:rgba(13,27,62,.92);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);color:#fff}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-.01em}
+.brand .mk{width:36px;height:36px;border-radius:11px;background:linear-gradient(150deg,var(--sea),#2563eb);display:grid;place-items:center}
+.brand .mk svg{width:22px;height:22px;stroke:#fff}
+.nav{display:flex;gap:22px;margin-left:auto;font-weight:600;font-size:15px}
+.nav a{text-decoration:none;opacity:.85}.nav a:hover{opacity:1}
+.top .login{margin-left:8px;padding:10px 16px;font-size:15px;border-radius:11px}
+@media (max-width:760px){.nav{display:none}.top .login{margin-left:auto}}
 
-.band{margin:12px 0 0;border-radius:var(--r);padding:10px 12px;display:grid;gap:6px;font-size:14px}
-.band.remind{background:var(--warn-soft);border:1px solid var(--warn)}
-.band.review{background:var(--info-soft);border:1px solid var(--info)}
-.band.newlink{background:var(--ok-soft);border:1px solid var(--ok)}
-.band .t{font-weight:700;display:flex;align-items:center;gap:8px}
-.band .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.band .row button,.band .acts button{font-size:13px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--surface)}
-.band .acts{display:flex;gap:8px;flex-wrap:wrap}
+/* hero */
+.hero{background:var(--ink);color:#fff;position:relative;overflow:hidden;padding:64px 0 0}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(180deg,transparent,rgba(15,181,201,.28));pointer-events:none}
+.hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:48px;align-items:center;position:relative;z-index:1}
+.hero h1{font-size:clamp(44px,7.2vw,86px);font-weight:800;letter-spacing:-.035em}
+.hero h1 .ln2{display:block;color:var(--sun)}
+.hero .lead{color:#c9d6ee;margin-top:22px}
+.hero .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.hero .note{margin-top:16px;color:#9fb2d6;font-size:15px}
+.hero .note b{color:#fff}
+.hero-art{position:relative;padding-bottom:64px}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr;gap:36px}.hero{padding-top:44px}}
 
-main{padding-block:0 110px}
-.group{margin-top:18px}
-.group h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;align-items:baseline;padding:0 2px 8px}
-.group h2 small{letter-spacing:0;text-transform:none;font-weight:500}
-.group.today h2{color:var(--c-amber2)}
-.group h2 span{font-weight:800}
-.cards{display:grid;gap:10px}
-.card{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;box-shadow:var(--shadow);transition:transform .08s}
-.card:active{transform:scale(.99)}
-.card.cancelled{opacity:.55}
-.card.fresh{border-color:var(--ok)}
-.time{font-size:18px;font-weight:600;line-height:1.1;padding-top:2px}
-.time small{display:block;font-size:11px;color:var(--muted);font-family:var(--font-ui);font-weight:600;margin-top:3px}
-.body{min-width:0;display:grid;gap:4px}
-.name{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.meta{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
-.chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);letter-spacing:.02em}
-.chip.ok{background:var(--ok-soft);color:var(--ok)}
-.chip.warn{background:var(--warn-soft);color:var(--warn)}
-.chip.bad{background:var(--bad-soft);color:var(--bad)}
-.chip.info{background:var(--info-soft);color:var(--info)}
-.chip.acc{background:var(--accent-soft);color:var(--accent)}
-.side{display:grid;gap:6px;justify-items:end}
-.amt{font-weight:600;font-size:15px}
-.amt.due{color:var(--warn)}
-.amt.got{color:var(--ok)}
-.thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid var(--line);background:var(--surface2)}
-.empty{margin-top:48px;text-align:center;color:var(--muted);display:grid;gap:8px;justify-items:center}
-.empty .ic{width:56px;height:56px;border-radius:16px;background:var(--surface2);display:grid;place-items:center;font-size:26px}
-.empty p{margin:0;max-width:30ch}
-.note{font-size:12px;color:var(--muted);text-align:center;margin-top:24px}
+/* arrivals board */
+.board{background:#071230;border-radius:20px;padding:18px 16px 12px;box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.08);font-family:var(--mono)}
+.board-h{display:flex;align-items:center;gap:10px;color:var(--sun);font-weight:700;font-size:14px;letter-spacing:.06em;padding:0 6px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.board-h svg{width:20px;height:20px}
+.board-h .ap{margin-left:auto;color:#7f93bd;font-weight:500}
+.brow{display:grid;grid-template-columns:58px 74px 1fr auto;gap:10px;align-items:center;padding:11px 6px;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px;color:#e9eefb;transform-origin:top;animation:flip .55s cubic-bezier(.3,1.4,.5,1) both}
+.brow:last-child{border-bottom:0}
+.brow .t{color:var(--sun);font-weight:700}
+.brow .f{color:#8fb0ff}
+.brow .p{font-family:var(--body);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brow .p small{display:block;font-weight:500;color:#8193b8;font-size:12.5px}
+.st{font-family:var(--body);font-size:12px;font-weight:700;padding:5px 9px;border-radius:999px;white-space:nowrap}
+.st.ok{background:rgba(34,197,139,.16);color:#5ee6ae}
+.st.wait{background:rgba(255,183,3,.15);color:#ffc93d}
+.st.new{background:rgba(226,60,125,.18);color:#ff7cad}
+.st.ret{background:rgba(15,181,201,.16);color:#5fe1ef}
+.brow:nth-child(2){animation-delay:.15s}.brow:nth-child(3){animation-delay:.3s}.brow:nth-child(4){animation-delay:.45s}.brow:nth-child(5){animation-delay:.6s}.brow:nth-child(6){animation-delay:.75s}
+@keyframes flip{from{opacity:0;transform:rotateX(-85deg)}to{opacity:1;transform:none}}
+.toast{position:relative;margin:0 -10px 14px auto;width:min(320px,92%);background:#fff;color:var(--text);border-radius:16px;padding:12px 14px;display:flex;gap:12px;align-items:center;box-shadow:0 18px 50px rgba(0,0,0,.35);animation:drop .5s 1.25s cubic-bezier(.2,1.4,.4,1) both}
+.toast .ti{width:38px;height:38px;border-radius:11px;background:var(--bloom);display:grid;place-items:center;flex:none}
+.toast .ti svg{width:20px;height:20px;stroke:#fff}
+.toast b{display:block;font-size:14.5px}
+.toast span{font-size:13px;color:var(--muted)}
+@keyframes drop{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}
+@media (max-width:520px){.brow{grid-template-columns:48px 1fr auto}.brow .f{display:none}.toast{margin-right:0}}
+@media (prefers-reduced-motion:reduce){.brow,.toast{animation:none}html{scroll-behavior:auto}}
 
-.fab{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(22px + env(safe-area-inset-bottom,0px));height:54px;padding:0 20px 0 16px;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,.25);z-index:8}
-.fab svg{width:20px;height:20px}
-.fab-link{right:auto;left:calc(18px + env(safe-area-inset-left,0px));background:var(--ok);color:#fff}
-@media (max-width:360px){.fab{padding:0 14px 0 12px;font-size:14px}}
+/* towns strip */
+.towns{background:var(--sea);color:#062a33;font-weight:700;font-family:var(--display);font-size:clamp(17px,2.2vw,22px);letter-spacing:-.01em}
+.towns .wrap{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center;padding-top:16px;padding-bottom:16px}
+.towns .wrap span{display:inline-flex;align-items:center;gap:8px}
+.towns svg{width:18px;height:18px}
 
-.sheet{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;animation:up .22s ease-out}
-@keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
-@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
-.sheet-hdr{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
-.sheet-hdr .in{height:52px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.sheet-hdr h2{font-size:16px;font-weight:800}
-.lnk{color:var(--accent);font-weight:700;font-size:15px;padding:6px 4px}
-.lnk.quiet{color:var(--muted)}
-.sheet-body{flex:1;overflow:auto;padding-block:14px calc(28px + env(safe-area-inset-bottom,0px));display:grid;gap:14px;align-content:start}
-fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:visible}
-.sec-t{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:10px 14px 0}
-.row2{display:grid;grid-template-columns:1fr 1fr}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr}
-.f{display:grid;gap:3px;padding:10px 14px;border-top:1px solid var(--line);min-width:0;position:relative}
-.sec-t + .f, .sec-t + .row2 > .f, .sec-t + .row3 > .f{border-top:0}
-.row2 > .f + .f, .row3 > .f + .f{border-left:1px solid var(--line)}
-.f label{font-size:12px;color:var(--muted);font-weight:600}
-.f input,.f select,.f textarea{border:0;background:none;padding:2px 0;width:100%;min-width:0;outline:none;font-size:16px}
-.f textarea{resize:vertical;min-height:60px}
-.f input::placeholder,.f textarea::placeholder{color:#8a8e98;opacity:1}
-.inline{display:flex;align-items:center;gap:8px}
-.inline select{width:auto;font-size:14px;color:var(--muted)}
-.tog{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-top:1px solid var(--line)}
-.tog span{font-weight:600}
-.sw{position:relative;width:46px;height:28px;border-radius:999px;background:var(--line);transition:background .15s;flex:none}
-.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .15s}
-.sw[aria-checked="true"]{background:var(--ok)}
-.sw[aria-checked="true"]::after{transform:translateX(18px)}
-.photos{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px 14px}
-.ph{position:relative;width:84px;height:84px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--surface2)}
-.ph img{width:100%;height:100%;object-fit:cover;display:block}
-.ph button{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:13px;line-height:1}
-.addph{width:84px;height:84px;border-radius:10px;border:1.5px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:12px;font-weight:600;text-align:center;line-height:1.2;cursor:pointer}
-.addph input{display:none}
-.danger{text-align:center;padding:12px;color:var(--bad);font-weight:700;width:100%}
-.confirm{display:flex;gap:10px;justify-content:center;padding:10px}
-.btn{padding:10px 16px;border-radius:10px;font-weight:700;background:var(--surface2)}
-.btn.red{background:var(--bad);color:#fff}
-.btn.gold{background:var(--accent);color:var(--accent-fg)}
-.contact{display:flex;gap:8px;padding:0 14px 12px;flex-wrap:wrap}
-.contact a,.contact button{padding:7px 12px;border-radius:999px;background:var(--surface2);font-size:13px;font-weight:700;text-decoration:none;color:var(--fg)}
-.contact a.wa{background:var(--ok-soft);color:var(--ok)}
-.status-pick{display:flex;gap:6px;padding:10px 14px 14px;flex-wrap:wrap}
-.status-pick button,.segs button{padding:7px 12px;border-radius:999px;background:var(--surface2);font-size:13px;font-weight:700;color:var(--muted);border:1px solid transparent}
-.status-pick button[aria-pressed="true"],.segs button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
-.segs{display:flex;gap:6px;flex-wrap:wrap}
-.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;z-index:30;box-shadow:var(--shadow);max-width:90vw;text-align:center}
-.cust{background:var(--info-soft);border-radius:10px;padding:10px 14px;margin:10px 14px 0;font-size:13px;display:grid;gap:4px}
-.cust b{font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+section{padding:96px 0}
+@media (max-width:700px){section{padding:68px 0}}
+.sec-head{max-width:760px;margin-bottom:48px}
+.sec-head .lead{margin-top:16px}
 
-.ac{position:absolute;left:0;right:0;top:100%;z-index:5;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;max-height:300px;overflow-y:auto}
-.ac button{display:flex;width:100%;text-align:left;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
-.ac button:first-child{border-top:0}
-.ac button:active,.ac button.hl{background:var(--surface2)}
-.ac .k{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:14px;background:var(--surface2)}
-.ac .k.air{background:var(--info-soft)} .ac .k.hot{background:var(--accent-soft)} .ac .k.pl{background:var(--ok-soft)}
-.ac .tx{min-width:0;display:grid}
-.ac .tx b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ac .tx small{color:var(--muted);font-size:12px}
-.ac .add{color:var(--accent);font-weight:700}
-.hint{font-size:12px;color:var(--muted);padding:0 14px 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.hint button{color:var(--accent);font-weight:700;text-decoration:underline}
+/* steps (a real sequence) */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;counter-reset:s}
+.step{position:relative}
+.step .no{font-family:var(--display);font-weight:800;font-size:64px;line-height:1;color:var(--c);letter-spacing:-.04em}
+.step h3{margin-top:10px}
+.step p{color:var(--muted);margin-top:8px}
+.phone{margin-top:22px;border-radius:34px;padding:9px;background:var(--ink);box-shadow:0 24px 60px rgba(13,27,62,.22);max-width:300px}
+.phone .scr{border-radius:26px;overflow:hidden;aspect-ratio:9/16;background:#0b1430}
+.phone img{width:100%;height:auto}
+@media (max-width:900px){.steps{grid-template-columns:1fr;gap:56px}.phone{max-width:320px}}
 
-.plist{display:grid;gap:8px}
-.prow{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px}
-.prow .tx{flex:1;min-width:0}
-.prow .tx b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.prow .tx small{color:var(--muted);font-size:12px}
-.prow.closed .tx b{text-decoration:line-through;color:var(--muted)}
-.prow button{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);flex:none}
-.prow button.on{background:var(--ok-soft);color:var(--ok)}
-.addrow{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;position:relative}
-.addrow input{border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:var(--bg);width:100%;font-size:16px}
-.cnt{font-size:12px;color:var(--muted)}
-.linkbox{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:10px}
-.linkbox code{display:block;background:var(--surface2);padding:10px;border-radius:8px;font-size:13px;word-break:break-all;font-family:var(--font-num)}
-.linkbox .acts{display:flex;gap:8px;flex-wrap:wrap}
-.linkbox a{text-decoration:none;display:inline-block}
-.kv{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:8px 0;border-top:1px solid var(--line)}
-.kv:first-child{border-top:0}
-.kv span{color:var(--muted)}
-/* üstten bildirim */
-.flash{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translate(-50%,-140%);z-index:40;width:min(94vw,460px);background:var(--ok);color:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 12px 30px rgba(0,0,0,.3);display:grid;gap:2px;transition:transform .35s cubic-bezier(.2,.9,.3,1.2);cursor:pointer}
-.flash.show{transform:translate(-50%,0)}
-.flash b{font-size:15px}
-.flash span{font-size:13px;opacity:.95}
-@media (prefers-reduced-motion:reduce){.flash{transition:none}}
-.ages{display:flex;gap:8px;flex-wrap:wrap}
-.ages label{display:grid;gap:2px;font-size:11px;color:var(--muted);font-weight:600}
-.ages select{border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--bg);font-size:15px;color:var(--fg)}
-:root[data-theme="dark"] .card{background:linear-gradient(160deg,#18213a,#141b2d);border-color:#2b3654}
-:root[data-theme="dark"] .card .time{color:#7aa7ff}
-:root[data-theme="dark"] .card .name{color:#fff}
-:root[data-theme="dark"] .group h2{color:#9fb3e8}
-:root[data-theme="dark"] .group.today h2{color:#fbbf24}
-:root[data-theme="dark"] .search{background:#1e2740}
-:root[data-theme="dark"] .fab{box-shadow:0 10px 28px rgba(0,0,0,.5)}
-:root[data-theme="dark"] .fab{background:linear-gradient(160deg,var(--c-amber),var(--c-amber2));color:#fff}
-:root[data-theme="dark"] .fab-link{background:linear-gradient(160deg,var(--c-green),var(--c-green2));color:#fff}
-/* raporlar */
-.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.rbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
-.rbox .l{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
-.rbox .v{font-size:20px;font-weight:800;font-family:var(--font-num);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rbox.k .v{color:var(--ok)} .rbox.w .v{color:var(--warn)}
-.rtable{width:100%;border-collapse:collapse;font-size:13px}
-.rtable th{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-align:right;padding:8px 6px;border-bottom:1px solid var(--line)}
-.rtable th:first-child,.rtable td:first-child{text-align:left}
-.rtable td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right;font-family:var(--font-num)}
-.rtable tr:last-child td{border-bottom:0}
-.rwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
-/* plaka rozeti */
-.plate{display:inline-flex;align-items:stretch;border:2px solid #1b1f2a;border-radius:6px;overflow:hidden;background:#fff;color:#111;font-family:var(--font-num);font-weight:600;font-size:13px;letter-spacing:.08em;line-height:1;height:26px;flex:none}
-.plate span.tr{background:#003399;color:#fff;font-family:var(--font-ui);font-size:8px;font-weight:800;letter-spacing:0;display:grid;place-items:center;padding:0 4px;align-content:end;padding-bottom:3px}
-.plate span.no{display:grid;place-items:center;padding:0 8px;white-space:nowrap}
-.plate.big{height:40px;font-size:20px;border-width:3px;border-radius:8px}
-.plate.big span.tr{font-size:10px;padding:0 6px}
-/* yönetici & duvar */
-.wall{min-height:100%;display:grid;place-items:center;padding:24px 16px}
-.wall .box{max-width:420px;display:grid;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
-.wall h2{font-size:20px;font-weight:800}
-.wall p{margin:0;color:var(--muted)}
-.plans{display:grid;gap:6px}
-.plans div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding:6px 0}
-.plans b{font-family:var(--font-num)}
-.ibanbox{display:grid;gap:4px;background:var(--surface2);border-radius:10px;padding:10px 12px}
-.ibanbox small{text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-size:11px;font-weight:700}
-.ibanbox b{font-family:var(--font-num);font-size:15px;word-break:break-all}
-.wa-btn{display:inline-flex;justify-content:center;background:var(--ok);color:#fff;font-weight:800;padding:12px 16px;border-radius:12px;text-decoration:none}
-.astats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.astats button{background:var(--surface2);border-radius:10px;padding:8px 6px;display:grid;gap:2px;text-align:center;border:1px solid transparent}
-.astats button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
-.astats .n{font-size:18px;font-weight:800;font-family:var(--font-num)}
-.astats .l{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700}
-.crow{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
-.crow .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.crow .sub{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.crow .st{grid-row:1/3;display:grid;gap:4px;justify-items:end}
-.crow.exp{border-color:var(--bad)} .crow.soon{border-color:var(--warn)} .crow.sus{opacity:.6}
-.kvs{display:grid;gap:6px;padding:10px 14px;font-size:14px}
-.kvs div{display:flex;justify-content:space-between;gap:10px}
-.kvs span{color:var(--muted)}
-.btnrow{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px}
-.btn.sm{padding:8px 12px;font-size:13px}
-.btn.ok{background:var(--ok-soft);color:var(--ok)}
-.btn.warn{background:var(--warn-soft);color:var(--warn)}
-.btn.badb{background:var(--bad-soft);color:var(--bad)}
-.invite{background:var(--surface2);border-radius:10px;padding:10px 12px;font-size:13px;white-space:pre-wrap;font-family:var(--font-num);margin:0 14px 10px}
-.pay{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:6px 14px;border-top:1px solid var(--line)}
-.pay span{color:var(--muted)}
-@media (min-width:720px){ .hdr-in,main,.sheet-body,.sheet-hdr .in{max-width:720px;margin-inline:auto} .stats{grid-template-columns:repeat(3,1fr)} }
+/* features: ruled list, not cards */
+.feat{background:var(--paper)}
+.flist{display:grid;grid-template-columns:repeat(2,1fr);column-gap:56px;border-top:1px solid var(--line)}
+.fi{display:grid;grid-template-columns:54px 1fr;gap:18px;padding:26px 0;border-bottom:1px solid var(--line)}
+.fi .ic{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:var(--c);color:#fff}
+.fi .ic svg{width:26px;height:26px}
+.fi p{color:var(--muted);margin-top:6px;font-size:16px}
+@media (max-width:760px){.flist{grid-template-columns:1fr}}
+
+/* money split */
+.money .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.money ul{list-style:none;padding:0;margin:28px 0 0;display:grid;gap:16px}
+.money li{display:grid;grid-template-columns:28px 1fr;gap:12px;font-size:17px}
+.money li svg{width:24px;height:24px;color:var(--mint);margin-top:2px}
+.money .shots{display:flex;gap:18px;justify-content:center}
+.money .shots .phone{margin-top:0;max-width:260px}
+.money .shots .phone:last-child{margin-top:60px}
+@media (max-width:900px){.money .wrap{grid-template-columns:1fr;gap:40px}.money .shots .phone{max-width:44vw}}
+
+/* languages band */
+.langs{background:var(--bloom);color:#fff;padding:72px 0}
+.langs .wrap{display:grid;grid-template-columns:1fr 1.3fr;gap:48px;align-items:center}
+.langs h2{font-size:clamp(30px,4.4vw,46px)}
+.langs p{color:#ffe3ee;margin-top:14px}
+.hello{display:grid;gap:12px}
+.hello div{background:rgba(255,255,255,.14);border-radius:14px;padding:14px 18px;font-family:var(--display);font-weight:700;font-size:clamp(19px,2.4vw,24px);display:flex;align-items:center;gap:14px}
+.hello span{font-family:var(--body);font-size:13px;font-weight:700;background:#fff;color:var(--bloom);border-radius:8px;padding:3px 8px;flex:none}
+@media (max-width:860px){.langs .wrap{grid-template-columns:1fr}}
+
+/* pricing */
+.price{background:var(--ink);color:#fff}
+.price .lead{color:#c9d6ee}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:860px}
+.plan{border-radius:22px;padding:30px;background:var(--ink2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.plan.hi{background:var(--sun);color:#2a1d00;box-shadow:none}
+.plan .nm{font-weight:700;font-size:16px;opacity:.85}
+.plan .amt{font-family:var(--display);font-weight:800;font-size:58px;letter-spacing:-.03em;line-height:1;margin-top:10px}
+.plan .amt small{font-size:18px;font-weight:700;letter-spacing:0;opacity:.75}
+.plan ul{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:9px;font-size:16px}
+.plan li{display:flex;gap:10px}.plan li svg{width:20px;height:20px;flex:none;margin-top:3px}
+.trial{margin-top:26px;display:inline-flex;gap:10px;align-items:center;background:rgba(34,197,139,.16);color:#7df0c2;font-weight:700;padding:10px 16px;border-radius:12px}
+.trial svg{width:20px;height:20px}
+@media (max-width:700px){.plans{grid-template-columns:1fr}}
+
+/* faq */
+.faq .wrap{max-width:860px}
+details{border-bottom:1px solid var(--line);padding:4px 0}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px;align-items:center;font-family:var(--display);font-weight:700;font-size:20px;padding:18px 0}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";width:12px;height:12px;border-right:2.5px solid var(--sea);border-bottom:2.5px solid var(--sea);transform:rotate(45deg);transition:transform .2s;flex:none;margin-right:4px}
+details[open] summary::after{transform:rotate(-135deg)}
+details p{color:var(--muted);padding:0 0 20px;max-width:68ch}
+
+/* final cta */
+.final{background:var(--sun);color:#2a1d00;padding:80px 0}
+.final .wrap{display:flex;flex-wrap:wrap;gap:28px;align-items:center;justify-content:space-between}
+.final h2{font-size:clamp(32px,5vw,54px);max-width:16ch}
+.final p{margin-top:12px;font-size:18px}
+footer{background:var(--ink);color:#9fb2d6;font-size:15px;padding:34px 0}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center}
+footer a{color:#fff;text-decoration:none;font-weight:600}
+footer .sp{margin-left:auto}
+@media (max-width:600px){footer .sp{margin-left:0}}
 </style>
 </head>
 <body>
 
-<div id="flash" class="flash" role="status" aria-live="assertive"><b id="flashT"></b><span id="flashS"></span></div>
-<div id="loginView" class="login" hidden>
-  <div class="box">
-    <div class="logo"><div class="mark">T</div><div><h1>Transfer Defteri</h1><small>VIP transfer &amp; tur operasyon defteri</small></div></div>
-    <div class="tabs" role="tablist" style="justify-self:stretch" id="authTabs" hidden>
-      <button role="tab" id="tabLogin" aria-selected="true" style="flex:1">Giriş yap</button>
-      <button role="tab" id="tabSignup" aria-selected="false" style="flex:1">Yeni firma kaydı</button>
-    </div>
-    <form class="card-f" id="loginForm">
-      <div class="in"><label for="lEmail">Kullanıcı adı veya e‑posta</label><input id="lEmail" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>
-      <div class="in"><label for="lPass">Şifre</label><input id="lPass" type="password" autocomplete="current-password" required></div>
-      <div class="err" id="lErr" hidden></div>
-      <div class="okmsg" id="lOk" hidden></div>
-      <button class="pbtn" id="lBtn" type="submit">Giriş yap</button>
-      <button class="sbtn" id="lForgot" type="button">Şifremi unuttum</button>
-    </form>
-    <form class="card-f" id="signupForm" hidden>
-      <div class="in"><label for="sCompany">Firma adı</label><input id="sCompany" autocomplete="organization" placeholder="Örn. Antalya VIP Transfer" required></div>
-      <div class="in"><label for="sEmail2">E‑posta</label><input id="sEmail2" type="email" autocomplete="email" inputmode="email" required></div>
-      <div class="in"><label for="sPhone">WhatsApp numaranız</label><input id="sPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+90 5xx xxx xx xx"></div>
-      <div class="in"><label for="sPass2">Şifre (en az 6 karakter)</label><input id="sPass2" type="password" autocomplete="new-password" minlength="6" required></div>
-      <div class="err" id="sErr2" hidden></div>
-      <div class="okmsg" id="sOk2" hidden></div>
-      <button class="pbtn" id="sBtn2" type="submit">Ücretsiz dene (14 gün)</button>
-      <div class="note" style="margin:0">Kart bilgisi istenmez. Deneme süresi bitince devam etmek isterseniz paket seçersiniz.</div>
-    </form>
-    <div class="note" style="margin:0">Bir kez giriş yaptığınızda bu cihazda oturumunuz açık kalır.</div>
-  </div>
-</div>
-
-<div id="appView" hidden>
-<header class="hdr">
-  <div class="hdr-in gut">
-    <div class="brand">
-      <h1><span class="van" aria-hidden="true"><svg viewBox="0 0 172 104"><defs><linearGradient id="vb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2f3d"/><stop offset="1" stop-color="#14171f"/></linearGradient><linearGradient id="vg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8fb7ff"/><stop offset="1" stop-color="#dbe8ff"/></linearGradient></defs><path d="M12 72V46c0-5 2-9 6-12L52 18c4-4 9-6 15-6h78c8 0 13 5 13 13v47c0 4-3 7-7 7H19c-4 0-7-3-7-7z" fill="url(#vb)"/><path d="M20 46c0-3 1-5 3-7L54 22c3-3 7-4 11-4h21v30H20z" fill="url(#vg)" opacity=".95"/><path d="M92 18h30v30H92zM128 18h22c4 0 6 3 6 7v23h-28z" fill="url(#vg)" opacity=".95"/><rect x="92" y="50" width="64" height="3" fill="#0d0f14" opacity=".6"/><path d="M12 60h146v8H12z" fill="#e0b860"/><circle cx="48" cy="80" r="15" fill="#0d0f14"/><circle cx="48" cy="80" r="8" fill="#9aa0ad"/><circle cx="128" cy="80" r="15" fill="#0d0f14"/><circle cx="128" cy="80" r="8" fill="#9aa0ad"/><rect x="150" y="54" width="10" height="7" rx="2" fill="#ffe08a"/><rect x="12" y="54" width="7" height="7" rx="2" fill="#ff6b6b"/></svg><span class="plate" id="plateBadge" hidden><span class="tr">TR</span><span class="no" id="plateNo"></span></span></span><em id="coName">Transfer Defteri<small>TRANSFER DEFTERİ</small></em></h1>
-      <div class="right"><div class="date" id="todayLbl"></div>
-      <button class="ico" id="btnLink" aria-label="Müşteriye rezervasyon linki gönder" hidden style="background:var(--ok-soft);color:var(--ok)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg><span>Link gönder</span></button>
-      <button class="ico" id="btnAdmin" aria-label="Firma ekle ve yönet" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M19 8v6M16 11h6"/></svg><span>Firma ekle</span><span class="dot" id="adminDot" hidden></span></button>
-      <button class="ico" id="btnPlaces" aria-label="Oteller ve yerler" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M8 8h2M8 12h2M8 16h2M17 14h1M17 18h1M3 21h18"/></svg><span>Oteller</span></button>
-      <button class="ico" id="btnReports" aria-label="Raporlar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Raporlar</span></button>
-      <button class="ico" id="btnSettings" aria-label="Ayarlar ve müşteri linki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ayarlar</span></button></div>
-    </div>
-    <div class="stats">
-      <div class="stat"><div class="lbl">Bugün</div><div class="val num" id="stToday">–</div></div>
-      <div class="stat"><div class="lbl">Bekleyen tahsilat</div><div class="val num" id="stDue">–</div></div>
-      <div class="stat" id="stNextWrap" hidden><div class="lbl">Sıradaki</div><div class="val" id="stNext">–</div></div>
-    </div>
-    <div class="tools">
-      <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="İsim, otel, telefon ara" autocomplete="off"></label>
-      <div class="tabs" role="tablist">
-        <button role="tab" data-tab="upcoming" aria-selected="true">Yaklaşan</button>
-        <button role="tab" data-tab="past" aria-selected="false">Geçmiş</button>
-        <button role="tab" data-tab="all" aria-selected="false">Tümü</button>
-      </div>
-    </div>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Transfer Defteri ana sayfa"><span class="mk"><svg class="i" viewBox="0 0 24 24"><path d="M3 17V8a2 2 0 0 1 2-2h9l5 4h1a1 1 0 0 1 1 1v6"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17" cy="17.5" r="2"/><path d="M9.5 17.5h5.5M3 11h16"/></svg></span>Transfer Defteri</a>
+    <nav class="nav" aria-label="Sayfa bölümleri"><a href="#nasil">Nasıl çalışır</a><a href="#ozellikler">Özellikler</a><a href="#fiyat">Fiyat</a><a href="#sss">Sorular</a></nav>
+    <a class="btn btn-ghost login" href="/app/">Giriş yap</a>
   </div>
 </header>
 
-<main class="gut">
-  <div id="notifBand" class="band newlink" hidden>
-    <div class="t">🔔 Yeni rezervasyonlarda sesli bildirim</div>
-    <div>Müşteri formu doldurduğu an zil çalar, ismi sesli okunur ve ekranın üstünde bildirim çıkar. Açmak için bir kez dokunun.</div>
-    <div class="acts"><button id="notifOn">Sesli bildirimi aç</button><button id="notifLater">Şimdi değil</button></div>
+<main>
+<section class="hero" aria-labelledby="h1">
+  <div class="wrap">
+    <div>
+      <h1 id="h1">Transferleriniz tek defterde.<span class="ln2">Cebinizde.</span></h1>
+      <p class="lead">Antalya'daki VIP transfer ve tur firmaları için rezervasyon uygulaması. Müşteriniz formu kendi dilinde doldurur, kayıt telefonunuza düşer, onay mesajı WhatsApp'tan tek dokunuşla gider.</p>
+      <div class="cta">
+        <a class="btn btn-wa wa-link" href="https://wa.me/905455260007" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>30 gün ücretsiz deneyin</a>
+        <a class="btn btn-ghost" href="#nasil">Nasıl çalıştığını görün</a>
+      </div>
+      <p class="note"><b>Kurulum yok, kart istenmez.</b> Hesabınızı WhatsApp'tan açıyoruz.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="toast"><span class="ti"><svg class="i" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></span><div><b>Yeni rezervasyon geldi</b><span>Thomas Schneider · DE 1520 · 08:30</span></div></div>
+      <div class="board">
+        <div class="board-h"><svg class="i" viewBox="0 0 24 24"><path d="M2 22h20"/><path d="M3.8 10.6 5 8l2.3 1.4 1.6-4.5 2.1.6-1 5.5 6.4 2.2a2 2 0 0 1-1.2 3.8L4 13.6z"/></svg>BUGÜNKÜ GELİŞLER<span class="ap">AYT</span></div>
+        <div class="brow"><span class="t">08:30</span><span class="f">DE 1520</span><span class="p">Thomas Schneider<small>Akra Hotel · 2 yetişkin</small></span><span class="st new">Linkten</span></div>
+        <div class="brow"><span class="t">09:40</span><span class="f">PC 1234</span><span class="p">Anna Müller<small>Rixos Downtown · yükseltici</small></span><span class="st ok">Onaylandı</span></div>
+        <div class="brow"><span class="t">12:15</span><span class="f">XQ 581</span><span class="p">Olga Ivanova<small>Delphin Imperial · dönüş 28.11</small></span><span class="st ret">Gidiş-dönüş</span></div>
+        <div class="brow"><span class="t">14:40</span><span class="f">EZY 2145</span><span class="p">Sarah Collins<small>Side Prenses · bebek koltuğu</small></span><span class="st wait">Tahsilat €45</span></div>
+        <div class="brow"><span class="t">16:05</span><span class="f">TK 2412</span><span class="p">James Smith<small>Kaya Palazzo · 4 yetişkin</small></span><span class="st ok">Onaylandı</span></div>
+      </div>
+    </div>
   </div>
-  <div id="newlink" class="band newlink" hidden></div>
-  <div id="remind" class="band remind" hidden></div>
-  <div id="review" class="band review" hidden>
-    <div><b>Otel listesi gözden geçirilsin mi?</b> Son kontrolün üzerinden <span id="reviewDays">30</span> gün geçti. Yeni açılan veya kapanan otel varsa ekleyin ya da kapalı işaretleyin.</div>
-    <div class="acts"><button id="reviewOpen">Otelleri yönet</button><button id="reviewDone">Kontrol ettim, güncel</button></div>
+</section>
+
+<div class="towns" aria-label="Hizmet bölgeleri">
+  <div class="wrap">
+    <span><svg class="i" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>Lara</span><span>Belek</span><span>Side</span><span>Kemer</span><span>Alanya</span><span>Kundu</span><span>Manavgat</span><span>Konyaaltı</span>
   </div>
-  <div id="list"></div>
-  <div id="empty" class="empty" hidden>
-    <div class="ic">🚐</div>
-    <h3 id="emptyT">Henüz rezervasyon yok</h3>
-    <p id="emptyP"></p>
+</div>
+
+<section id="nasil" aria-labelledby="h-nasil">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="h-nasil">Müşteri yazar, siz onaylarsınız</h2>
+      <p class="lead">WhatsApp'ta isim, otel, uçuş kodu sormakla vakit kaybetmeyin. Üç adımda rezervasyon tamam.</p>
+    </div>
+    <div class="steps">
+      <div class="step" style="--c:var(--sea)"><div class="no">1</div><h3>Linki gönderin</h3><p>"Link gönder"e basın, WhatsApp açılır. Müşteriye rezervasyon formunuzun linki ve havalimanı karşılama sayfanız gider.</p><div class="phone"><div class="scr"><img src="site/img/form.webp" alt="Müşterinin İngilizce rezervasyon formu" loading="lazy" width="585" height="1266"></div></div></div>
+      <div class="step" style="--c:var(--bloom)"><div class="no">2</div><h3>Kayıt listenize düşer</h3><p>Müşteri adını, otelini, uçuş kodunu ve yolcuları kendisi yazar. Telefonunuz sesli haber verir, kayıt listenin başına gelir.</p><div class="phone"><div class="scr"><img src="site/img/flash.webp" alt="Yeni rezervasyon bildirimi ve rezervasyon listesi" loading="lazy" width="585" height="1266"></div></div></div>
+      <div class="step" style="--c:var(--sun)"><div class="no">3</div><h3>Tek dokunuşla onaylayın</h3><p>Fiyatı girin, "Onaylandı"ya basın. Müşteriye kendi dilinde hazır WhatsApp onay mesajı açılır, siz sadece gönderirsiniz.</p><div class="phone"><div class="scr"><img src="site/img/confirm.webp" alt="Rezervasyonu onaylama ve WhatsApp onay mesajı" loading="lazy" width="585" height="1266"></div></div></div>
+    </div>
   </div>
-  <div id="loadNote" class="note">Yükleniyor…</div>
+</section>
+
+<section class="feat" id="ozellikler" aria-labelledby="h-oz">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="h-oz">İşinizin her parçası için bir yer</h2>
+      <p class="lead">Defter, not kâğıdı, hesap makinesi ve WhatsApp arasında kaybolan her şey tek uygulamada.</p>
+    </div>
+    <div class="flist">
+      <div class="fi"><span class="ic" style="--c:var(--sea)"><svg class="i" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span><div><h3>4 dilde müşteri formu</h3><p>İngilizce, Almanca, Rusça ve Türkçe. Uçuş kodu ve tüm yolcuların isimleri zorunlu, eksik bilgiyle kayıt gelmez.</p></div></div>
+      <div class="fi"><span class="ic" style="--c:var(--bloom)"><svg class="i" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></span><div><h3>Sesli bildirim</h3><p>Linkten yeni rezervasyon gelince uygulama zil çalar ve "Yeni rezervasyon" diye sesli söyler.</p></div></div>
+      <div class="fi"><span class="ic" style="--c:var(--mint)"><svg class="i" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/><path d="m9 12 2 2 4-4"/></svg></span><div><h3>WhatsApp onay mesajı</h3><p>Tarih, uçuş, otel, yolcular ve fiyat müşterinin dilinde hazır yazılır. Siz sadece "Gönder"e basarsınız.</p></div></div>
+      <div class="fi"><span class="ic" style="--c:#ff7a1a"><svg class="i" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span><div><h3>Havalimanı karşılama sayfası</h3><p>Müşteri sizi nerede bulacağını İngilizce ya da Almanca okur, fotoğrafını ve videosunu izler.</p></div></div>
+      <div class="fi"><span class="ic" style="--c:#7c3aed"><svg class="i" viewBox="0 0 24 24"><path d="M2 22h20"/><path d="M6.4 17.4 3.5 13l2.2-1 2.9 1.4 3.6-2.2L6 6.5l2.6-1.2 7.7 3.3 3.3-1.6a2 2 0 0 1 1.7 3.6L8.6 16.9z"/></svg></span><div><h3>Gidiş-dönüş tek kayıtta</h3><p>Dönüş, tarihi yaklaşınca listede kendiliğinden belirir. Dönüş ödemesi ayrı takip edilir.</p></div></div>
+      <div class="fi"><span class="ic" style="--c:var(--sun);color:#2a1d00"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span><div><h3>2 saat önceden hatırlatma</h3><p>Saati yaklaşan transferler listenin en üstünde uyarı olarak çıkar, hiçbir karşılama unutulmaz.</p></div></div>
+      <div class="fi"><span class="ic" style="--c:#2563eb"><svg class="i" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span><div><h3>Tahsilat ve ödeme takibi</h3><p>Kimden ne alacağınız, şoföre ya da acentaya ne ödeyeceğiniz her kaydın üzerinde görünür.</p></div></div>
+      <div class="fi"><span class="ic" style="--c:#0d9488"><svg class="i" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><div><h3>Kayıtlar bulutta</h3><p>Telefon değişse ya da kaybolsa da kayıtlar gitmez. Yanlışlıkla sildiğiniz kaydı 30 gün içinde geri alırsınız.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="money" aria-labelledby="h-para">
+  <div class="wrap">
+    <div>
+      <h2 id="h-para">Ay sonunda hesap hazır</h2>
+      <p class="lead" style="margin-top:16px">Alınan, bekleyen, ödenen ve kalan kâr tek ekranda. Yakıt, yıkama, köprü gibi masrafları da yazın, net kârı görün.</p>
+      <ul>
+        <li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Bu ay, geçen ay, bu yıl ya da istediğiniz tarih aralığı</span></li>
+        <li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Euro, dolar, sterlin ve TL ayrı ayrı toplanır</span></li>
+        <li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Raporu tek dokunuşla WhatsApp'tan paylaşın</span></li>
+        <li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Eski kayıtları silseniz de rapor rakamları korunur</span></li>
+      </ul>
+    </div>
+    <div class="shots">
+      <div class="phone"><div class="scr"><img src="site/img/list.webp" alt="Rezervasyon listesi: bugünkü transferler ve bekleyen tahsilat" loading="lazy" width="585" height="1266"></div></div>
+      <div class="phone"><div class="scr"><img src="site/img/rep.webp" alt="Aylık rapor: alınan, bekleyen, ödenen, kâr" loading="lazy" width="585" height="1266"></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="langs" aria-labelledby="h-dil">
+  <div class="wrap">
+    <div>
+      <h2 id="h-dil">Müşteriniz hangi dili konuşursa</h2>
+      <p>Form, onay mesajı ve karşılama sayfası müşterinin dilinde. Telefon numarasından dili kendisi tahmin eder.</p>
+    </div>
+    <div class="hello" lang="en">
+      <div><span>EN</span>Your transfer is confirmed</div>
+      <div lang="de"><span>DE</span>Ihr Transfer ist bestätigt</div>
+      <div lang="ru"><span>RU</span>Ваш трансфер подтверждён</div>
+      <div lang="tr"><span>TR</span>Transferiniz onaylandı</div>
+    </div>
+  </div>
+</div>
+
+<section class="price" id="fiyat" aria-labelledby="h-fiyat">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="h-fiyat">Bir transferin kârından az</h2>
+      <p class="lead">Tüm özellikler her iki planda da aynı. İstediğiniz zaman bırakırsınız.</p>
+    </div>
+    <div class="plans">
+      <div class="plan"><div class="nm">Aylık</div><div class="amt">250 TL <small>/ ay</small></div>
+        <ul><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Sınırsız rezervasyon</li><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Müşteri formu ve karşılama sayfası</li><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Raporlar ve kasa defteri</li></ul></div>
+      <div class="plan hi"><div class="nm">Yıllık</div><div class="amt">3000 TL <small>/ yıl</small></div>
+        <ul><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Aylık planın her şeyi</li><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Yılda tek ödeme</li><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Her ay ödeme derdi yok</li></ul></div>
+    </div>
+    <div class="trial"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg>İlk 30 gün ücretsiz, ödeme bilgisi istenmez</div>
+  </div>
+</section>
+
+<section class="faq" id="sss" aria-labelledby="h-sss">
+  <div class="wrap">
+    <div class="sec-head"><h2 id="h-sss">Sık sorulanlar</h2></div>
+    <details><summary>Uygulamayı nereden indiriyorum?</summary><p>İndirmenize gerek yok. Size verdiğimiz kullanıcı adı ve şifreyle transferdefteri.net/app adresinden girersiniz. Telefonda "Ana ekrana ekle" derseniz uygulama gibi simgesiyle açılır.</p></details>
+    <details><summary>Müşteri bu sayfada ödeme yapıyor mu?</summary><p>Hayır. Müşteri sadece bilgilerini yazar. Fiyatı ve ödemeyi siz belirler, siz alırsınız. Uygulama yalnızca kimden ne alacağınızı takip eder.</p></details>
+    <details><summary>Müşterinin bilgisi eksik gelirse?</summary><p>Formda uçuş kodu, tarih, saat, otel ve tüm yolcuların isimleri zorunlu. Yine de yanlış bir şey varsa kaydı açıp düzeltirsiniz.</p></details>
+    <details><summary>Telefonum değişirse kayıtlarım ne olur?</summary><p>Kayıtlar telefonda değil bulutta saklanır. Yeni telefondan aynı kullanıcı adıyla girdiğinizde hepsi yerinde olur.</p></details>
+    <details><summary>Bilgisayardan da kullanabilir miyim?</summary><p>Evet. Aynı adresten bilgisayarda, tablette ve telefonda aynı anda kullanabilirsiniz. Bir cihazda eklenen kayıt diğerinde hemen görünür.</p></details>
+    <details><summary>30 gün bitince ne oluyor?</summary><p>Devam etmek isterseniz aylık 250 TL ya da yıllık 3000 TL ödersiniz. İstemezseniz hiçbir şey yapmanız gerekmez, hesabınız kendiliğinden durur.</p></details>
+  </div>
+</section>
+
+<section class="final" aria-labelledby="h-son">
+  <div class="wrap">
+    <div><h2 id="h-son">Bu sezonu defterle değil, Transfer Defteri'yle açın</h2><p>WhatsApp'tan yazın, hesabınızı aynı gün açalım.</p></div>
+    <a class="btn btn-ink wa-link" href="https://wa.me/905455260007" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>WhatsApp'tan yazın</a>
+  </div>
+</section>
 </main>
 
-<button class="fab fab-link" id="fabLink" aria-label="Müşteriye rezervasyon linki gönder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>Link gönder</button>
-<button class="fab" id="fab" aria-label="Yeni rezervasyon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Yeni</button>
-</div>
-
-<!-- rezervasyon formu -->
-<div id="sheet" class="sheet" hidden>
-  <div class="sheet-hdr"><div class="in gut">
-    <button class="lnk quiet" id="btnClose">Kapat</button>
-    <h2 id="sheetTitle">Yeni rezervasyon</h2>
-    <button class="lnk" id="btnSave">Kaydet</button>
-  </div></div>
-  <div class="sheet-body gut" id="form">
-    <div class="err" id="formErr" hidden></div>
-    <fieldset id="custBox" hidden><div class="cust" style="margin:10px 14px"><b>Müşteri formundan geldi</b><div id="custInfo"></div></div><div style="height:10px"></div></fieldset>
-
-    <fieldset>
-      <div class="sec-t">Geliş</div>
-      <div class="row2">
-        <div class="f"><label for="fDate">Tarih</label><input id="fDate" type="date"></div>
-        <div class="f"><label for="fTime">Saat</label><input id="fTime" type="time"></div>
-      </div>
-      <div class="f"><label for="fFlight">Uçuş no (isteğe bağlı)</label><input id="fFlight" placeholder="TK 1234" autocapitalize="characters"></div>
-      <div class="sec-t" style="border-top:1px solid var(--line);padding-top:12px">Dönüş (aynı kayıt — boş bırakılırsa tek yön)</div>
-      <div class="row2">
-        <div class="f" style="border-top:0"><label for="fRDate">Dönüş tarihi</label><input id="fRDate" type="date"></div>
-        <div class="f" style="border-top:0"><label for="fRTime">Dönüş saati</label><input id="fRTime" type="time"></div>
-      </div>
-      <div class="f"><label for="fRFlight">Dönüş uçuşu</label><input id="fRFlight" placeholder="isteğe bağlı" autocapitalize="characters"></div>
-    </fieldset>
-
-    <fieldset>
-      <div class="sec-t">Yolcu</div>
-      <div class="row2">
-        <div class="f"><label for="fFirst">Ad</label><input id="fFirst" placeholder="Johann" autocomplete="off" spellcheck="false"></div>
-        <div class="f"><label for="fLast">Soyad</label><input id="fLast" placeholder="Müller" autocomplete="off" spellcheck="false"></div>
-      </div>
-      <div class="f"><label for="fPhone">Telefon / WhatsApp</label><input id="fPhone" type="tel" placeholder="+49 170 1234567" inputmode="tel"></div>
-      <div class="f"><label for="fEmail">E‑posta</label><input id="fEmail" type="email" placeholder="isteğe bağlı" inputmode="email"></div>
-      <div class="contact" id="contactBar" hidden></div>
-      <div class="row3">
-        <div class="f"><label for="fAdults">Yetişkin</label><input id="fAdults" type="number" min="0" inputmode="numeric" value="2"></div>
-        <div class="f"><label for="fChildren">Çocuk</label><input id="fChildren" type="number" min="0" inputmode="numeric" value="0"></div>
-        <div class="f"><label for="fInfants">Bebek</label><input id="fInfants" type="number" min="0" inputmode="numeric" value="0"></div>
-      </div>
-      <div class="f" id="fAgesWrap" hidden><label>Çocuk yaşları</label><div class="ages" id="fAges" style="padding:4px 0 0"></div></div>
-      <div id="fNamesWrap" hidden><div class="sec-t" style="border-top:1px solid var(--line);padding-top:12px">Yolcu isimleri</div><div id="fNames"></div></div>
-      <div class="tog"><span>Bebek koltuğu</span><button class="sw" id="fSeat" role="switch" aria-checked="false" aria-label="Bebek koltuğu"></button></div>
-      <div class="tog"><span>Yükseltici</span><button class="sw" id="fBooster" role="switch" aria-checked="false" aria-label="Yükseltici"></button></div>
-      <div class="f"><label for="fLug">Bagaj (adet)</label><input id="fLug" type="number" min="0" inputmode="numeric" placeholder="isteğe bağlı"></div>
-    </fieldset>
-
-    <fieldset>
-      <div class="sec-t">Güzergah</div>
-      <div class="f"><label for="fHotel">Otel</label><input id="fHotel" placeholder="Otel adını yazın" autocomplete="off"></div>
-      <div class="hint" id="hotelHint" hidden></div>
-      <div class="f"><label for="fArea">Bölge</label><input id="fArea" placeholder="Belek, Lara, Side, Alanya…" autocomplete="off"></div>
-      <div class="row2">
-        <div class="f"><label for="fFrom">Nereden</label><input id="fFrom" placeholder="Havalimanı, otel, ilçe…" autocomplete="off"></div>
-        <div class="f"><label for="fTo">Nereye</label><input id="fTo" placeholder="Havalimanı, otel, ilçe…" autocomplete="off"></div>
-      </div>
-      <div class="f"><label for="fVehicle">Araç / Şoför (isteğe bağlı)</label><input id="fVehicle" placeholder="Vito 07 ABC 123 · Mehmet"></div>
-    </fieldset>
-
-    <fieldset>
-      <div class="sec-t" id="payTitle">Ödeme</div>
-      <div class="row2">
-        <div class="f"><label for="fRecv">Alınacak ödeme</label><div class="inline"><input id="fRecv" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"><select id="fRecvCur"><option>EUR</option><option>USD</option><option>GBP</option><option>TRY</option></select></div></div>
-        <div class="f"><label for="fPay">Ödenecek ödeme</label><div class="inline"><input id="fPay" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"><select id="fPayCur"><option>EUR</option><option>USD</option><option>GBP</option><option>TRY</option></select></div></div>
-      </div>
-      <div class="f"><label for="fPayTo">Kime ödenecek (şoför, acenta…)</label><input id="fPayTo" placeholder="isteğe bağlı"></div>
-      <div class="tog"><span>Ödeme alındı</span><button class="sw" id="fReceived" role="switch" aria-checked="false" aria-label="Ödeme alındı"></button></div>
-      <div class="tog"><span>Ödeme yapıldı</span><button class="sw" id="fPaid" role="switch" aria-checked="false" aria-label="Ödeme yapıldı"></button></div>
-      <div id="retPayBox" hidden>
-        <div class="sec-t" style="border-top:1px solid var(--line);padding-top:12px">Dönüş ödemesi</div>
-        <div class="row2">
-          <div class="f" style="border-top:0"><label for="fRRecv">Alınacak (dönüş)</label><div class="inline"><input id="fRRecv" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"><select id="fRRecvCur"><option>EUR</option><option>USD</option><option>GBP</option><option>TRY</option></select></div></div>
-          <div class="f" style="border-top:0"><label for="fRPay">Ödenecek (dönüş)</label><div class="inline"><input id="fRPay" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"><select id="fRPayCur"><option>EUR</option><option>USD</option><option>GBP</option><option>TRY</option></select></div></div>
-        </div>
-        <div class="hint" style="padding-top:8px"><button type="button" id="splitPay">Toplamı ikiye böl</button></div>
-        <div class="tog"><span>Dönüş ödemesi alındı</span><button class="sw" id="fRReceived" role="switch" aria-checked="false" aria-label="Dönüş ödemesi alındı"></button></div>
-        <div class="tog"><span>Dönüş ödemesi yapıldı</span><button class="sw" id="fRPaid" role="switch" aria-checked="false" aria-label="Dönüş ödemesi yapıldı"></button></div>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <div class="sec-t">Durum &amp; hatırlatma</div>
-      <div class="status-pick" id="statusPick">
-        <button data-s="pending">Beklemede</button>
-        <button data-s="confirmed">Onaylandı</button>
-        <button data-s="done">Tamamlandı</button>
-        <button data-s="cancelled">İptal</button>
-      </div>
-      <div id="confirmBox" hidden style="padding:0 14px 12px;display:grid;gap:6px">
-        <a class="wa-btn" id="confirmWa" target="_blank" rel="noopener">✓ Kaydet ve müşteriye WhatsApp onayı gönder</a>
-        <span class="note" style="margin:0;text-align:left">Müşterinin dilinde hazır onay mesajı açılır; WhatsApp'ta "Gönder"e basmanız yeterli.</span>
-      </div>
-      <div class="f"><label for="fRemind">Hatırlatma</label>
-        <select id="fRemind"><option value="0">Kapalı</option><option value="30">30 dk önce</option><option value="60">1 saat önce</option><option value="120">2 saat önce</option><option value="180">3 saat önce</option><option value="720">12 saat önce</option><option value="1440">1 gün önce</option></select></div>
-      <div class="f"><label for="fNote">Not</label><textarea id="fNote" placeholder="Özel istek, iniş terminali, ek bilgi…"></textarea></div>
-    </fieldset>
-
-    <fieldset>
-      <div class="sec-t">Fotoğraflar</div>
-      <div class="photos" id="photos"></div>
-    </fieldset>
-
-    <div id="delWrap" hidden>
-      <button class="danger" id="btnDel">Rezervasyonu sil</button>
-      <div class="confirm" id="delConfirm" hidden>
-        <button class="btn" id="delNo">Vazgeç</button>
-        <button class="btn red" id="delYes">Evet, sil</button>
-      </div>
-    </div>
+<footer>
+  <div class="wrap">
+    <span>© 2026 Transfer Defteri</span>
+    <a href="tel:+905455260007">0545 526 00 07</a>
+    <a href="/app/">Firma girişi</a>
+    <span class="sp">Antalya</span>
   </div>
-</div>
-
-<!-- yerler -->
-<div id="placesSheet" class="sheet" hidden>
-  <div class="sheet-hdr"><div class="in gut">
-    <button class="lnk quiet" id="plClose">Kapat</button>
-    <h2>Oteller &amp; Yerler</h2>
-    <span class="cnt" id="plCount"></span>
-  </div></div>
-  <div class="sheet-body gut">
-    <div class="addrow">
-      <b>Yeni otel ekle</b>
-      <input id="npName" placeholder="Otel adı" autocomplete="off">
-      <div class="f" style="padding:0;border:0"><input id="npArea" placeholder="Bölge (Belek, Lara, Konaklı…)" autocomplete="off" style="border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:var(--bg)"></div>
-      <button class="btn gold" id="npAdd">Listeye ekle</button>
-      <div class="err" id="npErr" hidden></div>
-    </div>
-    <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="plQ" type="search" placeholder="Otel veya bölge ara" autocomplete="off"></label>
-    <div class="segs" id="plSegs">
-      <button data-seg="hotel" aria-pressed="true">Oteller</button>
-      <button data-seg="closed" aria-pressed="false">Kapalı oteller</button>
-      <button data-seg="airport" aria-pressed="false">Havalimanları</button>
-      <button data-seg="place" aria-pressed="false">İlçe &amp; köyler</button>
-    </div>
-    <div class="plist" id="plList"></div>
-    <div class="note">Temel liste uygulamayla gelir; eklediğiniz ve kapattığınız oteller bulutta saklanır, tüm cihazlarınızda ve müşteri formunda görünür.</div>
-  </div>
-</div>
-
-<!-- link gönder -->
-<div id="linkSheet" class="sheet" hidden>
-  <div class="sheet-hdr"><div class="in gut">
-    <button class="lnk quiet" id="lkClose">Kapat</button>
-    <h2>Müşteriye link gönder</h2>
-    <span></span>
-  </div></div>
-  <div class="sheet-body gut">
-    <div class="linkbox">
-      <b>Rezervasyon linkiniz</b>
-      <div class="note" style="margin:0;text-align:left">Müşteri bu linki açar, dilini seçer, bilgilerini doldurur. Gönderdiği an kayıt listenize düşer; siz sadece kontrol edip fiyat yazarsınız.</div>
-      <code id="lkLink"></code>
-      <div class="acts">
-        <a class="btn gold" id="lkWa" target="_blank" rel="noopener">WhatsApp ile gönder</a>
-        <button class="btn" id="lkCopy">Linki kopyala</button>
-        <a class="btn" id="lkOpen" target="_blank" rel="noopener">Formu gör</a>
-      </div>
-    </div>
-    <fieldset>
-      <div class="sec-t">Neler gönderilsin?</div>
-      <div class="tog"><span>📝 Rezervasyon formu linki</span><button class="sw" id="lkForm" role="switch" aria-checked="true" aria-label="Rezervasyon formu linki"></button></div>
-      <div class="tog" id="lkMeetRow"><span>📍 Karşılama sayfası<br><small style="color:var(--muted);font-weight:600">İngilizce/Almanca yazı + görsel + video</small></span><button class="sw" id="lkMeet" role="switch" aria-checked="true" aria-label="Karşılama sayfası"></button></div>
-      <div class="hint" id="lkMeetNone" hidden style="padding:4px 14px 12px">Karşılama sayfanız henüz yok. Ayarlar → Havalimanı karşılama bölümünden yazı, görsel ve video ekleyin.</div>
-      <div class="btnrow"><a class="btn sm" id="lkMeetOpen" target="_blank" rel="noopener">Karşılama sayfasını gör</a></div>
-    </fieldset>
-    <fieldset>
-      <div class="sec-t">Hazır mesaj</div>
-      <div class="f"><label for="lkMsg">WhatsApp'ta gidecek metin (düzenleyebilirsiniz)</label><textarea id="lkMsg" style="min-height:150px"></textarea></div>
-      <div class="hint" style="padding:0 14px 12px"><button type="button" id="lkReset">Metni yeniden oluştur</button></div>
-    </fieldset>
-  </div>
-</div>
-
-<!-- raporlar -->
-<div id="repSheet" class="sheet" hidden>
-  <div class="sheet-hdr"><div class="in gut">
-    <button class="lnk quiet" id="repClose">Kapat</button>
-    <h2>Raporlar</h2>
-    <button class="lnk" id="repShare">Paylaş</button>
-  </div></div>
-  <div class="sheet-body gut">
-    <div class="segs" id="repSegs">
-      <button data-p="month" aria-pressed="true">Bu ay</button>
-      <button data-p="last">Geçen ay</button>
-      <button data-p="year">Bu yıl</button>
-      <button data-p="custom">Tarih aralığı</button>
-    </div>
-    <div class="row2" id="repRange" hidden style="background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden">
-      <div class="f" style="border-top:0"><label for="repFrom">Başlangıç</label><input id="repFrom" type="date"></div>
-      <div class="f" style="border-top:0"><label for="repTo">Bitiş</label><input id="repTo" type="date"></div>
-    </div>
-    <div class="note" style="margin:0;text-align:left" id="repTitle"></div>
-    <div class="rgrid" id="repBoxes"></div>
-    <div class="rwrap"><table class="rtable" id="repTable"></table></div>
-    <div class="note" style="margin:0;text-align:left">Alınan = tahsil edildi işaretli tutarlar. Ödenen = ödendi işaretli tutarlar. Kâr = alınacak − ödenecek. Net kâr = kâr − masraflar + ekstra gelirler. Para birimleri ayrı ayrı gösterilir.</div>
-    <fieldset>
-      <div class="sec-t">Gelir / Gider (masraflar)</div>
-      <div class="row2">
-        <div class="f"><label for="lgDate">Tarih</label><input id="lgDate" type="date"></div>
-        <div class="f"><label for="lgKind">Tür</label><select id="lgKind"><option value="expense">Gider (masraf)</option><option value="income">Ekstra gelir</option></select></div>
-      </div>
-      <div class="row2">
-        <div class="f"><label for="lgCat">Kategori</label><select id="lgCat"><option>Yakıt</option><option>HGS / Otopark</option><option>Yıkama</option><option>Bakım / Lastik</option><option>Yemek</option><option>Şoför ücreti</option><option>Kira / Araç taksidi</option><option>Sigorta / Vergi</option><option>Telefon / İnternet</option><option>Diğer</option></select></div>
-        <div class="f"><label for="lgAmt">Tutar</label><div class="inline"><input id="lgAmt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"><select id="lgCur"><option>TRY</option><option>EUR</option><option>USD</option><option>GBP</option></select></div></div>
-      </div>
-      <div class="f"><label for="lgNote">Açıklama</label><input id="lgNote" placeholder="isteğe bağlı"></div>
-      <div class="btnrow"><button type="button" class="btn gold" id="lgAdd">Ekle</button><span class="err" id="lgErr" hidden></span></div>
-      <div id="lgList"></div>
-    </fieldset>
-    <fieldset>
-      <div class="sec-t">Eski kayıtları temizle</div>
-      <div class="note" style="margin:0;text-align:left;padding:8px 14px">Eski rezervasyonlar ve fotoğrafları silinir, yer açılır. Raporlardaki rakamlar (ciro, kâr, tahsilat) ve kasa defteri silinmez, aynen kalır. Yaklaşan (ileri tarihli) kayıtlar hiçbir zaman silinmez.</div>
-      <div class="btnrow">
-        <button type="button" class="btn sm" data-del="30">1 aydan eski</button>
-        <button type="button" class="btn sm" data-del="90">3 aydan eski</button>
-        <button type="button" class="btn sm" data-del="365">1 yıldan eski</button>
-        <button type="button" class="btn sm" data-del="range">Seçili tarih aralığı</button>
-      </div>
-      <div class="confirm" id="delBulkConfirm" hidden style="flex-direction:column;align-items:center;gap:8px">
-        <div id="delBulkTxt" style="font-weight:700"></div>
-        <div style="display:flex;gap:10px"><button class="btn" id="delBulkNo">Vazgeç</button><button class="btn red" id="delBulkYes">Evet, sil</button></div>
-      </div>
-    </fieldset>
-  </div>
-</div>
-
-<!-- ayarlar -->
-<div id="trashSheet" class="sheet" hidden>
-  <div class="sheet-hdr"><div class="in gut">
-    <button class="lnk quiet" id="trashClose">Kapat</button>
-    <h2>Silinenler</h2>
-    <span></span>
-  </div></div>
-  <div class="sheet-body gut">
-    <div class="note" style="text-align:left">Silinen rezervasyonlar 30 gün burada durur. "Geri al" ile listenize döner. 30 gün dolunca otomatik olarak kalıcı silinir.</div>
-    <div id="trashList"></div>
-    <div style="margin:18px 0 40px">
-      <button class="danger" id="trashAll" hidden>Hepsini şimdi kalıcı sil</button>
-      <div class="confirm" id="trashConfirm" hidden><button class="btn" id="trashNo">Vazgeç</button><button class="btn red" id="trashYes">Evet, kalıcı olarak sil</button></div>
-    </div>
-  </div>
-</div>
-<div id="setSheet" class="sheet" hidden>
-  <div class="sheet-hdr"><div class="in gut">
-    <button class="lnk quiet" id="setClose">Kapat</button>
-    <h2>Ayarlar</h2>
-    <span></span>
-  </div></div>
-  <div class="sheet-body gut">
-    <div class="linkbox">
-      <b>Müşteri rezervasyon linki</b>
-      <div class="note" style="margin:0;text-align:left">Bu linki müşterilerinize gönderin. Doldurdukları form doğrudan listenize düşer.</div>
-      <code id="custLink"></code>
-      <div class="acts">
-        <button class="btn gold" id="copyLink">Linki kopyala</button>
-        <a class="btn" id="waLink" target="_blank" rel="noopener">WhatsApp ile gönder</a>
-        <a class="btn" id="openLink" target="_blank" rel="noopener">Formu gör</a>
-      </div>
-    </div>
-    <div class="linkbox" id="setPlacesBox" hidden><b>Oteller &amp; Yerler</b><div class="acts"><button class="btn" id="setPlaces">Otel listesini yönet</button></div></div>
-    <fieldset>
-      <div class="sec-t">Firma</div>
-      <div class="f"><label for="sName">Firma adı (müşteri formunda görünür)</label><input id="sName"></div>
-      <div class="f"><label for="sWa">WhatsApp numaranız (müşteri formunda "bize yazın" düğmesi)</label><input id="sWa" type="tel" placeholder="+90 5xx xxx xx xx"></div>
-      <div class="f"><label for="sPlate">Araç plakası (üstte rozet olarak görünür)</label><input id="sPlate" placeholder="07 ABC 123" autocapitalize="characters" autocomplete="off"></div>
-      <div class="f"><label for="sSlug">Link kısa adı</label><input id="sSlug" placeholder="vip" autocapitalize="off" autocomplete="off"></div>
-      <div style="padding:10px 14px"><button class="btn gold" id="sSave">Kaydet</button> <span class="err" id="sErr" hidden></span></div>
-    </fieldset>
-    <fieldset>
-      <div class="sec-t">Havalimanı karşılama (müşteriye gider)</div>
-      <div class="hint" style="padding:6px 14px 0">Müşteri linkte dilini seçer, yazıyı okur, fotoğrafı ve videoyu görür. Dolu olan diller düğme olarak çıkar.</div>
-      <div class="f"><label for="mtEn">🇬🇧 İngilizce yazı</label><textarea id="mtEn" style="min-height:90px"></textarea></div>
-      <div class="f"><label for="mtDe">🇩🇪 Almanca yazı</label><textarea id="mtDe" style="min-height:90px"></textarea></div>
-      <div class="f"><label for="mtTr">🇹🇷 Türkçe yazı (isteğe bağlı)</label><textarea id="mtTr" style="min-height:70px"></textarea></div>
-      <div class="f"><label for="mtRu">🇷🇺 Rusça yazı (isteğe bağlı)</label><textarea id="mtRu" style="min-height:70px"></textarea></div>
-      <div class="f"><label>Görsel</label><div class="inline" style="flex-wrap:wrap"><img id="mtPhotoPv" alt="" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid var(--line)" hidden><label class="btn sm" style="cursor:pointer">Görsel seç<input type="file" id="mtPhoto" accept="image/*" hidden></label><button type="button" class="btn sm" id="mtPhotoDel" hidden>Kaldır</button></div></div>
-      <div class="f"><label>Video</label><div class="inline" style="flex-wrap:wrap"><span id="mtVideoName" class="hint" style="padding:0"></span><label class="btn sm" style="cursor:pointer">Video seç<input type="file" id="mtVideo" accept="video/*" hidden></label><button type="button" class="btn sm" id="mtVideoDel" hidden>Kaldır</button></div></div>
-      <div class="btnrow"><button type="button" class="btn gold" id="mtSave">Karşılama bilgisini kaydet</button><a class="btn sm" id="mtOpen" target="_blank" rel="noopener">Sayfayı gör</a><span class="err" id="mtErr" hidden></span></div>
-    </fieldset>
-    <fieldset>
-      <div class="sec-t">Silinenler</div>
-      <div class="hint" style="padding:6px 14px 0">Silinen rezervasyonlar 30 gün burada durur, geri alınabilir. 30 gün sonra fotoğraflarıyla birlikte kalıcı silinir.</div>
-      <div class="btnrow"><button type="button" class="btn" id="btnTrash">🗑 Silinenleri aç</button></div>
-    </fieldset>
-    <fieldset>
-      <div class="sec-t">Görünüm</div>
-      <div class="tog"><span>Koyu tema (renkli)</span><button class="sw" id="themeSw" role="switch" aria-checked="true" aria-label="Koyu tema"></button></div>
-    </fieldset>
-    <fieldset>
-      <div class="sec-t">Bildirimler</div>
-      <div class="tog"><span>Yeni rezervasyonda zil sesi</span><button class="sw" id="nfSound" role="switch" aria-checked="true" aria-label="Zil sesi"></button></div>
-      <div class="tog"><span>İsmi sesli oku</span><button class="sw" id="nfVoice" role="switch" aria-checked="true" aria-label="Sesli okuma"></button></div>
-      <div class="tog"><span>Ekran üstü bildirim</span><button class="sw" id="nfPush" role="switch" aria-checked="false" aria-label="Ekran üstü bildirim"></button></div>
-      <div style="padding:6px 14px 12px"><button class="btn sm" id="nfTest" type="button">Bildirimi dene</button></div>
-    </fieldset>
-    <fieldset>
-      <div class="sec-t">Hesap</div>
-      <div style="padding:6px 14px">
-        <div class="kv"><span>Giriş</span><b id="sEmail"></b></div>
-        <div class="kv"><span>Plan</span><b id="sPlan"></b></div>
-        <div class="kv"><span>Bitiş tarihi</span><b id="sTrial"></b></div>
-      </div>
-      <div style="padding:6px 14px 14px"><button class="btn" id="sPass">Şifre değiştir</button> <button class="btn" id="sLogout">Çıkış yap</button></div>
-      <div id="passBox" hidden style="padding:0 14px 14px;display:grid;gap:8px">
-        <input id="newPass" type="password" placeholder="Yeni şifre (en az 6 karakter)" autocomplete="new-password" style="border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:var(--bg);font-size:16px">
-        <button class="btn gold" id="newPassSave">Şifreyi güncelle</button>
-        <div class="err" id="passErr" hidden></div>
-      </div>
-    </fieldset>
-    <div class="note">Transfer Defteri · sürüm 1.4</div>
-  </div>
-</div>
-
-<div id="wallView" class="wall" hidden>
-  <div class="box">
-    <div class="logo"><div class="mark">T</div><div><h1 style="font-size:18px">Transfer Defteri</h1><small id="wallCo"></small></div></div>
-    <h2 id="wallT">Deneme süreniz doldu</h2>
-    <p id="wallP">Kayıtlarınız güvende; yenileme yaptığınızda kaldığınız yerden devam edersiniz.</p>
-    <div class="plans" id="wallPlans"></div>
-    <div class="ibanbox" id="wallIban" hidden><small>Havale / EFT</small><b id="wallIbanNo"></b><span id="wallIbanName"></span><span class="note" style="margin:0;text-align:left">Açıklamaya kullanıcı adınızı yazın: <b id="wallUser"></b></span><button class="btn sm" id="wallCopyIban" type="button">IBAN'ı kopyala</button></div>
-    <a class="wa-btn" id="wallWa" target="_blank" rel="noopener" hidden>WhatsApp'tan yazın</a>
-    <button class="sbtn" id="wallLogout" type="button">Çıkış yap</button>
-  </div>
-</div>
-
-<div id="pwView" class="wall" hidden>
-  <form class="box" id="pwForm">
-    <h2>Yeni şifrenizi belirleyin</h2>
-    <p>Geçici şifreyle giriş yaptınız. Devam etmek için kendi şifrenizi oluşturun.</p>
-    <div class="in"><label for="pw1">Yeni şifre (en az 6 karakter)</label><input id="pw1" type="password" autocomplete="new-password" minlength="6" required></div>
-    <div class="in"><label for="pw2">Yeni şifre (tekrar)</label><input id="pw2" type="password" autocomplete="new-password" minlength="6" required></div>
-    <div class="err" id="pwErr" hidden></div>
-    <button class="pbtn" type="submit">Kaydet ve devam et</button>
-  </form>
-</div>
-
-<div id="adminSheet" class="sheet" hidden>
-  <div class="sheet-hdr"><div class="in gut">
-    <button class="lnk quiet" id="adClose">Kapat</button>
-    <h2>Yönetim</h2>
-    <button class="lnk" id="adNew">+ Firma</button>
-  </div></div>
-  <div class="sheet-body gut">
-    <div class="astats" id="adStats">
-      <button data-f="all" aria-pressed="true"><span class="n" id="asAll">0</span><span class="l">Firma</span></button>
-      <button data-f="active"><span class="n" id="asActive">0</span><span class="l">Aktif</span></button>
-      <button data-f="soon"><span class="n" id="asSoon">0</span><span class="l">Yaklaşan</span></button>
-      <button data-f="exp"><span class="n" id="asExp">0</span><span class="l">Dolmuş</span></button>
-    </div>
-    <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="adQ" type="search" placeholder="Firma, kullanıcı adı, plaka, telefon" autocomplete="off"></label>
-    <div class="plist" id="adList"></div>
-    <fieldset>
-      <div class="sec-t">Platform ayarları</div>
-      <div class="f"><label for="psWa">Destek WhatsApp numaranız (süresi dolan firmalar buraya yazar)</label><input id="psWa" type="tel" placeholder="+90 5xx xxx xx xx"></div>
-      <div class="row2">
-        <div class="f"><label for="psM">Aylık fiyat (TL)</label><input id="psM" type="number" inputmode="numeric"></div>
-        <div class="f"><label for="psY">Yıllık fiyat (TL)</label><input id="psY" type="number" inputmode="numeric"></div>
-      </div>
-      <div class="row2">
-        <div class="f"><label for="psTrial">Deneme süresi (gün)</label><input id="psTrial" type="number" inputmode="numeric"></div>
-        <div class="f"><label for="psUrl">Uygulama adresi (davet mesajında)</label><input id="psUrl" placeholder="https://transferdefteri.net"></div>
-      </div>
-      <div class="f"><label for="psIban">IBAN (ödeme için)</label><input id="psIban" placeholder="TR.."></div>
-      <div class="f"><label for="psIbanName">Hesap sahibi</label><input id="psIbanName"></div>
-      <div style="padding:10px 14px"><button class="btn gold" id="psSave">Ayarları kaydet</button> <span class="err" id="psErr" hidden></span></div>
-    </fieldset>
-  </div>
-</div>
-
-<div id="coSheet" class="sheet" hidden>
-  <div class="sheet-hdr"><div class="in gut">
-    <button class="lnk quiet" id="coClose">Geri</button>
-    <h2 id="coTitle">Firma</h2>
-    <button class="lnk" id="coSave">Kaydet</button>
-  </div></div>
-  <div class="sheet-body gut">
-    <div class="err" id="coErr" hidden></div>
-    <div id="coNewBox">
-      <fieldset>
-        <div class="sec-t">Giriş bilgileri</div>
-        <div class="f"><label for="cnUser">Kullanıcı adı (harf/rakam, örn. 07abc123 veya mehmettur)</label><input id="cnUser" autocapitalize="off" autocomplete="off" spellcheck="false"></div>
-        <div class="f"><label for="cnPass">Geçici şifre (ilk girişte değiştirmesi istenir)</label><div class="inline"><input id="cnPass" autocomplete="off" spellcheck="false"><button type="button" class="btn sm" id="cnGen">Üret</button></div></div>
-      </fieldset>
-    </div>
-    <fieldset>
-      <div class="sec-t">Firma</div>
-      <div class="f" hidden><label for="cnCompany">Firma adı</label><input id="cnCompany" autocomplete="off"></div>
-      <div class="f" hidden><label for="cnContact">Yetkili adı</label><input id="cnContact" autocomplete="off"></div>
-      <div class="f" style="border-top:0"><label for="cnPhone">WhatsApp / telefon</label><input id="cnPhone" type="tel" inputmode="tel" placeholder="+90 5xx xxx xx xx"></div>
-      <div class="f"><label for="cnEmail">E‑posta (isteğe bağlı)</label><input id="cnEmail" type="email" inputmode="email"></div>
-      <div class="f"><label for="cnPlate">Plaka (isteğe bağlı)</label><input id="cnPlate" autocapitalize="characters" autocomplete="off" placeholder="07 ABC 123"></div>
-      <div class="f"><label for="cnNotes">Not</label><textarea id="cnNotes" placeholder="Sadece siz görürsünüz"></textarea></div>
-    </fieldset>
-    <div id="coExistBox" hidden>
-      <fieldset>
-        <div class="sec-t">Üyelik</div>
-        <div class="kvs" id="coKv"></div>
-        <div class="btnrow">
-          <button type="button" class="btn sm ok" id="coPayM">Aylık ödeme al</button>
-          <button type="button" class="btn sm ok" id="coPayY">Yıllık ödeme al</button>
-          <button type="button" class="btn sm" id="coExt">+1 ay ücretsiz</button>
-          <button type="button" class="btn sm warn" id="coSusp">Askıya al</button>
-        </div>
-        <div id="coPays"></div>
-      </fieldset>
-      <fieldset>
-        <div class="sec-t">Giriş</div>
-        <div class="kvs" id="coLogin"></div>
-        <div class="btnrow">
-          <button type="button" class="btn sm" id="coNewPass">Yeni geçici şifre</button>
-          <a class="btn sm" id="coWa" target="_blank" rel="noopener">WhatsApp</a>
-          <a class="btn sm" id="coLink" target="_blank" rel="noopener">Müşteri formu</a>
-        </div>
-        <div class="invite" id="coInvite" hidden></div>
-        <div class="btnrow" id="coInviteBtns" hidden><button type="button" class="btn sm" id="coCopyInv">Metni kopyala</button><a class="btn sm ok" id="coSendInv" target="_blank" rel="noopener">WhatsApp ile gönder</a></div>
-      </fieldset>
-      <button class="danger" id="coDel">Firmayı sil</button>
-      <div class="confirm" id="coDelConfirm" hidden><button class="btn" id="coDelNo">Vazgeç</button><button class="btn red" id="coDelYes">Evet, kalıcı olarak sil</button></div>
-    </div>
-  </div>
-</div>
-
+</footer>
 <script>
-(function(){
-"use strict";
-const SUPABASE_URL="https://ppqfcasjawbbfohjnvjr.supabase.co";
-const SUPABASE_KEY="sb_publishable_1V60UInHZfyvFxSDU5hnjQ_F3cBFGCF";
-const BASE=location.pathname.replace(/[^/]*$/,"");
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-
-const $=id=>document.getElementById(id);
-const TR_DAYS=["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
-const TR_MONTHS=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
-const STATUS={pending:["Beklemede","warn"],confirmed:["Onaylandı","info"],done:["Tamamlandı","ok"],cancelled:["İptal","bad"]};
-const SYM={EUR:"€",USD:"$",GBP:"£",TRY:"₺"};
-const LANG={tr:"Türkçe",en:"English",ru:"Русский",de:"Deutsch"};
-
-let session=null, company=null, settings={}, bookings=[], userPlaces=[], access=null;
-let tab="upcoming", query="", editing=null, photos=[], dismissed={}, seenLink={};
-const signed={}; // storage path -> signed url
-
-const todayStr=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
-const fmtDateLong=s=>{const d=new Date(s+"T12:00:00");return TR_DAYS[d.getDay()]+" "+d.getDate()+" "+TR_MONTHS[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?" "+d.getFullYear():"");};
-const money=(a,c)=>a?((SYM[c]||c)+" "+Number(a).toLocaleString("tr-TR",{minimumFractionDigits:0,maximumFractionDigits:2})):"";
-const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-const digits=p=>String(p||"").replace(/[^\d]/g,"");
-const norm=s=>String(s||"").toLocaleLowerCase("tr-TR").replace(/ı/g,"i").replace(/ş/g,"s").replace(/ğ/g,"g").replace(/ü/g,"u").replace(/ö/g,"o").replace(/ç/g,"c").replace(/â/g,"a").replace(/î/g,"i").replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();
-let toastT;function toast(m){let t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";document.body.appendChild(t);}t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true;},2400);}
-const errMsg=e=>{const m=(e&&e.message)||String(e);if(/Invalid login/i.test(m))return"E‑posta veya şifre hatalı.";if(/Email not confirmed/i.test(m))return"E‑posta henüz onaylanmamış.";if(/rate limit/i.test(m))return"Çok fazla deneme, biraz bekleyin.";if(/Failed to fetch|NetworkError/i.test(m))return"İnternet bağlantısı yok.";return m;};
-
-/* ---------- auth ---------- */
-$("loginForm").addEventListener("submit",async e=>{
-  e.preventDefault();$("lErr").hidden=true;$("lOk").hidden=true;$("lBtn").disabled=true;
-  let ident=$("lEmail").value.trim();
-  if(!ident.includes("@"))ident=ident.toLocaleLowerCase("tr-TR").replace(/ı/g,"i").replace(/ş/g,"s").replace(/ğ/g,"g").replace(/ü/g,"u").replace(/ö/g,"o").replace(/ç/g,"c").replace(/[^a-z0-9._-]/g,"")+"@firma.transferdefteri.net";
-  const {error}=await sb.auth.signInWithPassword({email:ident,password:$("lPass").value});
-  $("lBtn").disabled=false;
-  if(error){$("lErr").textContent=errMsg(error);$("lErr").hidden=false;}
-});
-function showAuthTab(signup){$("loginForm").hidden=signup;$("signupForm").hidden=!signup;$("tabLogin").setAttribute("aria-selected",signup?"false":"true");$("tabSignup").setAttribute("aria-selected",signup?"true":"false");}
-$("tabLogin").addEventListener("click",()=>showAuthTab(false));
-$("tabSignup").addEventListener("click",()=>showAuthTab(true));
-if(location.hash==="#kayit"){$("authTabs").hidden=false;showAuthTab(true);}
-$("signupForm").addEventListener("submit",async e=>{
-  e.preventDefault();$("sErr2").hidden=true;$("sOk2").hidden=true;
-  const companyName=$("sCompany").value.trim(),email=$("sEmail2").value.trim(),pass=$("sPass2").value,phone=$("sPhone").value.trim();
-  if(companyName.length<2){$("sErr2").textContent="Firma adı gerekli.";$("sErr2").hidden=false;return;}
-  if(pass.length<6){$("sErr2").textContent="Şifre en az 6 karakter olmalı.";$("sErr2").hidden=false;return;}
-  $("sBtn2").disabled=true;
-  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{company:companyName,whatsapp:phone},emailRedirectTo:location.origin+BASE}});
-  $("sBtn2").disabled=false;
-  if(error){$("sErr2").textContent=/already registered|already been registered/i.test(error.message)?"Bu e‑posta zaten kayıtlı. Giriş yap sekmesini kullanın.":errMsg(error);$("sErr2").hidden=false;return;}
-  if(data.session){toast("Hoş geldiniz! Hesabınız hazır.");}
-  else{$("sOk2").textContent="Hesabınız oluşturuldu. E‑postanıza gelen onay bağlantısına tıklayıp giriş yapın.";$("sOk2").hidden=false;}
-});
-$("lForgot").addEventListener("click",async()=>{
-  const email=$("lEmail").value.trim();if(!email||!email.includes("@")){$("lErr").textContent="Kullanıcı adıyla giriş yapıyorsanız yeni şifre için bize yazın; e‑posta ile girdiyseniz e‑postanızı yazın.";$("lErr").hidden=false;return;}
-  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+BASE});
-  if(error){$("lErr").textContent=errMsg(error);$("lErr").hidden=false;}else{$("lOk").textContent="Şifre sıfırlama bağlantısı e‑postanıza gönderildi.";$("lOk").hidden=false;}
-});
-$("sLogout").addEventListener("click",async()=>{await sb.auth.signOut();location.reload();});
-$("sPass").addEventListener("click",()=>{$("passBox").hidden=!$("passBox").hidden;});
-$("newPassSave").addEventListener("click",async()=>{
-  const p=$("newPass").value;if(p.length<6){$("passErr").textContent="En az 6 karakter.";$("passErr").hidden=false;return;}
-  const {error}=await sb.auth.updateUser({password:p});
-  if(error){$("passErr").textContent=errMsg(error);$("passErr").hidden=false;}else{$("passErr").hidden=true;$("newPass").value="";$("passBox").hidden=true;toast("Şifre güncellendi");}
-});
-sb.auth.onAuthStateChange((ev,s)=>{
-  session=s;
-  if(ev==="PASSWORD_RECOVERY"){showApp().then(()=>{openSettings();$("passBox").hidden=false;toast("Yeni şifrenizi belirleyin");});return;}
-  if(s&&$("appView").hidden)showApp();
-  if(!s){$("appView").hidden=true;$("loginView").hidden=false;}
-});
-
-/* ---------- data layer ---------- */
-const MAP={passengers:"passengers",booster:"booster",retReceiveAmount:"ret_receive_amount",retReceiveCur:"ret_receive_cur",retReceived:"ret_received",retPayAmount:"ret_pay_amount",retPayCur:"ret_pay_cur",retPaid:"ret_paid",date:"date",time:"time",flight:"flight",returnDate:"return_date",returnTime:"return_time",returnFlight:"return_flight",firstName:"first_name",lastName:"last_name",phone:"phone",email:"email",language:"language",adults:"adults",children:"children",childAges:"child_ages",infants:"infants",babySeat:"baby_seat",luggage:"luggage",hotel:"hotel",area:"area",from:"from_place",to:"to_place",vehicle:"vehicle",receiveAmount:"receive_amount",receiveCur:"receive_cur",payAmount:"pay_amount",payCur:"pay_cur",payTo:"pay_to",received:"received",paid:"paid",status:"status",reminderMin:"reminder_min",note:"note",customerNote:"customer_note",photos:"photos",source:"source",createdAt:"created_at",updatedAt:"updated_at"};
-const fromDb=r=>{const o={id:r.id};for(const k in MAP)o[k]=r[MAP[k]];if(o.time)o.time=String(o.time).slice(0,5);if(o.returnTime)o.returnTime=String(o.returnTime).slice(0,5);o.childAges=o.childAges||[];o.photos=o.photos||[];return o;};
-const toDb=o=>{const r={};for(const k in MAP){if(k==="createdAt"||k==="updatedAt")continue;let v=o[k];if(v===""||v===undefined)v=null;if(["time","returnTime","returnDate","luggage"].includes(k)&&!v)v=null;r[MAP[k]]=v;}r.company_id=company.id;return r;};
-
-async function fetchAllBookings(){
-  const all=[];const step=1000;
-  for(let from=0;;from+=step){
-    const {data,error}=await sb.from("bookings").select("*").is("deleted_at",null).order("date").order("time").order("id").range(from,from+step-1);
-    if(error)return {data:null,error};
-    all.push(...data);if(data.length<step)break;
-  }
-  return {data:all,error:null};
-}
-async function loadAll(){
-  const [{data:co,error:e1},{data:st},{data:bk,error:e2},{data:pl}]=await Promise.all([
-    sb.from("companies").select("*").single(),
-    sb.from("settings").select("*").maybeSingle(),
-    fetchAllBookings(),
-    sb.from("places").select("*")
-  ]);
-  if(e1||e2){$("loadNote").textContent="Veriler yüklenemedi: "+errMsg(e1||e2);return;}
-  company=co;settings=st||{};bookings=(bk||[]).map(fromDb);userPlaces=pl||[];
-  try{seenLink=JSON.parse(localStorage.getItem("td_seen")||"{}");}catch(e){}
-  setCoName();
-  renderPlate();
-  const {data:acc}=await sb.rpc("my_access");access=acc||{};
-  $("btnAdmin").hidden=!access.is_admin;
-  $("btnPlaces").hidden=true;
-  if(!access.access&&!access.is_admin){showWall();return;}
-  $("loadNote").hidden=true;
-  render();renderReview();
-  setTimeout(purgeTrash,5000);
-  $("notifBand").hidden=!!nf.asked;syncNfUi();
-  subscribeRealtime();
-}
-let channel=null;
-function subscribeRealtime(){
-  if(channel)return;
-  channel=sb.channel("bookings-live").on("postgres_changes",{event:"*",schema:"public",table:"bookings",filter:"company_id=eq."+company.id},payload=>{
-    if(payload.eventType==="DELETE"||(payload.new&&payload.new.deleted_at)){const did=(payload.old&&payload.old.id)||payload.new.id;bookings=bookings.filter(b=>b.id!==did);}
-    else{const b=fromDb(payload.new);const i=bookings.findIndex(x=>x.id===b.id);if(i>=0)bookings[i]=b;else{bookings.push(b);if(b.source==="link"&&payload.eventType==="INSERT")notifyNew(b);}}
-    scheduleRender();
-  }).on("postgres_changes",{event:"*",schema:"public",table:"places"},async()=>{const {data}=await sb.from("places").select("*");userPlaces=data||[];if(!$("placesSheet").hidden)renderPlaces();}).subscribe();
-}
-async function saveBooking(data,id){
-  const row=toDb(data);
-  if(id){const {error}=await sb.from("bookings").update(row).eq("id",id);if(error)throw error;return id;}
-  const {data:ins,error}=await sb.from("bookings").insert(row).select("id").single();if(error)throw error;return ins.id;
-}
-/* kayıt silinince fotoğrafları da depodan silinsin (yer kaplamasın) */
-async function removePhotos(list){const paths=[];list.forEach(b=>(b&&b.photos||[]).forEach(p=>{if(p&&p.path)paths.push(p.path);}));
-  for(let i=0;i<paths.length;i+=100){try{await sb.storage.from("photos").remove(paths.slice(i,i+100));}catch(e){}}}
-const TRASH_DAYS=30;
-async function deleteBooking(id){const {error}=await sb.from("bookings").update({deleted_at:new Date().toISOString()}).eq("id",id);if(error)throw error;}
-/* 30 günü geçen silinenleri fotoğraflarıyla birlikte kalıcı sil */
-async function purgeTrash(){
-  try{const lim=new Date(Date.now()-TRASH_DAYS*864e5).toISOString();
-    const {data}=await sb.from("bookings").select("id,photos").not("deleted_at","is",null).lt("deleted_at",lim).limit(500);
-    if(!data||!data.length)return;
-    await removePhotos(data);
-    const ids=data.map(r=>r.id);for(let i=0;i<ids.length;i+=200)await sb.from("bookings").delete().in("id",ids.slice(i,i+200));
-  }catch(e){}
-}
-/* Silinenler */
-let trash=[];
-async function openTrash(){
-  $("trashSheet").hidden=false;document.body.style.overflow="hidden";$("trashList").innerHTML='<div class="note">Yükleniyor…</div>';
-  const {data,error}=await sb.from("bookings").select("*").not("deleted_at","is",null).order("deleted_at",{ascending:false}).limit(1000);
-  if(error){$("trashList").innerHTML='<div class="note">Yüklenemedi: '+esc(errMsg(error))+'</div>';return;}
-  trash=data||[];renderTrash();
-}
-function renderTrash(){
-  const host=$("trashList");
-  if(!trash.length){host.innerHTML='<div class="note" style="text-align:center;padding:30px 0">Silinen kayıt yok.</div>';$("trashAll").hidden=true;return;}
-  $("trashAll").hidden=false;
-  host.innerHTML=trash.map(r=>{const b=fromDb(r);const left=Math.max(0,TRASH_DAYS-Math.floor((Date.now()-new Date(r.deleted_at))/864e5));
-    return `<div class="trow" style="display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)">
-      <div style="flex:1;min-width:0"><b>${esc(((b.firstName||"")+" "+(b.lastName||"")).trim()||"İsimsiz yolcu")}</b>
-      <div style="font-size:13px;color:var(--muted)">${esc(fmtDateLong(b.date))} ${esc(b.time||"")}${b.hotel?" · "+esc(b.hotel):""}</div>
-      <div style="font-size:12px;color:var(--c-orange);font-weight:700">${left} gün sonra kalıcı silinecek</div></div>
-      <button class="btn sm" data-restore="${r.id}">Geri al</button></div>`;}).join("");
-  host.querySelectorAll("[data-restore]").forEach(btn=>btn.addEventListener("click",async()=>{
-    const id=btn.dataset.restore;btn.disabled=true;
-    const {data,error}=await sb.from("bookings").update({deleted_at:null}).eq("id",id).select().single();
-    if(error){btn.disabled=false;return toast("Geri alınamadı: "+errMsg(error));}
-    trash=trash.filter(x=>x.id!==id);if(!bookings.some(b=>b.id===id))bookings.push(fromDb(data));renderTrash();render();toast("Kayıt geri alındı");
-  }));
-}
-$("trashClose").addEventListener("click",()=>{$("trashSheet").hidden=true;document.body.style.overflow="";});
-$("btnTrash").addEventListener("click",()=>{$("setSheet").hidden=true;openTrash();});
-$("trashAll").addEventListener("click",()=>{$("trashConfirm").hidden=false;});
-$("trashNo").addEventListener("click",()=>{$("trashConfirm").hidden=true;});
-$("trashYes").addEventListener("click",async()=>{
-  $("trashYes").disabled=true;
-  try{await removePhotos(trash);const ids=trash.map(r=>r.id);
-    for(let i=0;i<ids.length;i+=200){const {error}=await sb.from("bookings").delete().in("id",ids.slice(i,i+200));if(error)throw error;}
-    trash=[];renderTrash();toast("Silinenler boşaltıldı");}
-  catch(e){toast("Silinemedi: "+errMsg(e));}finally{$("trashYes").disabled=false;$("trashConfirm").hidden=true;}
-});
-
-async function ensureSigned(paths){
-  const need=paths.filter(p=>p&&!signed[p]);if(!need.length)return false;
-  const {data}=await sb.storage.from("photos").createSignedUrls(need,3600);
-  (data||[]).forEach(d=>{if(d.signedUrl)signed[d.path]=d.signedUrl;});return true;
-}
-
-/* ---------- render ---------- */
-let renderQueued=false;
-function scheduleRender(){if(renderQueued)return;renderQueued=true;setTimeout(()=>{renderQueued=false;render();},150);}
-const PAGE=150;let shown=PAGE;
-function sorted(list){return list.slice().sort((a,b)=>(a.date+" "+(a.time||""))<(b.date+" "+(b.time||""))?-1:1);}
-const RET_SHOW_DAYS=2; // dönüş, gününe bu kadar gün kala "Yaklaşan"da görünür
-const ymd=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-/* tek kayıt = geliş + dönüş: listede iki ayağı ayrı satır olarak göster */
-function legs(){
-  const out=[];
-  bookings.forEach(b=>{
-    out.push(b.returnDate?Object.assign({},b,{_leg:"arr"}):b);
-    if(b.returnDate)out.push(Object.assign({},b,{_leg:"ret",_rid:b.id,date:b.returnDate,time:b.returnTime||"",flight:b.returnFlight||"",receiveAmount:b.retReceiveAmount||0,receiveCur:b.retReceiveCur||b.receiveCur,received:!!b.retReceived,payAmount:b.retPayAmount||0,payCur:b.retPayCur||b.payCur,paid:!!b.retPaid,from:b.hotel||b.to||"Otel",to:(b.from&&/Havalimanı|Airport|AYT|GZP|DLM/i.test(b.from))?b.from:"Havalimanı"}));
-  });
-  return out;
-}
-const baseOf=b=>b&&b._leg?bookings.find(x=>x.id===b.id)||b:b;
-function render(){
-  const t=todayStr();const q=query.trim().toLowerCase();
-  const soon=(()=>{const d=new Date();d.setDate(d.getDate()+RET_SHOW_DAYS);return ymd(d);})();
-  let list=legs().filter(b=>{
-    if(tab==="upcoming"&&b.date<t)return false;
-    if(tab==="upcoming"&&b._leg==="ret"&&b.date>soon&&!query.trim())return false;
-    if(tab==="past"&&b.date>=t)return false;
-    if(q){const hay=[b.firstName,b.lastName,b.hotel,b.phone,b.flight,b.note,b.customerNote].join(" ").toLowerCase();if(!hay.includes(q))return false;}
-    return true;
-  });
-  list=sorted(list);if(tab==="past")list.reverse();
-  const total=list.length;list=list.slice(0,shown);
-  const todays=legs().filter(b=>b.date===t&&b.status!=="cancelled");
-  $("stToday").innerHTML=todays.length+' <span style="font-size:14px;font-weight:700;color:var(--muted)">transfer</span>';
-  const due={};legs().forEach(b=>{if(b.status!=="cancelled"&&!b.received&&Number(b.receiveAmount)>0){due[b.receiveCur||"EUR"]=(due[b.receiveCur||"EUR"]||0)+Number(b.receiveAmount);}});
-  $("stDue").textContent=Object.keys(due).map(c=>money(due[c],c)).join(" · ")||"–";
-  const now=new Date();const nowKey=t+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
-  const next=sorted(legs().filter(b=>b.status!=="cancelled"&&b.status!=="done")).find(b=>(b.date+" "+(b.time||"00:00"))>=nowKey);
-  $("stNextWrap").hidden=!next;
-  if(next)$("stNext").textContent=(next.date===t?"Bugün ":fmtDateLong(next.date)+" ")+(next.time||"")+" · "+(next.lastName||next.firstName||"");
-
-  const host=$("list");host.innerHTML="";
-  $("empty").hidden=list.length>0;
-  if(!list.length){
-    if(q){$("emptyT").textContent="Eşleşen kayıt yok";$("emptyP").textContent="Aramayı değiştirin veya başka bir sekmeye geçin.";}
-    else if(tab==="past"){$("emptyT").textContent="Geçmiş kayıt yok";$("emptyP").textContent="Tarihi geçen transferler burada toplanır.";}
-    else{$("emptyT").textContent="Henüz rezervasyon yok";$("emptyP").innerHTML="Sağ alttaki <b>Yeni</b> düğmesiyle ekleyin ya da müşterilerinize rezervasyon linkinizi gönderin (sağ üstteki zincir simgesi).";}
-  }
-  const groups=new Map();list.forEach(b=>{if(!groups.has(b.date))groups.set(b.date,[]);groups.get(b.date).push(b);});
-  const tm=new Date();tm.setDate(tm.getDate()+1);const tomorrow=tm.getFullYear()+"-"+String(tm.getMonth()+1).padStart(2,"0")+"-"+String(tm.getDate()).padStart(2,"0");
-  groups.forEach((items,date)=>{
-    const g=document.createElement("section");g.className="group"+(date===t?" today":"");
-    const label=date===t?"Bugün":date===tomorrow?"Yarın":fmtDateLong(date);
-    g.innerHTML=`<h2><span>${label}</span><small>${date===t||date===tomorrow?fmtDateLong(date)+" · ":""}${items.length} transfer</small></h2><div class="cards"></div>`;
-    const cards=g.querySelector(".cards");items.forEach(b=>cards.appendChild(card(b)));host.appendChild(g);
-  });
-  if(total>list.length){const more=document.createElement("button");more.type="button";more.className="btn";more.style.cssText="width:100%;margin:6px 0 90px";
-    more.textContent="Daha fazla göster ("+(total-list.length)+" kayıt daha)";more.addEventListener("click",()=>{shown+=PAGE*2;render();});host.appendChild(more);}
-  renderReminders();renderNewLink();
-  const paths=list.map(b=>b.photos&&b.photos[0]&&b.photos[0].path).filter(Boolean);
-  ensureSigned(paths).then(ch=>{if(ch)render();});
-}
-const short=(s,b)=>String(s||"").replace(/^(.*?)Havalimanı \((\w+)\)(?: – Dış Hatlar (T\d))?(?: – İç Hatlar)?$/,(m,a,code,t)=>code+(t?" "+t:"")).replace(/^Otel$/,b.area?"Otel ("+b.area+")":"Otel");
-function card(b){
-  const el=document.createElement("button");el.className="card"+(b.status==="cancelled"?" cancelled":"")+(b.source==="link"&&b.status==="pending"&&!seenLink[b.id]?" fresh":"");el.type="button";
-  const pax=[b.adults>0?b.adults+" yetişkin":"",b.children>0?b.children+" çocuk"+(b.childAges&&b.childAges.length?" ("+b.childAges.join(", ")+")":""):"",b.infants>0?b.infants+" bebek":""].filter(Boolean).join(", ");
-  const st=STATUS[b.status]||STATUS.pending;
-  const recv=b._leg==="ret"&&!(Number(b.receiveAmount)>0)?`<div class="chip">Ödeme gelişte</div>`:Number(b.receiveAmount)>0?`<div class="amt num ${b.received?"got":"due"}">${money(b.receiveAmount,b.receiveCur||"EUR")}</div>`:(b.source==="link"&&b.status==="pending"?`<div class="chip warn">Fiyat girilmedi</div>`:"");
-  const pay=Number(b.payAmount)>0?`<div class="chip ${b.paid?"ok":""}">${b.paid?"Ödendi":"Ödenecek"} ${esc(money(b.payAmount,b.payCur||"EUR"))}</div>`:"";
-  const p0=b.photos&&b.photos[0];const ph=p0?`<img class="thumb" alt="" src="${esc(p0.path?(signed[p0.path]||""):(p0.url||p0.dataUrl||""))}">`:"";
-  const route=[short(b.from,b),short(b.to,b)].filter(Boolean).join(" → ");
-  el.innerHTML=`
-    <div class="time num">${esc(b.time||"--:--")}${b.flight?`<small>${esc(b.flight)}</small>`:""}</div>
-    <div class="body">
-      <div class="name">${esc((b.firstName||"")+" "+(b.lastName||"")).trim()||"İsimsiz yolcu"}</div>
-      <div class="meta">${esc(b.hotel||"")}${b.hotel&&route?" · ":""}${esc(route)}</div>
-      <div class="chips">
-        <span class="chip ${st[1]}">${st[0]}</span>
-        ${pax?`<span class="chip">${esc(pax)}</span>`:""}
-        ${b.babySeat?`<span class="chip acc">Bebek koltuğu</span>`:""}
-        ${b.booster?`<span class="chip acc">Yükseltici</span>`:""}
-        ${(b.passengers||[]).length>1?`<span class="chip">👥 ${(b.passengers||[]).length} isim</span>`:""}
-        ${Number(b.receiveAmount)>0?`<span class="chip ${b.received?"ok":"warn"}">${b.received?"Tahsil edildi":"Tahsilat bekliyor"}</span>`:""}
-        ${pay}
-        ${b._leg==="arr"?`<span class="chip acc">✈︎ Geliş · dönüş ${esc(b.returnDate.slice(8,10)+"."+b.returnDate.slice(5,7))}</span>`:""}
-        ${b._leg==="ret"?`<span class="chip info">↩︎ Dönüş · geliş ${esc((baseOf(b).date||"").slice(8,10)+"."+(baseOf(b).date||"").slice(5,7))}</span>`:""}
-        ${Number(b.reminderMin)>0?`<span class="chip">⏰</span>`:""}
-        ${b.source==="link"?`<span class="chip info">Linkten geldi${b.language?" · "+(LANG[b.language]||b.language):""}</span>`:""}
-      </div>
-    </div>
-    <div class="side">${recv}${ph}</div>`;
-  el.addEventListener("click",()=>openSheet(baseOf(b)));
-  return el;
-}
-function renderNewLink(){
-  const fresh=bookings.filter(b=>b.source==="link"&&b.status==="pending"&&!seenLink[b.id]);
-  const box=$("newlink");box.hidden=!fresh.length;if(!fresh.length)return;
-  box.innerHTML=`<div class="t">🆕 ${fresh.length} yeni müşteri rezervasyonu</div>`+fresh.slice(0,5).map(b=>`<div class="row"><span><b>${esc(b.date.slice(8,10)+"."+b.date.slice(5,7))} ${esc(b.time||"")}</b> ${esc((b.firstName||"")+" "+(b.lastName||""))} · ${esc(b.hotel||"")}</span><button data-open="${b.id}">Aç</button></div>`).join("");
-  box.querySelectorAll("[data-open]").forEach(btn=>btn.addEventListener("click",()=>{const b=bookings.find(x=>x.id===btn.dataset.open);if(b)openSheet(b);}));
-}
-function renderReminders(){
-  const now=Date.now();const due=[];
-  legs().forEach(b=>{const m=Number(b.reminderMin);const dk=b.id+(b._leg==="ret"?"r":"");if(!m||b.status==="cancelled"||b.status==="done"||dismissed[dk])return;const start=new Date(b.date+"T"+(b.time||"00:00")+":00").getTime();if(now>=start-m*60000&&now<=start+30*60000)due.push({b,start});});
-  const box=$("remind");box.hidden=!due.length;if(!due.length)return;
-  box.innerHTML=`<div class="t">⏰ Yaklaşan transfer${due.length>1?"ler":""}</div>`+due.map(({b,start})=>{const mins=Math.round((start-now)/60000);const when=mins>60?Math.floor(mins/60)+" sa "+(mins%60)+" dk sonra":mins>0?mins+" dk sonra":mins===0?"şimdi":"başladı";return `<div class="row"><span><b>${esc(b.time||"")}</b> ${esc((b.firstName||"")+" "+(b.lastName||""))} · ${esc(b.hotel||"")} ${b._leg==="ret"?"· ↩︎ Dönüş ":""}<span style="color:var(--muted)">(${when})</span></span><button data-dis="${esc(b.id+(b._leg==="ret"?"r":""))}">Gizle</button></div>`;}).join("");
-  box.querySelectorAll("[data-dis]").forEach(btn=>btn.addEventListener("click",()=>{dismissed[btn.dataset.dis]=1;renderReminders();}));
-}
-setInterval(renderReminders,30000);
-
-/* ---------- form ---------- */
-function sw(id,val){$(id).setAttribute("aria-checked",val?"true":"false");}
-function swv(id){return $(id).getAttribute("aria-checked")==="true";}
-["fSeat","fBooster","fReceived","fPaid","fRReceived","fRPaid"].forEach(id=>$(id).addEventListener("click",()=>sw(id,!swv(id))));
-function renderNameInputs(prev){
-  const box=$("fNames");const keep={};
-  box.querySelectorAll("input[data-k]").forEach(i=>{keep[i.dataset.k]=i.value;});
-  if(prev){const by={adult:[],child:[],infant:[]};(prev||[]).slice(1).forEach(p=>{(by[p.type]||by.adult).push(p.name||"");});
-    by.adult.forEach((n,i)=>keep["a"+(i+2)]=n);by.child.forEach((n,i)=>keep["c"+(i+1)]=n);by.infant.forEach((n,i)=>keep["i"+(i+1)]=n);}
-  const A=+$("fAdults").value||0,C=+$("fChildren").value||0,I=+$("fInfants").value||0;
-  const ages=[...$("fAges").querySelectorAll("select")].map(x=>x.value);
-  const rows=[];
-  for(let i=2;i<=A;i++)rows.push(`<div class="f"><label>${i}. yetişkin</label><input data-k="a${i}" data-type="adult" autocapitalize="words" spellcheck="false" value="${esc(keep["a"+i]||"")}"></div>`);
-  for(let i=1;i<=C;i++)rows.push(`<div class="f"><label>${i}. çocuk${ages[i-1]!=null?" ("+ages[i-1]+" yaş)":""}</label><input data-k="c${i}" data-type="child" autocapitalize="words" spellcheck="false" value="${esc(keep["c"+i]||"")}"></div>`);
-  for(let i=1;i<=I;i++)rows.push(`<div class="f"><label>${i}. bebek</label><input data-k="i${i}" data-type="infant" autocapitalize="words" spellcheck="false" value="${esc(keep["i"+i]||"")}"></div>`);
-  box.innerHTML=rows.join("");$("fNamesWrap").hidden=!rows.length;
-}
-["fAdults","fInfants"].forEach(id=>$(id).addEventListener("input",()=>renderNameInputs()));
-function readNames(){
-  const lead=(($("fFirst").value||"")+" "+($("fLast").value||"")).trim();
-  const ages=[...$("fAges").querySelectorAll("select")].map(x=>+x.value);let ci=0;
-  return [{type:"adult",name:lead}].concat([...$("fNames").querySelectorAll("input[data-k]")].map(i=>({type:i.dataset.type,name:i.value.trim(),age:i.dataset.type==="child"?ages[ci++]:null})));
-}
-function renderAgeInputs(prev){
-  const n=Math.max(0,Math.min(20,+$("fChildren").value||0));
-  const cur=prev||[...$("fAges").querySelectorAll("select")].map(x=>+x.value);
-  $("fAgesWrap").hidden=!n;
-  $("fAges").innerHTML=Array.from({length:n},(_,i)=>{const a=cur[i]??6;return `<label>${i+1}. çocuk<select data-i="${i}">${Array.from({length:18},(_,k)=>`<option value="${k}" ${k===a?"selected":""}>${k} yaş</option>`).join("")}</select></label>`;}).join("");
-}
-$("fChildren").addEventListener("input",()=>{renderAgeInputs();renderNameInputs();});
-$("fAges").addEventListener("change",()=>renderNameInputs());
-function syncRetPay(){const on=!!$("fRDate").value;$("retPayBox").hidden=!on;$("payTitle").textContent=on?"Geliş ödemesi":"Ödeme";
-  document.querySelector('label[for="fRecv"]').textContent=on?"Alınacak (geliş)":"Alınacak ödeme";document.querySelector('label[for="fPay"]').textContent=on?"Ödenecek (geliş)":"Ödenecek ödeme";}
-$("fRDate").addEventListener("input",syncRetPay);$("fRDate").addEventListener("change",syncRetPay);
-$("splitPay").addEventListener("click",()=>{const r=(+$("fRecv").value||0)+(+$("fRRecv").value||0),p=(+$("fPay").value||0)+(+$("fRPay").value||0);
-  const h=x=>Math.round(x/2*100)/100;if(r){$("fRecv").value=h(r);$("fRRecv").value=Math.round((r-h(r))*100)/100;$("fRRecvCur").value=$("fRecvCur").value;}
-  if(p){$("fPay").value=h(p);$("fRPay").value=Math.round((p-h(p))*100)/100;$("fRPayCur").value=$("fPayCur").value;}toast("Tutarlar ikiye bölündü");});
-$("statusPick").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>setStatus(b.dataset.s)));
-function setStatus(s){$("statusPick").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===s?"true":"false"));editing.status=s;
-  const show=s==="confirmed"&&digits($("fPhone").value).length>=8;$("confirmBox").hidden=!show;
-  if(s==="confirmed"&&$("fRemind").value==="0")$("fRemind").value="120";}
-function openSheet(b){
-  editing=b?Object.assign({},b):{status:"pending",source:"manual"};
-  $("sheetTitle").textContent=b?"Rezervasyon":"Yeni rezervasyon";
-  $("formErr").hidden=true;
-  $("fDate").value=b?.date||todayStr();$("fTime").value=b?.time||"";$("fFlight").value=b?.flight||"";
-  $("fRDate").value=b?.returnDate||"";$("fRTime").value=b?.returnTime||"";$("fRFlight").value=b?.returnFlight||"";
-  $("fFirst").value=b?.firstName||"";$("fLast").value=b?.lastName||"";$("fPhone").value=b?.phone||"";$("fEmail").value=b?.email||"";
-  $("fAdults").value=b?b.adults??0:2;$("fChildren").value=b?.children??0;$("fInfants").value=b?.infants??0;
-  renderAgeInputs(b?.childAges||[]);$("fLug").value=b?.luggage??"";
-  sw("fSeat",!!b?.babySeat);sw("fBooster",!!b?.booster);
-  $("fHotel").value=b?.hotel||"";$("fArea").value=b?.area||"";$("hotelHint").hidden=true;
-  $("fFrom").value=b?.from||"Antalya Havalimanı (AYT) – Dış Hatlar T1";$("fTo").value=b?.to||"Otel";
-  $("fVehicle").value=b?.vehicle||"";
-  $("fRecv").value=b?.receiveAmount||"";$("fRecvCur").value=b?.receiveCur||"EUR";$("fPay").value=b?.payAmount||"";$("fPayCur").value=b?.payCur||"EUR";$("fPayTo").value=b?.payTo||"";
-  $("fRRecv").value=b?.retReceiveAmount||"";$("fRRecvCur").value=b?.retReceiveCur||b?.receiveCur||"EUR";$("fRPay").value=b?.retPayAmount||"";$("fRPayCur").value=b?.retPayCur||b?.payCur||"EUR";
-  sw("fRReceived",!!b?.retReceived);sw("fRPaid",!!b?.retPaid);syncRetPay();
-  sw("fReceived",!!b?.received);sw("fPaid",!!b?.paid);
-  setStatus(b?.status||"pending");$("fRemind").value=String(b?b.reminderMin||0:120);
-  $("fNames").innerHTML="";renderNameInputs(b?.passengers||[]);$("fNote").value=b?.note||"";
-  photos=(b?.photos||[]).slice();renderPhotos();
-  $("delWrap").hidden=!b;$("delConfirm").hidden=true;
-  const isLink=b&&b.source==="link";$("custBox").hidden=!isLink;
-  if(isLink){$("custInfo").innerHTML=`Dil: ${esc(LANG[b.language]||b.language||"-")} · Gönderim: ${esc(b.createdAt?new Date(b.createdAt).toLocaleString("tr-TR"):"")}${b.customerNote?`<br>Müşteri notu: <i>${esc(b.customerNote)}</i>`:""}<br>Fiyatı girip durumu <b>Onaylandı</b> yapın.`;seenLink[b.id]=1;try{localStorage.setItem("td_seen",JSON.stringify(seenLink));}catch(e){}}
-  updateContact();
-  $("sheet").hidden=false;document.body.style.overflow="hidden";$("sheet").querySelector(".sheet-body").scrollTop=0;
-  if(b&&b.photos&&b.photos.length)ensureSigned(b.photos.map(p=>p.path)).then(()=>renderPhotos());
-}
-function closeSheet(){$("sheet").hidden=true;document.body.style.overflow="";editing=null;render();}
-$("btnClose").addEventListener("click",closeSheet);
-$("fab").addEventListener("click",()=>openSheet(null));
-$("fPhone").addEventListener("input",updateContact);
-/* WhatsApp mesajları (müşterinin dilinde) */
-function guessLang(b){if(b.language&&["tr","en","de","ru"].includes(b.language))return b.language;const d=digits(b.phone);if(d.startsWith("90"))return "tr";if(d.startsWith("7"))return "ru";if(/^(49|43|41)/.test(d))return "de";return "en";}
-const dmy=x=>x?x.slice(8,10)+"."+x.slice(5,7)+"."+x.slice(0,4):"";
-function paxText(b,L){const a=b.adults||0,c=b.children||0,i=b.infants||0;
-  const W={tr:["yetişkin","çocuk","bebek"],en:["adult(s)","child(ren)","infant(s)"],de:["Erw.","Kind(er)","Baby(s)"],ru:["взр.","реб.","млад."]}[L];
-  return [a?a+" "+W[0]:"",c?c+" "+W[1]:"",i?i+" "+W[2]:""].filter(Boolean).join(", ");}
-function waConfirmText(b){
-  const L=guessLang(b);const name=((b.firstName||"")+" "+(b.lastName||"")).trim();const co=company?.name||"";
-  const price=Number(b.receiveAmount)>0?money(b.receiveAmount,b.receiveCur||"EUR"):"";
-  const rprice=b.returnDate&&Number(b.retReceiveAmount)>0?money(b.retReceiveAmount,b.retReceiveCur||b.receiveCur||"EUR"):"";
-  const T={
-    tr:{h:`Sayın ${name},\n${co} transfer rezervasyonunuz ONAYLANMIŞTIR ✅`,d:"Tarih",f:"Uçuş",ho:"Otel",p:"Yolcu",pr:"Ücret",r:"Dönüş",bs:"Bebek koltuğu",bo:"Yükseltici",e:"Şoförümüz sizi isminizin yazılı olduğu tabela ile karşılayacaktır. İyi yolculuklar!"},
-    en:{h:`Dear ${name},\nyour transfer booking with ${co} is CONFIRMED ✅`,d:"Date",f:"Flight",ho:"Hotel",p:"Passengers",pr:"Price",r:"Return",bs:"Baby seat",bo:"Booster",e:"Our driver will meet you with a name sign. Have a nice trip!"},
-    de:{h:`Sehr geehrte/r ${name},\nIhre Transferbuchung bei ${co} ist BESTÄTIGT ✅`,d:"Datum",f:"Flug",ho:"Hotel",p:"Reisende",pr:"Preis",r:"Rückfahrt",bs:"Babysitz",bo:"Sitzerhöhung",e:"Unser Fahrer erwartet Sie mit einem Namensschild. Gute Reise!"},
-    ru:{h:`Уважаемый(ая) ${name},\nваш трансфер в ${co} ПОДТВЕРЖДЁН ✅`,d:"Дата",f:"Рейс",ho:"Отель",p:"Пассажиры",pr:"Стоимость",r:"Обратно",bs:"Детское кресло",bo:"Бустер",e:"Водитель встретит вас с табличкой с вашим именем. Хорошей поездки!"}}[L];
-  const lines=[T.h,"",`📅 ${T.d}: ${dmy(b.date)} ${b.time||""}`.trim()];
-  if(b.flight)lines.push(`✈️ ${T.f}: ${b.flight}`);
-  if(b.hotel)lines.push(`🏨 ${T.ho}: ${b.hotel}`);
-  const px=paxText(b,L);if(px)lines.push(`👥 ${T.p}: ${px}${b.babySeat?" · "+T.bs:""}${b.booster?" · "+T.bo:""}`);
-  if(b.returnDate)lines.push(`↩️ ${T.r}: ${dmy(b.returnDate)} ${b.returnTime||""}${b.returnFlight?" · "+b.returnFlight:""}${rprice?" · "+rprice:""}`);
-  if(price)lines.push(`💶 ${T.pr}: ${price}`);
-  lines.push("",T.e);
-  if(hasMeet()){const m=company.meeting;const mt=m.texts&&(m.texts[L]||m.texts.en||Object.values(m.texts).find(x=>x));
-    const ml={tr:"📍 Buluşma noktası (fotoğraf ve video):",en:"📍 Meeting point (photo and video):",de:"📍 Treffpunkt (Foto und Video):",ru:"📍 Место встречи (фото и видео):"}[L];
-    if(mt)lines.push("",mt.trim());
-    lines.push("",ml,meetLink()+"&l="+L);}
-  return lines.join("\n");
-}
-function waHelloText(b){
-  const L=guessLang(b);const name=((b.firstName||"")+" "+(b.lastName||"")).trim();const co=company?.name||"";const dt=dmy(b.date)+(b.time?" "+b.time:"");
-  return {tr:`Merhaba ${name}, ${co} transfer firmasından yazıyoruz. ${dt} tarihli transfer rezervasyonunuz hakkında:\n`,
-          en:`Hello ${name}, this is ${co} transfer service writing about your transfer booking on ${dt}:\n`,
-          de:`Hallo ${name}, hier ist ${co} wegen Ihrer Transferbuchung am ${dt}:\n`,
-          ru:`Здравствуйте, ${name}! Пишем из ${co} по поводу вашего трансфера ${dt}:\n`}[L];
-}
-const waUrl=(phone,text)=>"https://wa.me/"+digits(phone)+"?text="+encodeURIComponent(text);
-function updateContact(){
-  const d=digits($("fPhone").value);const bar=$("contactBar");
-  if(!d||!editing?.id){bar.hidden=true;return;}
-  bar.hidden=false;
-  bar.innerHTML=`<a class="wa" id="waHello" target="_blank" rel="noopener">WhatsApp</a>${editing&&editing.status==="confirmed"?`<a class="wa" id="waConfirm2" target="_blank" rel="noopener">Onay mesajı</a>`:""}<a href="tel:+${d}">Ara</a><button type="button" id="cpPhone">Numarayı kopyala</button>`;
-  $("waHello").addEventListener("click",function(){this.href=waUrl($("fPhone").value,waHelloText(readFormFull()));});
-  if($("waConfirm2"))$("waConfirm2").addEventListener("click",function(){this.href=waUrl($("fPhone").value,waConfirmText(readFormFull()));});
-  $("cpPhone").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("fPhone").value);toast("Kopyalandı");}catch(e){$("fPhone").select();}});
-}
-function readFormFull(){const d=readForm();d.passengers=readNames();return d;}
-function readForm(){
-  const v=id=>$(id).value.trim();
-  return Object.assign(editing,{
-    date:v("fDate"),time:v("fTime"),flight:v("fFlight").toUpperCase(),returnDate:v("fRDate"),returnTime:v("fRTime"),returnFlight:v("fRFlight").toUpperCase(),
-    firstName:v("fFirst"),lastName:v("fLast"),phone:v("fPhone"),email:v("fEmail"),
-    adults:+$("fAdults").value||0,children:+$("fChildren").value||0,infants:+$("fInfants").value||0,
-    childAges:[...$("fAges").querySelectorAll("select")].map(x=>+x.value),babySeat:swv("fSeat"),booster:swv("fBooster"),luggage:$("fLug").value===""?null:+$("fLug").value,
-    hotel:v("fHotel"),area:v("fArea"),from:v("fFrom"),to:v("fTo"),vehicle:v("fVehicle"),
-    receiveAmount:+$("fRecv").value||0,receiveCur:$("fRecvCur").value,payAmount:+$("fPay").value||0,payCur:$("fPayCur").value,payTo:v("fPayTo"),
-    retReceiveAmount:v("fRDate")?(+$("fRRecv").value||0):0,retReceiveCur:$("fRRecvCur").value,retPayAmount:v("fRDate")?(+$("fRPay").value||0):0,retPayCur:$("fRPayCur").value,retReceived:v("fRDate")?swv("fRReceived"):false,retPaid:v("fRDate")?swv("fRPaid"):false,
-    received:swv("fReceived"),paid:swv("fPaid"),reminderMin:+$("fRemind").value||0,note:v("fNote"),photos:photos.slice()
-  });
-}
-async function saveSheet(){
-  const d=readFormFull();
-  if(!d.date)return err("Tarih gerekli.");
-  if(!d.firstName&&!d.lastName)return err("Yolcu adı veya soyadı gerekli.");
-  const id=d.id;$("btnSave").disabled=true;
-  try{const nid=await saveBooking(d,id);if(!id){const b=Object.assign({id:nid},d);if(!bookings.some(x=>x.id===nid))bookings.push(b);}else{const i=bookings.findIndex(x=>x.id===id);if(i>=0)bookings[i]=Object.assign({},bookings[i],d);}toast(id?"Güncellendi":"Rezervasyon eklendi");closeSheet();}
-  catch(e){err("Kaydedilemedi: "+errMsg(e));}
-  finally{$("btnSave").disabled=false;}
-}
-$("btnSave").addEventListener("click",saveSheet);
-$("confirmWa").addEventListener("click",function(){
-  setStatus("confirmed");if($("fRemind").value==="0")$("fRemind").value="120";
-  this.href=waUrl($("fPhone").value,waConfirmText(readFormFull()));
-  setTimeout(saveSheet,0);
-});
-$("fPhone").addEventListener("input",()=>{if(editing)setStatus(editing.status);});
-function err(m){const e=$("formErr");e.textContent=m;e.hidden=false;e.scrollIntoView({block:"nearest"});}
-$("btnDel").addEventListener("click",()=>{$("delConfirm").hidden=false;});
-$("delNo").addEventListener("click",()=>{$("delConfirm").hidden=true;});
-$("delYes").addEventListener("click",async()=>{try{await deleteBooking(editing.id);bookings=bookings.filter(b=>b.id!==editing.id);toast("Silindi · 30 gün içinde Ayarlar → Silinenler'den geri alabilirsiniz");closeSheet();}catch(e){err("Silinemedi: "+errMsg(e));}});
-
-/* photos */
-function renderPhotos(){
-  const host=$("photos");host.innerHTML="";
-  photos.forEach((p,i)=>{const d=document.createElement("div");d.className="ph";d.innerHTML=`<img alt="Fotoğraf ${i+1}" src="${esc(p.path?(signed[p.path]||""):(p.url||p.dataUrl||""))}"><button type="button" aria-label="Fotoğrafı kaldır">×</button>`;d.querySelector("button").addEventListener("click",()=>{photos.splice(i,1);renderPhotos();});host.appendChild(d);});
-  const add=document.createElement("label");add.className="addph";add.innerHTML=`<span>＋<br>Fotoğraf<br>ekle</span><input type="file" accept="image/*" multiple>`;
-  add.querySelector("input").addEventListener("change",async e=>{for(const f of e.target.files){await addPhoto(f);}renderPhotos();});
-  host.appendChild(add);
-}
-function shrink(file,max){return new Promise(res=>{const img=new Image();const u=URL.createObjectURL(file);img.onload=()=>{const s=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>res(b),"image/jpeg",0.8);};img.onerror=()=>res(null);img.src=u;});}
-async function addPhoto(file){
-  toast("Fotoğraf yükleniyor…");
-  const blob=await shrink(file,1600);if(!blob){toast("Bu dosya okunamadı");return;}
-  const path=company.id+"/"+(editing.id||"new")+"/"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)+".jpg";
-  const {error}=await sb.storage.from("photos").upload(path,blob,{contentType:"image/jpeg"});
-  if(error){toast("Yüklenemedi: "+errMsg(error));return;}
-  const {data}=await sb.storage.from("photos").createSignedUrl(path,3600);if(data)signed[path]=data.signedUrl;
-  photos.push({path});toast("Fotoğraf eklendi");
-}
-
-/* ---------- places ---------- */
-function allPlaces(){
-  const closed=new Set(),extra=new Set();const out=[];
-  userPlaces.forEach(p=>{if(p.type==="hotel"&&p.status==="closed")closed.add(norm(p.name));});
-  AIRPORTS.forEach(([n,a])=>out.push({type:"airport",name:n,area:a,n:norm(n)}));
-  PLACES.forEach(([n,a])=>out.push({type:"place",name:n,area:a,n:norm(n)}));
-  userPlaces.forEach(p=>{if(p.type==="hotel"){extra.add(norm(p.name));out.push({type:"hotel",name:p.name,area:p.area||"",n:norm(p.name),id:p.id,status:p.status||"open",custom:true});}});
-  HOTELS.forEach(([n,a])=>{const k=norm(n);if(extra.has(k))return;out.push({type:"hotel",name:n,area:a,n:k,status:closed.has(k)?"closed":"open"});});
-  return out;
-}
-function suggest(q,kind){
-  const k=norm(q);if(k.length<2)return[];const words=k.split(" ");
-  return allPlaces().filter(p=>{if(kind==="hotel"&&p.type!=="hotel")return false;if(kind==="place"&&p.type==="hotel")return false;if(p.type==="hotel"&&p.status==="closed")return false;return words.every(w=>p.n.includes(w)||norm(p.area).includes(w));})
-    .sort((a,b)=>(a.n.startsWith(k)?0:1)-(b.n.startsWith(k)?0:1)||a.name.localeCompare(b.name,"tr")).slice(0,8);
-}
-function attachAC(input,kind,onPick){
-  let box=null,items=[],hl=-1;const close=()=>{if(box){box.remove();box=null;}};
-  const open=()=>{
-    const q=input.value;items=suggest(q,kind);
-    const unknownHotel=kind==="hotel"&&norm(q).length>=3&&!items.some(i=>i.n===norm(q));
-    if(!items.length&&!unknownHotel){close();return;}
-    if(!box){box=document.createElement("div");box.className="ac";(input.closest(".f")||input.parentElement).appendChild(box);}
-    const ic={airport:"✈️",hotel:"🏨",place:"📍"};
-    box.innerHTML=items.map((p,i)=>`<button type="button" data-i="${i}"><span class="k ${p.type==="airport"?"air":p.type==="hotel"?"hot":"pl"}">${ic[p.type]}</span><span class="tx"><b>${esc(p.name)}</b><small>${esc(p.area)}${p.custom?" · sizin eklediğiniz":""}</small></span></button>`).join("")
-      +(unknownHotel?`<button type="button" data-add="1"><span class="k hot">＋</span><span class="tx"><b class="add">"${esc(q.trim())}" listede yok — yeni otel olarak ekle</b><small>Bir dahaki sefere otomatik çıkar</small></span></button>`:"");
-    hl=-1;
-    box.querySelectorAll("button").forEach(b=>b.addEventListener("mousedown",e=>{e.preventDefault();if(b.dataset.add){close();promptAddHotel(input.value.trim());}else pick(items[+b.dataset.i]);}));
-  };
-  const pick=p=>{input.value=p.name;close();onPick&&onPick(p);input.dispatchEvent(new Event("change"));};
-  input.addEventListener("input",open);input.addEventListener("focus",open);input.addEventListener("blur",()=>setTimeout(close,120));
-  input.addEventListener("keydown",e=>{if(!box)return;const bs=box.querySelectorAll("button");if(e.key==="ArrowDown"){hl=Math.min(hl+1,bs.length-1);}else if(e.key==="ArrowUp"){hl=Math.max(hl-1,0);}else if(e.key==="Enter"){e.preventDefault();if(hl>=0)bs[hl].dispatchEvent(new Event("mousedown"));return;}else if(e.key==="Escape"){close();return;}else return;e.preventDefault();bs.forEach((b,i)=>b.classList.toggle("hl",i===hl));});
-}
-
-attachAC($("fArea"),"place");
-attachAC($("fFrom"),"place");
-attachAC($("fTo"),"place");
-attachAC($("npArea"),"place");
-
-function hotelHint(check){
-  const v=$("fHotel").value.trim();const h=$("hotelHint");
-  if(!check||!v||allPlaces().some(p=>p.type==="hotel"&&p.n===norm(v))){h.hidden=true;return;}
-  h.hidden=false;h.innerHTML=`Bu otel listede yok. <button type="button" id="hhAdd">Listeye ekle</button>`;
-  $("hhAdd").addEventListener("click",()=>promptAddHotel(v));
-}
-function promptAddHotel(name){openPlaces();$("npName").value=name;$("npArea").value=$("fArea").value||"";$("npArea").focus();}
-async function savePlace(p,id){
-  if(id){const {error}=await sb.from("places").update(p).eq("id",id);if(error)throw error;const i=userPlaces.findIndex(x=>x.id===id);if(i>=0)Object.assign(userPlaces[i],p);}
-  else{const {data,error}=await sb.from("places").insert(Object.assign({company_id:company.id},p)).select().single();if(error)throw error;userPlaces.push(data);}
-  renderPlaces();
-}
-async function markReviewed(){
-  const now=new Date().toISOString();
-  const {error}=await sb.from("settings").upsert({company_id:company.id,places_reviewed_at:now});
-  if(!error){settings.places_reviewed_at=now;renderReview();}
-}
-function renderReview(){$("review").hidden=true;return;
-  const last=settings.places_reviewed_at?new Date(settings.places_reviewed_at).getTime():0;
-  const days=last?Math.floor((Date.now()-last)/86400000):0;
-  $("review").hidden=!(days>=30);if(days>=30)$("reviewDays").textContent=days;
-}
-$("reviewDone").addEventListener("click",markReviewed);
-$("reviewOpen").addEventListener("click",openPlaces);
-let plSeg="hotel",plQ="";
-function openPlaces(){$("placesSheet").hidden=false;document.body.style.overflow="hidden";$("npErr").hidden=true;renderPlaces();}
-function closePlaces(){$("placesSheet").hidden=true;if($("sheet").hidden)document.body.style.overflow="";hotelHint(true);}
-$("btnPlaces").addEventListener("click",openPlaces);
-$("plClose").addEventListener("click",closePlaces);
-$("plQ").addEventListener("input",e=>{plQ=e.target.value;renderPlaces();});
-$("plSegs").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{plSeg=b.dataset.seg;$("plSegs").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));renderPlaces();}));
-$("npAdd").addEventListener("click",async()=>{
-  const name=$("npName").value.trim(),area=$("npArea").value.trim();
-  if(name.length<3){$("npErr").textContent="Otel adı en az 3 harf olmalı.";$("npErr").hidden=false;return;}
-  const ex=allPlaces().find(p=>p.type==="hotel"&&p.n===norm(name));
-  try{
-    if(ex&&ex.custom)await savePlace({status:"open",area:area||ex.area},ex.id);
-    else if(ex)await savePlace({type:"hotel",name:ex.name,area:area||ex.area,status:"open"});
-    else await savePlace({type:"hotel",name,area,status:"open"});
-    $("npName").value="";$("npArea").value="";$("npErr").hidden=true;toast("Otel listeye eklendi");
-    if(!$("sheet").hidden&&!$("fHotel").value){$("fHotel").value=name;if(area)$("fArea").value=area;}
-  }catch(e){$("npErr").textContent="Kaydedilemedi: "+errMsg(e);$("npErr").hidden=false;}
-});
-async function toggleHotel(p){
-  const closing=p.status!=="closed";
-  try{if(p.custom)await savePlace({status:closing?"closed":"open"},p.id);else await savePlace({type:"hotel",name:p.name,area:p.area,status:closing?"closed":"open"});toast(closing?"Kapalı olarak işaretlendi":"Yeniden açık");}catch(e){toast("Kaydedilemedi");}
-}
-function renderPlaces(){
-  const all=allPlaces();const k=norm(plQ);
-  let list=all.filter(p=>plSeg==="hotel"?(p.type==="hotel"&&p.status!=="closed"):plSeg==="closed"?(p.type==="hotel"&&p.status==="closed"):p.type===plSeg);
-  if(k)list=list.filter(p=>p.n.includes(k)||norm(p.area).includes(k));
-  list.sort((a,b)=>a.name.localeCompare(b.name,"tr"));
-  $("plCount").textContent=all.filter(p=>p.type==="hotel"&&p.status!=="closed").length+" otel";
-  const host=$("plList");host.innerHTML="";
-  list.slice(0,300).forEach(p=>{const r=document.createElement("div");r.className="prow"+(p.status==="closed"?" closed":"");r.innerHTML=`<span class="k">${p.type==="airport"?"✈️":p.type==="hotel"?"🏨":"📍"}</span><div class="tx"><b>${esc(p.name)}</b><small>${esc(p.area)}${p.custom?" · sizin eklediğiniz":""}</small></div>${p.type==="hotel"?`<button type="button" class="${p.status==="closed"?"":"on"}">${p.status==="closed"?"Yeniden aç":"Açık"}</button>`:""}`;const b=r.querySelector("button");if(b)b.addEventListener("click",()=>toggleHotel(p));host.appendChild(r);});
-  if(!list.length)host.innerHTML=`<div class="note">Eşleşen kayıt yok.</div>`;
-  else if(list.length>300){const n=document.createElement("div");n.className="note";n.textContent="İlk 300 kayıt gösteriliyor, aramayı daraltın.";host.appendChild(n);}
-}
-
-/* ---------- plaka, duvar, şifre ---------- */
-function renderPlate(){const p=(company&&company.plate||"").trim();$("plateBadge").hidden=!p;$("plateNo").textContent=p.toUpperCase();}
-function setCoName(){$("coName").innerHTML=esc(company.name||"Transfer Defteri")+"<small>TRANSFER DEFTERİ</small>";}
-function fmtTL(v){return Number(v||0).toLocaleString("tr-TR")+" TL";}
-function showWall(){
-  $("appView").hidden=true;$("wallView").hidden=false;
-  $("wallCo").textContent=company.name||"";
-  const sus=access.status==="suspended";
-  $("wallT").textContent=sus?"Hesabınız askıya alındı":(access.plan==="trial"?"Deneme süreniz doldu":"Üyelik süreniz doldu");
-  $("wallP").textContent=sus?"Devam etmek için bizimle iletişime geçin.":"Kayıtlarınız güvende; yenileme yapıldığında kaldığınız yerden devam edersiniz.";
-  $("wallPlans").innerHTML=`<div><span>Aylık üyelik</span><b>${fmtTL(access.price_monthly)}</b></div><div><span>Yıllık üyelik</span><b>${fmtTL(access.price_yearly)}</b></div>`;
-  if(access.iban){$("wallIban").hidden=false;$("wallIbanNo").textContent=access.iban;$("wallIbanName").textContent=access.iban_name||"";$("wallUser").textContent=access.username||session?.user?.email||"";}
-  const d=digits(access.support_whatsapp);
-  if(d){$("wallWa").hidden=false;$("wallWa").href="https://wa.me/"+d+"?text="+encodeURIComponent("Merhaba, Transfer Defteri üyeliğimi yenilemek istiyorum. Firma: "+(company.name||"")+" · Kullanıcı: "+(access.username||""));}
-}
-$("wallLogout").addEventListener("click",async()=>{await sb.auth.signOut();location.reload();});
-$("wallCopyIban").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(access.iban);toast("IBAN kopyalandı");}catch(e){}});
-$("pwForm").addEventListener("submit",async e=>{
-  e.preventDefault();const a=$("pw1").value,b=$("pw2").value;$("pwErr").hidden=true;
-  if(a.length<6){$("pwErr").textContent="En az 6 karakter.";$("pwErr").hidden=false;return;}
-  if(a!==b){$("pwErr").textContent="Şifreler aynı değil.";$("pwErr").hidden=false;return;}
-  const {error}=await sb.auth.updateUser({password:a,data:{must_change:false}});
-  if(error){$("pwErr").textContent=errMsg(error);$("pwErr").hidden=false;return;}
-  $("pwView").hidden=true;toast("Şifreniz kaydedildi");await showApp();
-});
-
-/* ---------- yönetim paneli ---------- */
-let adRows=[],adFilter="all",adQ="",coCur=null,psettings={};
-const dayLeft=r=>{const end=r.plan==="trial"?r.trial_ends_at:r.paid_until;if(r.plan==="lifetime")return Infinity;if(!end)return -1;return Math.ceil((new Date(end).getTime()-Date.now())/86400000);};
-const stateOf=r=>{if(r.status==="suspended")return {k:"sus",t:"Askıda",c:"bad"};const d=dayLeft(r);if(d===Infinity)return {k:"ok",t:"Süresiz",c:"ok"};if(d<0)return {k:"exp",t:"Süresi doldu",c:"bad"};const pl=({trial:"Deneme",monthly:"Aylık",yearly:"Yıllık"})[r.plan]||r.plan;return {k:d<=7?"soon":"ok",t:pl+" · "+d+" gün",c:d<=7?"warn":(r.plan==="trial"?"info":"ok")};};
-async function openAdmin(){
-  $("adminSheet").hidden=false;document.body.style.overflow="hidden";
-  await loadAdmin();
-}
-async function loadAdmin(){
-  const [{data:rows,error},{data:ps}]=await Promise.all([sb.rpc("admin_overview"),sb.rpc("admin_settings")]);
-  if(error){toast("Yüklenemedi: "+errMsg(error));return;}
-  adRows=rows||[];psettings=ps||{};
-  $("psWa").value=psettings.support_whatsapp||"";$("psM").value=psettings.price_monthly||"";$("psY").value=psettings.price_yearly||"";$("psTrial").value=psettings.trial_days||"";$("psUrl").value=psettings.app_url||"";$("psIban").value=psettings.iban||"";$("psIbanName").value=psettings.iban_name||"";
-  renderAdmin();
-}
-function renderAdmin(){
-  const others=adRows.filter(r=>r.id!==company.id);
-  $("asAll").textContent=others.length;
-  $("asActive").textContent=others.filter(r=>["ok","soon"].includes(stateOf(r).k)).length;
-  $("asSoon").textContent=others.filter(r=>stateOf(r).k==="soon").length;
-  $("asExp").textContent=others.filter(r=>["exp","sus"].includes(stateOf(r).k)).length;
-  const soonOrExp=others.filter(r=>["soon","exp"].includes(stateOf(r).k)).length;$("adminDot").hidden=!soonOrExp;
-  const q=norm(adQ);
-  let list=others.filter(r=>{const st=stateOf(r).k;if(adFilter==="active"&&!["ok","soon"].includes(st))return false;if(adFilter==="soon"&&st!=="soon")return false;if(adFilter==="exp"&&!["exp","sus"].includes(st))return false;if(q&&!norm([r.name,r.username,r.plate,r.whatsapp,r.contact_name,r.owner_email].join(" ")).includes(q))return false;return true;});
-  const order={exp:0,soon:1,sus:2,ok:3};list.sort((a,b)=>order[stateOf(a).k]-order[stateOf(b).k]||(a.name||"").localeCompare(b.name||"","tr"));
-  const host=$("adList");host.innerHTML="";
-  if(!list.length){host.innerHTML=`<div class="note">${adRows.length<=1?"Henüz firma yok. Sağ üstteki + Firma ile ekleyin.":"Eşleşen firma yok."}</div>`;return;}
-  list.forEach(r=>{const st=stateOf(r);const el=document.createElement("button");el.type="button";el.className="crow "+st.k;
-    el.innerHTML=`<div class="nm">${r.plate?`<span class="plate" style="height:22px;font-size:12px;vertical-align:middle"><span class="tr">TR</span><span class="no">${esc(r.plate)}</span></span> `:""}${esc(r.plate?"":(r.name||r.username))}</div><div class="st"><span class="chip ${st.c}">${esc(st.t)}</span><span class="chip">${r.bookings_count} kayıt</span></div><div class="sub">${esc(r.username||"")}${r.whatsapp?" · "+esc(r.whatsapp):""}${r.last_sign_in_at?"":" · hiç giriş yapmadı"}</div>`;
-    el.addEventListener("click",()=>openCompany(r));host.appendChild(el);});
-}
-$("btnAdmin").addEventListener("click",openAdmin);
-$("adClose").addEventListener("click",()=>{$("adminSheet").hidden=true;document.body.style.overflow="";});
-$("adQ").addEventListener("input",e=>{adQ=e.target.value;renderAdmin();});
-$("adStats").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{adFilter=b.dataset.f;$("adStats").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));renderAdmin();}));
-$("psSave").addEventListener("click",async()=>{
-  const pairs=[["support_whatsapp",$("psWa").value.trim()],["price_monthly",$("psM").value.trim()],["price_yearly",$("psY").value.trim()],["trial_days",$("psTrial").value.trim()],["app_url",$("psUrl").value.trim()],["iban",$("psIban").value.trim()],["iban_name",$("psIbanName").value.trim()]];
-  for(const [k,v] of pairs){const {error}=await sb.rpc("admin_set_setting",{p_key:k,p_value:v});if(error){$("psErr").textContent=errMsg(error);$("psErr").hidden=false;return;}}
-  $("psErr").hidden=true;toast("Ayarlar kaydedildi");await loadAdmin();
-});
-const genPass=()=>{const a="abcdefghjkmnpqrstuvwxyz",n="23456789";let p="";for(let i=0;i<4;i++)p+=a[Math.floor(Math.random()*a.length)];for(let i=0;i<4;i++)p+=n[Math.floor(Math.random()*n.length)];return p;};
-$("cnGen").addEventListener("click",()=>{$("cnPass").value=genPass();});
-function appUrl(){return (psettings.app_url||"").replace(/\/+$/,"")||(location.origin+BASE.replace(/\/$/,""));}
-function inviteText(r,pass){return `Merhaba,\nTransfer Defteri giriş bilgileriniz:\n\nUygulama: ${appUrl()}\nKullanıcı adı: ${r.username}\n${pass?"Geçici şifre: "+pass+"\n\nİlk girişte kendi şifrenizi belirleyeceksiniz.":"Şifreniz: kendi belirlediğiniz şifre (unuttuysanız yazın, yenisini verelim)."}\n\nTelefonda tarayıcı menüsünden "Ana ekrana ekle" derseniz uygulama gibi açılır. Müşterilerinize göndereceğiniz rezervasyon linki uygulamanın içinde "Link gönder" düğmesindedir.`;}
-function openCompany(r){
-  coCur=r;const isNew=!r;
-  $("coTitle").textContent=isNew?"Yeni firma":(r.plate||r.username||r.name);
-  $("coErr").hidden=true;$("coNewBox").hidden=!isNew;$("coExistBox").hidden=isNew;$("coInvite").hidden=true;$("coInviteBtns").hidden=true;$("coDelConfirm").hidden=true;
-  $("cnUser").value="";$("cnPass").value=isNew?genPass():"";
-  $("cnCompany").value=r?.name||"";$("cnContact").value=r?.contact_name||"";$("cnPhone").value=r?.whatsapp||"";$("cnEmail").value=r?.owner_email&&!/@firma\.transferdefteri\.net$/.test(r.owner_email)?r.owner_email:"";$("cnPlate").value=r?.plate||"";$("cnNotes").value=r?.notes||"";
-  if(r){
-    const st=stateOf(r);const end=r.plan==="trial"?r.trial_ends_at:r.paid_until;
-    $("coKv").innerHTML=`<div><span>Durum</span><b class="chip ${st.c}">${esc(st.t)}</b></div><div><span>Plan</span><b>${esc(({trial:"Deneme",monthly:"Aylık",yearly:"Yıllık",lifetime:"Süresiz"})[r.plan]||r.plan)}</b></div><div><span>Bitiş</span><b>${end?new Date(end).toLocaleDateString("tr-TR"):"-"}</b></div><div><span>Toplam ödeme</span><b>${fmtTL(r.total_paid)}</b></div><div><span>Kayıt / linkten</span><b>${r.bookings_count} / ${r.link_bookings_count}</b></div><div><span>Kayıt tarihi</span><b>${new Date(r.created_at).toLocaleDateString("tr-TR")}</b></div>`;
-    $("coSusp").textContent=r.status==="suspended"?"Askıdan çıkar":"Askıya al";
-    $("coPayM").textContent="Aylık ödeme al ("+fmtTL(psettings.price_monthly)+")";$("coPayY").textContent="Yıllık ödeme al ("+fmtTL(psettings.price_yearly)+")";
-    $("coLogin").innerHTML=`<div><span>Kullanıcı adı</span><b>${esc(r.username||"-")}</b></div><div><span>Son giriş</span><b>${r.last_sign_in_at?new Date(r.last_sign_in_at).toLocaleString("tr-TR"):"Henüz girmedi"}</b></div><div><span>Şifre</span><b>${r.must_change?"Geçici (değiştirmedi)":"Kendi şifresi"}</b></div>`;
-    const d=digits(r.whatsapp);$("coWa").hidden=!d;$("coWa").href="https://wa.me/"+d;
-    $("coLink").href=appUrl()+"/r/?c="+r.slug;
-    sb.rpc("admin_payments",{p_company:r.id}).then(({data})=>{$("coPays").innerHTML=(data||[]).map(p=>`<div class="pay"><span>${new Date(p.created_at).toLocaleDateString("tr-TR")} · ${({monthly:"Aylık",yearly:"Yıllık",custom:"Uzatma"})[p.plan]||p.plan}</span><b>${fmtTL(p.amount)}</b><span>→ ${new Date(p.period_end).toLocaleDateString("tr-TR")}</span></div>`).join("")||"";});
-  }
-  $("coSheet").hidden=false;$("coSheet").querySelector(".sheet-body").scrollTop=0;
-}
-$("adNew").addEventListener("click",()=>openCompany(null));
-$("coClose").addEventListener("click",()=>{$("coSheet").hidden=true;});
-function coErr(m){$("coErr").textContent=m;$("coErr").hidden=false;$("coSheet").querySelector(".sheet-body").scrollTop=0;}
-$("coSave").addEventListener("click",async()=>{
-  const v=id=>$(id).value.trim();$("coSave").disabled=true;
-  try{
-    if(!coCur){
-      const plateV=v("cnPlate").toUpperCase().replace(/\s+/g," ").trim();
-      const {data,error}=await sb.rpc("admin_create_company",{p:{username:v("cnUser"),password:v("cnPass"),company:plateV||v("cnUser"),contact:"",whatsapp:v("cnPhone"),email:v("cnEmail"),plate:plateV}});
-      if(error)throw error;
-      if(v("cnNotes"))await sb.rpc("admin_set_company",{p_id:data.company_id,p:{notes:v("cnNotes")}});
-      await loadAdmin();const r=adRows.find(x=>x.id===data.company_id);toast("Firma oluşturuldu");
-      openCompany(r);showInvite(r,v("cnPass"));
-    }else{
-      const plateV=v("cnPlate").toUpperCase().replace(/\s+/g," ").trim();
-      const {error}=await sb.rpc("admin_set_company",{p_id:coCur.id,p:{whatsapp:v("cnPhone"),owner_email:v("cnEmail")||coCur.owner_email,plate:plateV,notes:v("cnNotes")}});
-      if(error)throw error;await loadAdmin();toast("Kaydedildi");openCompany(adRows.find(x=>x.id===coCur.id));
-    }
-  }catch(e){coErr(errMsg(e));}finally{$("coSave").disabled=false;}
-});
-function showInvite(r,pass){const t=inviteText(r,pass);$("coInvite").textContent=t;$("coInvite").hidden=false;$("coInviteBtns").hidden=false;const d=digits(r.whatsapp);$("coSendInv").href="https://wa.me/"+(d||"")+"?text="+encodeURIComponent(t);$("coCopyInv").onclick=async()=>{try{await navigator.clipboard.writeText(t);toast("Kopyalandı");}catch(e){}};}
-$("coNewPass").addEventListener("click",async()=>{const p=genPass();const {error}=await sb.rpc("admin_set_password",{p_user:coCur.owner_user_id,p_pass:p});if(error)return coErr(errMsg(error));toast("Geçici şifre verildi");showInvite(coCur,p);});
-async function pay(plan,months,amount){const {data,error}=await sb.rpc("admin_add_payment",{p_company:coCur.id,p_amount:amount,p_plan:plan,p_months:months,p_note:null});if(error)return coErr(errMsg(error));toast("Kaydedildi · bitiş "+new Date(data).toLocaleDateString("tr-TR"));await loadAdmin();openCompany(adRows.find(x=>x.id===coCur.id));}
-$("coPayM").addEventListener("click",()=>pay("monthly",1,+psettings.price_monthly||0));
-$("coPayY").addEventListener("click",()=>pay("yearly",12,+psettings.price_yearly||0));
-$("coExt").addEventListener("click",()=>pay(coCur.plan==="trial"?"monthly":coCur.plan,1,0));
-$("coSusp").addEventListener("click",async()=>{const {error}=await sb.rpc("admin_set_company",{p_id:coCur.id,p:{status:coCur.status==="suspended"?"active":"suspended"}});if(error)return coErr(errMsg(error));await loadAdmin();openCompany(adRows.find(x=>x.id===coCur.id));});
-$("coDel").addEventListener("click",()=>{$("coDelConfirm").hidden=false;});
-$("coDelNo").addEventListener("click",()=>{$("coDelConfirm").hidden=true;});
-$("coDelYes").addEventListener("click",async()=>{const {error}=await sb.rpc("admin_delete_company",{p_id:coCur.id});if(error)return coErr(errMsg(error));toast("Firma silindi");$("coSheet").hidden=true;await loadAdmin();});
-
-/* ---------- sesli bildirim ---------- */
-const NF_KEY="td_notif";
-let nf={sound:true,voice:true,push:false,asked:false};try{nf=Object.assign(nf,JSON.parse(localStorage.getItem(NF_KEY)||"{}"));}catch(e){}
-const saveNf=()=>{try{localStorage.setItem(NF_KEY,JSON.stringify(nf));}catch(e){}};
-let actx=null,swReg=null;
-if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").then(r=>{swReg=r;}).catch(()=>{});navigator.serviceWorker.addEventListener("message",e=>{if(e.data&&e.data.type==="open-booking"){const b=bookings.find(x=>x.id===e.data.id);if(b)openSheet(b);}});}
-function unlockAudio(){try{if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();}catch(e){}
-  try{if("speechSynthesis" in window){const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u);}}catch(e){}}
-function chime(){
-  try{if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();
-    const t=actx.currentTime;[[880,0],[1175,.16],[1568,.32]].forEach(([f,d])=>{const o=actx.createOscillator(),g=actx.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(.35,t+d+.02);g.gain.exponentialRampToValueAtTime(.001,t+d+.45);o.connect(g);g.connect(actx.destination);o.start(t+d);o.stop(t+d+.5);});
-  }catch(e){}
-}
-function speak(text){try{if(!("speechSynthesis" in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=1;const v=speechSynthesis.getVoices().find(v=>/^tr/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}}
-let flashT;
-function flash(title,sub,b){$("flashT").textContent=title;$("flashS").textContent=sub;const el=$("flash");el.classList.add("show");el.onclick=()=>{el.classList.remove("show");if(b)openSheet(b);};clearTimeout(flashT);flashT=setTimeout(()=>el.classList.remove("show"),9000);}
-async function sysNotify(title,body,b){
-  if(!nf.push||!("Notification" in window)||Notification.permission!=="granted")return;
-  const opt={body,icon:"icon-192.png",badge:"icon-192.png",tag:"td-"+(b?b.id:Date.now()),renotify:true,vibrate:[200,100,200],data:{id:b&&b.id}};
-  try{const reg=swReg||(await navigator.serviceWorker?.getRegistration());if(reg){await reg.showNotification(title,opt);return;}}catch(e){}
-  try{new Notification(title,opt);}catch(e){}
-}
-function notifyNew(b){
-  const name=((b.firstName||"")+" "+(b.lastName||"")).trim()||"Yeni yolcu";
-  const when=(b.date?b.date.slice(8,10)+"."+b.date.slice(5,7):"")+(b.time?" "+b.time:"");
-  const sub=[when,b.hotel,[b.adults?b.adults+" yetişkin":"",b.children?b.children+" çocuk":"",b.infants?b.infants+" bebek":""].filter(Boolean).join(", ")].filter(Boolean).join(" · ");
-  flash("🆕 Yeni rezervasyon: "+name,sub,b);
-  if(nf.sound)chime();
-  try{navigator.vibrate&&navigator.vibrate([250,120,250]);}catch(e){}
-  if(nf.voice)setTimeout(()=>speak("Yeni rezervasyon. "+name+(b.hotel?". "+b.hotel:"")),700);
-  sysNotify("Yeni rezervasyon: "+name,sub,b);
-  try{document.title="🔔 Yeni rezervasyon – Transfer Defteri";setTimeout(()=>{document.title="Transfer Defteri";},15000);}catch(e){}
-}
-async function enableNotif(){
-  unlockAudio();nf.asked=true;
-  if("Notification" in window){try{const p=await Notification.requestPermission();nf.push=(p==="granted");}catch(e){}}
-  saveNf();syncNfUi();$("notifBand").hidden=true;
-  chime();toast(nf.push?"Bildirimler açık":"Ses açık (ekran üstü bildirime izin verilmedi)");
-}
-function syncNfUi(){sw("nfSound",nf.sound);sw("nfVoice",nf.voice);sw("nfPush",nf.push&&("Notification" in window)&&Notification.permission==="granted");}
-$("notifOn").addEventListener("click",enableNotif);
-$("notifLater").addEventListener("click",()=>{nf.asked=true;saveNf();$("notifBand").hidden=true;});
-$("nfSound").addEventListener("click",()=>{nf.sound=!swv("nfSound");sw("nfSound",nf.sound);saveNf();if(nf.sound){unlockAudio();chime();}});
-$("nfVoice").addEventListener("click",()=>{nf.voice=!swv("nfVoice");sw("nfVoice",nf.voice);saveNf();if(nf.voice){unlockAudio();speak("Sesli okuma açık");}});
-$("nfPush").addEventListener("click",async()=>{if(swv("nfPush")){nf.push=false;saveNf();syncNfUi();return;}await enableNotif();});
-function applyTheme(t){document.documentElement.setAttribute("data-theme",t);try{localStorage.setItem("td_theme",t);}catch(e){}sw("themeSw",t==="dark");const m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="dark"?"#0d1220":"#ffffff");}
-sw("themeSw",document.documentElement.getAttribute("data-theme")==="dark");
-$("themeSw").addEventListener("click",()=>applyTheme(swv("themeSw")?"light":"dark"));
-$("nfTest").addEventListener("click",()=>{unlockAudio();notifyNew({id:null,firstName:"Johann",lastName:"Müller",date:todayStr(),time:"18:40",hotel:"Örnek Otel",adults:2,children:1});});
-document.addEventListener("pointerdown",unlockAudio,{once:true});
-
-/* ---------- raporlar & toplu silme ---------- */
-let repP="month",delBulkList=[],ledger=[],ledgerLoaded=false;
-async function fetchPaged(table,order){const all=[];for(let f=0;;f+=1000){const {data,error}=await sb.from(table).select("*").order(order,{ascending:false}).range(f,f+999);if(error)return null;all.push(...data);if(data.length<1000)break;}return all;}
-let archive=[];
-async function loadLedger(){const [lg,ar]=await Promise.all([fetchPaged("ledger","date"),fetchPaged("report_days","day")]);if(lg){ledger=lg;ledgerLoaded=true;}if(ar)archive=ar;}
-/* rapor özetlerini birleştir */
-const MAPKEYS=["recvAll","recvGot","recvDue","payAll","payDone","payDue","profit"];
-function mergeR(a,b){const o={count:(a.count||0)+(b.count||0),cancelled:(a.cancelled||0)+(b.cancelled||0),link:(a.link||0)+(b.link||0),pax:(a.pax||0)+(b.pax||0)};
-  MAPKEYS.forEach(k=>{const m=Object.assign({},a[k]||{});Object.entries(b[k]||{}).forEach(([c,v])=>{m[c]=(m[c]||0)+Number(v||0);});o[k]=m;});return o;}
-function archiveIn(from,to){return archive.filter(x=>x.day>=from&&x.day<=to);}
-/* toplu silmeden önce: silinecek kayıtların rakamlarını gün gün arşive ekle */
-async function archiveBookings(list){
-  const ids=new Set(list.map(b=>b.id));const byDay=new Map();
-  legs().filter(l=>ids.has(l.id)).forEach(l=>{if(!byDay.has(l.date))byDay.set(l.date,[]);byDay.get(l.date).push(l);});
-  if(!byDay.size)return;
-  const days=[...byDay.keys()];const old={};
-  for(let i=0;i<days.length;i+=200){const {data,error}=await sb.from("report_days").select("*").in("day",days.slice(i,i+200));if(error)throw error;(data||[]).forEach(r=>old[r.day]=r.data);}
-  const rows=days.map(d=>({company_id:company.id,day:d,data:mergeR(old[d]||{},calcReport(byDay.get(d))),updated_at:new Date().toISOString()}));
-  for(let i=0;i<rows.length;i+=200){const {error}=await sb.from("report_days").upsert(rows.slice(i,i+200));if(error)throw error;}
-  rows.forEach(r=>{const i=archive.findIndex(x=>x.day===r.day);if(i>=0)archive[i]=r;else archive.push(r);});
-}
-function repRange(){
-  const n=new Date();let a,b,t;
-  if(repP==="month"){a=new Date(n.getFullYear(),n.getMonth(),1);b=new Date(n.getFullYear(),n.getMonth()+1,0);t=TR_MONTHS[n.getMonth()]+" "+n.getFullYear();}
-  else if(repP==="last"){a=new Date(n.getFullYear(),n.getMonth()-1,1);b=new Date(n.getFullYear(),n.getMonth(),0);t=TR_MONTHS[a.getMonth()]+" "+a.getFullYear();}
-  else if(repP==="year"){a=new Date(n.getFullYear(),0,1);b=new Date(n.getFullYear(),11,31);t=n.getFullYear()+" yılı";}
-  else{a=$("repFrom").value?new Date($("repFrom").value+"T00:00:00"):new Date(n.getFullYear(),n.getMonth(),1);b=$("repTo").value?new Date($("repTo").value+"T00:00:00"):n;t=a.toLocaleDateString("tr-TR")+" – "+b.toLocaleDateString("tr-TR");}
-  return {from:ymd(a),to:ymd(b),title:t};
-}
-function sumBy(list,fn){const o={};list.forEach(b=>{const c=fn.cur(b);const v=Number(fn.val(b))||0;if(!v)return;o[c]=(o[c]||0)+v;});return o;}
-const fmtMap=o=>Object.keys(o).length?Object.keys(o).map(c=>money(o[c],c)).join(" · "):"–";
-function calcReport(list){
-  const act=list.filter(b=>b.status!=="cancelled");
-  const recvAll=sumBy(act,{cur:b=>b.receiveCur||"EUR",val:b=>b.receiveAmount});
-  const recvGot=sumBy(act.filter(b=>b.received),{cur:b=>b.receiveCur||"EUR",val:b=>b.receiveAmount});
-  const recvDue=sumBy(act.filter(b=>!b.received),{cur:b=>b.receiveCur||"EUR",val:b=>b.receiveAmount});
-  const payAll=sumBy(act,{cur:b=>b.payCur||"EUR",val:b=>b.payAmount});
-  const payDone=sumBy(act.filter(b=>b.paid),{cur:b=>b.payCur||"EUR",val:b=>b.payAmount});
-  const payDue=sumBy(act.filter(b=>!b.paid),{cur:b=>b.payCur||"EUR",val:b=>b.payAmount});
-  const profit={};new Set([...Object.keys(recvAll),...Object.keys(payAll)]).forEach(c=>{profit[c]=(recvAll[c]||0)-(payAll[c]||0);});
-  return {count:act.length,cancelled:list.length-act.length,link:act.filter(b=>b.source==="link").length,pax:act.reduce((a,b)=>a+(b.adults||0)+(b.children||0)+(b.infants||0),0),recvAll,recvGot,recvDue,payAll,payDone,payDue,profit};
-}
-function calcLedger(from,to){
-  const L=ledger.filter(x=>x.date>=from&&x.date<=to);
-  const exp=sumBy(L.filter(x=>x.kind==="expense"),{cur:x=>x.currency||"TRY",val:x=>x.amount});
-  const inc=sumBy(L.filter(x=>x.kind==="income"),{cur:x=>x.currency||"TRY",val:x=>x.amount});
-  return {L,exp,inc};
-}
-function netProfit(R,Lg){const o={};new Set([...Object.keys(R.profit),...Object.keys(Lg.exp),...Object.keys(Lg.inc)]).forEach(c=>{o[c]=(R.profit[c]||0)-(Lg.exp[c]||0)+(Lg.inc[c]||0);});return o;}
-function renderLedger(from,to){
-  const {L}=calcLedger(from,to);
-  $("lgList").innerHTML=L.length?L.map(x=>`<div class="pay"><span>${esc(x.date.slice(8,10)+"."+x.date.slice(5,7))} · ${esc(x.category||"")}${x.note?" · "+esc(x.note):""}</span><b style="color:${x.kind==="income"?"var(--ok)":"var(--bad)"}">${x.kind==="income"?"+":"−"}${esc(money(x.amount,x.currency))}</b><button type="button" class="btn sm" data-lgdel="${x.id}" style="padding:4px 8px">Sil</button></div>`).join(""):'<div class="note" style="margin:0;padding:6px 14px 12px;text-align:left">Bu aralıkta gelir/gider kaydı yok.</div>';
-  $("lgList").querySelectorAll("[data-lgdel]").forEach(b=>b.addEventListener("click",async()=>{const {error}=await sb.from("ledger").delete().eq("id",b.dataset.lgdel);if(error)return toast("Silinemedi");ledger=ledger.filter(x=>x.id!==b.dataset.lgdel);renderReport();}));
-}
-$("lgAdd").addEventListener("click",async()=>{
-  const amt=+$("lgAmt").value;if(!amt){$("lgErr").textContent="Tutar girin.";$("lgErr").hidden=false;return;}
-  const row={company_id:company.id,date:$("lgDate").value||todayStr(),kind:$("lgKind").value,category:$("lgCat").value,amount:amt,currency:$("lgCur").value,note:$("lgNote").value.trim()};
-  const {data,error}=await sb.from("ledger").insert(row).select().single();
-  if(error){$("lgErr").textContent=errMsg(error);$("lgErr").hidden=false;return;}
-  $("lgErr").hidden=true;ledger.unshift(data);$("lgAmt").value="";$("lgNote").value="";toast("Eklendi");renderReport();
-});
-$("lgKind").addEventListener("change",()=>{const inc=$("lgKind").value==="income";$("lgCat").innerHTML=(inc?["Ekstra transfer","Tur komisyonu","Bahşiş","Diğer gelir"]:["Yakıt","HGS / Otopark","Yıkama","Bakım / Lastik","Yemek","Şoför ücreti","Kira / Araç taksidi","Sigorta / Vergi","Telefon / İnternet","Diğer"]).map(c=>`<option>${c}</option>`).join("");});
-function renderReport(){
-  const r=repRange();$("repRange").hidden=repP!=="custom";
-  const list=legs().filter(b=>b.date>=r.from&&b.date<=r.to);
-  const AR=archiveIn(r.from,r.to);
-  const R=AR.reduce((acc,x)=>mergeR(acc,x.data||{}),calcReport(list));const Lg=calcLedger(r.from,r.to);const NP=netProfit(R,Lg);
-  $("repTitle").innerHTML=`<b>${esc(r.title)}</b> · ${R.count} transfer${R.cancelled?` (+${R.cancelled} iptal)`:""} · ${R.pax} yolcu · ${R.link} linkten`;
-  $("repBoxes").innerHTML=`
-    <div class="rbox k"><div class="l">Alınan (tahsil edildi)</div><div class="v">${esc(fmtMap(R.recvGot))}</div></div>
-    <div class="rbox w"><div class="l">Bekleyen tahsilat</div><div class="v">${esc(fmtMap(R.recvDue))}</div></div>
-    <div class="rbox"><div class="l">Ödenen</div><div class="v">${esc(fmtMap(R.payDone))}</div></div>
-    <div class="rbox w"><div class="l">Ödenecek</div><div class="v">${esc(fmtMap(R.payDue))}</div></div>
-    <div class="rbox"><div class="l">Toplam ciro</div><div class="v">${esc(fmtMap(R.recvAll))}</div></div>
-    <div class="rbox"><div class="l">Kâr (transfer)</div><div class="v">${esc(fmtMap(R.profit))}</div></div>
-    <div class="rbox w"><div class="l">Masraflar</div><div class="v">${esc(fmtMap(Lg.exp))}</div></div>
-    <div class="rbox k"><div class="l">Net kâr</div><div class="v">${esc(fmtMap(NP))}</div></div>`;
-  renderLedger(r.from,r.to);
-  const groups=new Map();
-  list.filter(b=>b.status!=="cancelled").forEach(b=>{const k=repP==="year"?b.date.slice(0,7):b.date;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(b);});
-  const arch=new Map();AR.forEach(x=>{const k=repP==="year"?x.day.slice(0,7):x.day;arch.set(k,arch.has(k)?mergeR(arch.get(k),x.data||{}):(x.data||{}));if(!groups.has(k))groups.set(k,[]);});
-  const rows=[...groups.keys()].sort().map(k=>{let g=calcReport(groups.get(k));if(arch.has(k))g=mergeR(g,arch.get(k));const lbl=repP==="year"?TR_MONTHS[+k.slice(5,7)-1]:k.slice(8,10)+"."+k.slice(5,7);return `<tr><td>${lbl}</td><td>${g.count}</td><td>${esc(fmtMap(g.recvAll))}</td><td>${esc(fmtMap(g.payAll))}</td><td>${esc(fmtMap(g.profit))}</td></tr>`;}).join("");
-  $("repTable").innerHTML=`<tr><th>${repP==="year"?"Ay":"Gün"}</th><th>Adet</th><th>Alınacak</th><th>Ödenecek</th><th>Kâr</th></tr>${rows||'<tr><td colspan="5" style="text-align:center;color:var(--muted)">Bu aralıkta kayıt yok</td></tr>'}`;
-  window.__rep={r,R,Lg,NP};
-}
-async function openReports(){$("repSheet").hidden=false;document.body.style.overflow="hidden";$("delBulkConfirm").hidden=true;if(!$("lgDate").value)$("lgDate").value=todayStr();if(!ledgerLoaded){await loadLedger();}if(!$("repFrom").value){const n=new Date();$("repFrom").value=ymd(new Date(n.getFullYear(),n.getMonth(),1));$("repTo").value=ymd(n);}renderReport();}
-$("btnReports").addEventListener("click",openReports);
-$("repClose").addEventListener("click",()=>{$("repSheet").hidden=true;document.body.style.overflow="";});
-$("repSegs").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{repP=b.dataset.p;$("repSegs").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));renderReport();}));
-$("repFrom").addEventListener("change",renderReport);$("repTo").addEventListener("change",renderReport);
-$("repShare").addEventListener("click",async()=>{
-  const {r,R,Lg,NP}=window.__rep||{};if(!r)return;
-  const t=`${company.name||""} – Rapor (${r.title})\nTransfer: ${R.count} · Yolcu: ${R.pax}\nAlınan: ${fmtMap(R.recvGot)}\nBekleyen tahsilat: ${fmtMap(R.recvDue)}\nÖdenen: ${fmtMap(R.payDone)}\nÖdenecek: ${fmtMap(R.payDue)}\nToplam ciro: ${fmtMap(R.recvAll)}\nKâr (transfer): ${fmtMap(R.profit)}\nMasraflar: ${fmtMap(Lg.exp)}\nEkstra gelir: ${fmtMap(Lg.inc)}\nNet kâr: ${fmtMap(NP)}`;
-  try{await navigator.clipboard.writeText(t);toast("Rapor metni kopyalandı");}catch(e){}
-  window.open("https://wa.me/?text="+encodeURIComponent(t),"_blank");
-});
-document.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>{
-  const t=todayStr();let list;
-  if(b.dataset.del==="range"){const f=$("repFrom").value,to=$("repTo").value;if(!f||!to){toast("Önce tarih aralığı seçin");return;}list=bookings.filter(x=>x.date>=f&&x.date<=to&&x.date<t&&(!x.returnDate||x.returnDate<t));}
-  else{const d=new Date();d.setDate(d.getDate()-(+b.dataset.del));const cut=ymd(d);list=bookings.filter(x=>x.date<cut&&(!x.returnDate||x.returnDate<cut));}
-  delBulkList=list;
-  if(!list.length){toast("Silinecek kayıt yok");$("delBulkConfirm").hidden=true;return;}
-  $("delBulkTxt").textContent=list.length+" eski kayıt fotoğraflarıyla birlikte kalıcı silinecek. Raporlardaki tutarlar (ciro, kâr, tahsilat) ve kasa defteri silinmez, aynen kalır. Emin misiniz?";$("delBulkConfirm").hidden=false;$("delBulkConfirm").scrollIntoView({block:"center"});
-}));
-$("delBulkNo").addEventListener("click",()=>{$("delBulkConfirm").hidden=true;});
-$("delBulkYes").addEventListener("click",async()=>{
-  const ids=delBulkList.map(b=>b.id);if(!ids.length)return;$("delBulkYes").disabled=true;
-  try{if(!ledgerLoaded)await loadLedger();
-    await archiveBookings(delBulkList);
-    for(let i=0;i<ids.length;i+=200){const {error}=await sb.from("bookings").delete().in("id",ids.slice(i,i+200));if(error)throw error;}
-    removePhotos(delBulkList);
-    bookings=bookings.filter(b=>!ids.includes(b.id));toast(ids.length+" kayıt silindi · rapor ve kasa rakamları korundu");$("delBulkConfirm").hidden=true;renderReport();render();}
-  catch(e){toast("Silinemedi: "+errMsg(e));}finally{$("delBulkYes").disabled=false;}
-});
-
-/* ---------- link gönder ---------- */
-function custLink(){return location.origin+BASE+"r/?c="+(company.slug||"");}
-function meetLink(){return location.origin+BASE+"k/?c="+(company.slug||"");}
-function hasMeet(){const m=company&&company.meeting||{};return !!((m.texts&&Object.values(m.texts).some(x=>x&&x.trim()))||m.photo||m.video);}
-function defaultMsg(){
-  const parts=[(company.name||"")];
-  if(swv("lkForm"))parts.push("📝 Transfer rezervasyonunuz için lütfen bu formu doldurun / Please fill in this form for your transfer booking / Bitte füllen Sie dieses Formular aus:\n"+custLink());
-  if(swv("lkMeet")&&hasMeet())parts.push("📍 Havalimanında buluşma noktası (yazı, fotoğraf, video) / Airport meeting point (text, photo, video) / Treffpunkt am Flughafen (Text, Foto, Video):\n"+meetLink());
-  return parts.join("\n\n");
-}
-function openLink(){
-  $("linkSheet").hidden=false;document.body.style.overflow="hidden";
-  $("lkLink").textContent=custLink();$("lkOpen").href=custLink();
-  const hm=hasMeet();$("lkMeetRow").hidden=!hm;$("lkMeetNone").hidden=hm;$("lkMeetOpen").hidden=!hm;$("lkMeetOpen").href=meetLink();
-  let saved=null;try{saved=localStorage.getItem("td_lkmsg2_"+company.id);}catch(e){}
-  $("lkMsg").value=saved||defaultMsg();updLkWa();
-}
-["lkForm","lkMeet"].forEach(id=>$(id).addEventListener("click",()=>{sw(id,!swv(id));$("lkMsg").value=defaultMsg();try{localStorage.removeItem("td_lkmsg2_"+company.id);}catch(e){}updLkWa();}));
-$("lkReset").addEventListener("click",()=>{$("lkMsg").value=defaultMsg();try{localStorage.removeItem("td_lkmsg2_"+company.id);}catch(e){}updLkWa();});
-function updLkWa(){$("lkWa").href="https://wa.me/?text="+encodeURIComponent($("lkMsg").value.trim()||custLink());}
-$("lkMsg").addEventListener("input",()=>{updLkWa();try{localStorage.setItem("td_lkmsg2_"+company.id,$("lkMsg").value);}catch(e){}});
-$("btnLink").addEventListener("click",openLink);$("fabLink").addEventListener("click",openLink);
-$("lkClose").addEventListener("click",()=>{$("linkSheet").hidden=true;document.body.style.overflow="";});
-$("lkCopy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(custLink());toast("Link kopyalandı");}catch(e){toast("Kopyalanamadı, linki seçip kopyalayın");}});
-
-/* ---------- karşılama bilgisi ---------- */
-let mtDraft={};
-function fillMeeting(){
-  const m=company.meeting||{};mtDraft={photo:m.photo||"",video:m.video||"",poster:m.poster||""};
-  const t=m.texts||{};$("mtEn").value=t.en||"";$("mtDe").value=t.de||"";$("mtTr").value=t.tr||"";$("mtRu").value=t.ru||"";
-  syncMtMedia();$("mtOpen").href=meetLink();$("mtErr").hidden=true;
-}
-function syncMtMedia(){$("mtPhotoPv").hidden=!mtDraft.photo;if(mtDraft.photo)$("mtPhotoPv").src=mtDraft.photo;$("mtPhotoDel").hidden=!mtDraft.photo;
-  $("mtVideoName").textContent=mtDraft.video?"✓ Video yüklü":"Video yok";$("mtVideoDel").hidden=!mtDraft.video;}
-async function upMedia(file,kind){
-  if(!file)return null;if(file.size>50*1024*1024){toast("Dosya çok büyük (en fazla 50 MB)");return null;}
-  let blob=file,ext=(file.name.split(".").pop()||"bin").toLowerCase();
-  if(kind==="photo"){const b=await shrink(file,1600);if(b){blob=b;ext="jpg";}}
-  const path=company.id+"/karsilama-"+kind+"-"+Date.now().toString(36)+"."+ext;
-  toast(kind==="video"?"Video yükleniyor…":"Görsel yükleniyor…");
-  const {error}=await sb.storage.from("media").upload(path,blob,{contentType:kind==="photo"?"image/jpeg":(file.type||"video/mp4"),upsert:true});
-  if(error){toast("Yüklenemedi: "+errMsg(error));return null;}
-  return sb.storage.from("media").getPublicUrl(path).data.publicUrl;
-}
-$("mtPhoto").addEventListener("change",async e=>{const u=await upMedia(e.target.files[0],"photo");if(u){mtDraft.photo=u;syncMtMedia();toast("Görsel yüklendi, kaydetmeyi unutmayın");}e.target.value="";});
-$("mtVideo").addEventListener("change",async e=>{const u=await upMedia(e.target.files[0],"video");if(u){mtDraft.video=u;mtDraft.poster="";syncMtMedia();toast("Video yüklendi, kaydetmeyi unutmayın");}e.target.value="";});
-$("mtPhotoDel").addEventListener("click",()=>{mtDraft.photo="";syncMtMedia();});
-$("mtVideoDel").addEventListener("click",()=>{mtDraft.video="";mtDraft.poster="";syncMtMedia();});
-$("mtSave").addEventListener("click",async()=>{
-  const texts={};[["en","mtEn"],["de","mtDe"],["tr","mtTr"],["ru","mtRu"]].forEach(([k,id])=>{const v=$(id).value.trim();if(v)texts[k]=v;});
-  const meeting={texts,photo:mtDraft.photo||"",video:mtDraft.video||"",poster:mtDraft.poster||""};
-  const {data,error}=await sb.from("companies").update({meeting}).eq("id",company.id).select().single();
-  if(error){$("mtErr").textContent=errMsg(error);$("mtErr").hidden=false;return;}
-  company=data;$("mtErr").hidden=true;toast("Karşılama bilgisi kaydedildi");
-});
-
-/* ---------- settings ---------- */
-function openSettings(){
-  $("setSheet").hidden=false;document.body.style.overflow="hidden";fillMeeting();
-  $("custLink").textContent=custLink();
-  $("waLink").href="https://wa.me/?text="+encodeURIComponent("Transfer rezervasyon formu: "+custLink());
-  $("openLink").href=custLink();
-  $("sName").value=company.name||"";$("sWa").value=company.whatsapp||"";$("sSlug").value=company.slug||"";$("sPlate").value=company.plate||"";
-  $("sEmail").textContent=session?.user?.email||"";
-  $("sPlan").textContent=({trial:"Deneme",monthly:"Aylık",yearly:"Yıllık",lifetime:"Süresiz",cancelled:"İptal"})[company.plan]||company.plan;
-  const endD=company.plan==="trial"?company.trial_ends_at:company.paid_until;
-  $("sTrial").textContent=company.plan==="lifetime"?"-":(endD?new Date(endD).toLocaleDateString("tr-TR"):"-");
-}
-$("btnSettings").addEventListener("click",()=>{openSettings();$("setPlacesBox").hidden=true;});
-$("setPlaces").addEventListener("click",()=>{$("setSheet").hidden=true;openPlaces();});
-$("setClose").addEventListener("click",()=>{$("setSheet").hidden=true;document.body.style.overflow="";});
-$("copyLink").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(custLink());toast("Link kopyalandı");}catch(e){const r=document.createRange();r.selectNodeContents($("custLink"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Link seçildi, kopyalayın");}});
-$("sSave").addEventListener("click",async()=>{
-  const slug=$("sSlug").value.trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"");
-  if(slug.length<2){$("sErr").textContent="Kısa ad en az 2 karakter olmalı.";$("sErr").hidden=false;return;}
-  const {data,error}=await sb.from("companies").update({name:$("sName").value.trim()||company.name,whatsapp:$("sWa").value.trim(),slug,plate:$("sPlate").value.trim().toUpperCase()}).eq("id",company.id).select().single();
-  if(error){$("sErr").textContent=/duplicate/i.test(error.message)?"Bu kısa ad kullanımda, başka bir tane seçin.":errMsg(error);$("sErr").hidden=false;return;}
-  $("sErr").hidden=true;company=data;setCoName();renderPlate();openSettings();toast("Kaydedildi");
-});
-
-/* ---------- ui ---------- */
-document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;shown=PAGE;document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));render();}));
-$("q").addEventListener("input",e=>{query=e.target.value;shown=PAGE;scheduleRender();});
-window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("repSheet").hidden){$("repSheet").hidden=true;document.body.style.overflow="";}else if(!$("linkSheet").hidden){$("linkSheet").hidden=true;document.body.style.overflow="";}else if(!$("coSheet").hidden)$("coSheet").hidden=true;else if(!$("adminSheet").hidden){$("adminSheet").hidden=true;document.body.style.overflow="";}else if(!$("sheet").hidden)closeSheet();else if(!$("placesSheet").hidden)closePlaces();else if(!$("setSheet").hidden){$("setSheet").hidden=true;document.body.style.overflow="";}}});
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&company){fetchAllBookings().then(({data})=>{if(data){bookings=data.map(fromDb);render();}});}});
-
-/* ---------- boot ---------- */
-$("todayLbl").textContent=fmtDateLong(todayStr());
-async function showApp(){
-  $("loginView").hidden=true;
-  const u=session?.user||(await sb.auth.getUser()).data.user;
-  if(u&&u.user_metadata&&u.user_metadata.must_change===true){$("pwView").hidden=false;$("appView").hidden=true;return;}
-  $("pwView").hidden=true;$("wallView").hidden=true;$("appView").hidden=false;if(!company)await loadAll();
-}
-(async()=>{
-  const {data:{session:s}}=await sb.auth.getSession();session=s;
-  if(s)await showApp();else{$("loginView").hidden=false;}
-})();
-})();
+/* WhatsApp bağlantılarına hazır mesaj */
+document.querySelectorAll(".wa-link").forEach(function(a){a.href="https://wa.me/905455260007?text="+encodeURIComponent("Merhaba, Transfer Defteri'ni 30 gün ücretsiz denemek istiyorum.");});
+/* oturumu açık olan firmalar için giriş düğmesi */
+try{if(Object.keys(localStorage).some(function(k){return /^sb-.*-auth-token$/.test(k);})){document.querySelectorAll('a[href="/app/"]').forEach(function(a){if(a.classList.contains("login"))a.textContent="Uygulamayı aç";});}}catch(e){}
 </script>
 </body>
 </html>

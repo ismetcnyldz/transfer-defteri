@@ -6,6 +6,6 @@ self.addEventListener("notificationclick", e => {
   e.waitUntil((async () => {
     const all = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
     for (const c of all) { if ("focus" in c) { c.postMessage({ type: "open-booking", id: e.notification.data && e.notification.data.id }); return c.focus(); } }
-    return self.clients.openWindow("./");
+    return self.clients.openWindow("./app/");
   })());
 });
