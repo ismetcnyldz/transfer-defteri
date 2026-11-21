@@ -95,12 +95,14 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ico:active{transform:scale(.96)}
 .ico .dot{position:absolute;top:4px;right:5px;width:11px;height:11px;border-radius:50%;background:#ff3b30;border:2px solid #fff}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat{border-radius:14px;padding:10px 12px;min-width:0;color:#fff;background:linear-gradient(150deg,var(--c-blue),var(--c-blue2));box-shadow:0 6px 16px rgba(37,99,235,.25)}
+.stat{border-radius:16px;padding:14px 16px;min-width:0;color:#fff;background:linear-gradient(150deg,var(--c-blue),var(--c-blue2));box-shadow:0 6px 16px rgba(37,99,235,.25)}
 .stat + .stat{background:linear-gradient(150deg,var(--c-amber),var(--c-amber2));box-shadow:0 6px 16px rgba(217,119,6,.25)}
+#stNextWrap{grid-column:1/-1}
+#stNextWrap .val{font-size:26px;white-space:normal}
 #stNextWrap{background:linear-gradient(150deg,var(--c-green),var(--c-green2));box-shadow:0 6px 16px rgba(22,163,74,.25)}
-.stat .lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.88);font-weight:800}
+.stat .lbl{font-size:14px;letter-spacing:.03em;text-transform:uppercase;color:rgba(255,255,255,.88);font-weight:800}
 .stat .val, .stat .val span{color:#fff!important}
-.stat .val{font-size:26px;font-weight:800;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.1}
+.stat .val{font-size:38px;font-weight:800;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.1}
 #stNextWrap .val{font-size:15px;font-weight:700;margin-top:6px}
 .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .tools .search{flex:1 1 100%}
@@ -346,7 +348,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 .invite{background:var(--surface2);border-radius:10px;padding:10px 12px;font-size:13px;white-space:pre-wrap;font-family:var(--font-num);margin:0 14px 10px}
 .pay{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:6px 14px;border-top:1px solid var(--line)}
 .pay span{color:var(--muted)}
-@media (min-width:720px){ .hdr-in,main,.sheet-body,.sheet-hdr .in{max-width:720px;margin-inline:auto} .stats{grid-template-columns:repeat(3,1fr)} }
+@media (min-width:720px){ .hdr-in,main,.sheet-body,.sheet-hdr .in{max-width:720px;margin-inline:auto} .stats{grid-template-columns:repeat(3,1fr)} #stNextWrap{grid-column:auto} }
 </style>
 </head>
 <body>
@@ -771,7 +773,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 1.9</div>
+    <div class="note">Transfer Defteri · sürüm 2.0</div>
   </div>
 </div>
 
@@ -1153,7 +1155,7 @@ function render(){
   list=sorted(list);if(tab==="past")list.reverse();
   const total=list.length;list=list.slice(0,shown);
   const todays=legs().filter(b=>b.date===t&&b.status!=="cancelled");
-  $("stToday").innerHTML=todays.length+' <span style="font-size:14px;font-weight:700;color:var(--muted)">transfer</span>';
+  $("stToday").innerHTML=todays.length+' <span style="font-size:19px;font-weight:800;font-family:Manrope,system-ui,sans-serif;letter-spacing:0">transfer</span>';
   const due={};legs().forEach(b=>{if(b.status!=="cancelled"&&!b.received&&Number(b.receiveAmount)>0){due[b.receiveCur||"EUR"]=(due[b.receiveCur||"EUR"]||0)+Number(b.receiveAmount);}});
   $("stDue").textContent=Object.keys(due).map(c=>money(due[c],c)).join(" · ")||"–";
   const now=new Date();const nowKey=t+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
