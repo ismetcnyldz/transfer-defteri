@@ -136,6 +136,28 @@ main{padding-block:0 110px}
 .name{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .meta{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.rtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--surface2);padding:5px;border-radius:14px;margin-bottom:4px}
+.rtabs button{font:inherit;font-weight:800;font-size:14px;border:0;border-radius:10px;padding:10px 6px;background:transparent;color:var(--tc);display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
+.rtabs button svg.i{width:17px;height:17px}
+.rtabs button[aria-selected="true"]{background:var(--tc);color:#fff;box-shadow:0 4px 12px color-mix(in srgb,var(--tc) 40%,transparent)}
+.lgsum{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lgsum div{border-radius:14px;padding:12px 14px;background:var(--surface);border:1px solid var(--line)}
+.lgsum small{display:block;font-size:12px;font-weight:700;color:var(--muted)}
+.lgsum b{font-size:18px}
+.lgadd{padding:12px!important;display:grid;gap:12px}
+.kindseg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kindseg button{font:inherit;font-weight:800;font-size:16px;border:2px solid var(--line);background:transparent;color:var(--fg);border-radius:12px;padding:11px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
+.kindseg .kexp[aria-checked="true"]{background:var(--bad);border-color:var(--bad);color:#fff}
+.kindseg .kinc[aria-checked="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.catgrid{display:flex;flex-wrap:wrap;gap:7px}
+.catgrid button{font:inherit;font-size:14px;font-weight:700;border:1.5px solid var(--line);background:var(--surface2);color:var(--fg);border-radius:999px;padding:8px 13px;cursor:pointer}
+.catgrid button[aria-checked="true"]{background:var(--c-orange);border-color:var(--c-orange);color:#fff}
+.amtrow{display:grid;grid-template-columns:1fr auto;gap:8px}
+.amtrow input,.amtrow select{font:inherit;font-size:22px;font-weight:800;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg);color:var(--fg);min-width:0}
+.amtrow select{font-size:16px}
+.lgadd .row2{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.lgadd .row2 .f{border-top:0}
+.lglist .pay{border-radius:12px;background:var(--surface);border:1px solid var(--line);margin-bottom:6px;padding:10px 12px}
 .chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);letter-spacing:.02em;display:inline-flex;align-items:center;gap:4px}
 .chip svg.i{width:12px;height:12px;flex:none}
 .nband .t svg.i,.band .t svg.i{vertical-align:-3px}
@@ -585,6 +607,12 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
     <button class="lnk" id="repShare">Paylaş</button>
   </div></div>
   <div class="sheet-body gut">
+    <div class="rtabs" role="tablist" aria-label="Rapor bölümleri">
+      <button role="tab" data-rt="rep" aria-selected="true" style="--tc:var(--c-blue)"><svg class="i" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Rapor</button>
+      <button role="tab" data-rt="kasa" aria-selected="false" style="--tc:var(--c-orange)"><svg class="i" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M8 7h8M8 11h6"/></svg>Kasa</button>
+      <button role="tab" data-rt="clean" aria-selected="false" style="--tc:var(--c-violet)"><svg class="i" viewBox="0 0 24 24"><path d="m13 11 9-9M14.6 9.4l-3.8-3.8a1.5 1.5 0 0 0-2.1 0L2 12.3l9.7 9.7 6.7-6.7a1.5 1.5 0 0 0 0-2.1z"/><path d="m6.5 8 9.5 9.5"/></svg>Temizlik</button>
+    </div>
+    <div id="repPeriod">
     <div class="segs" id="repSegs">
       <button data-p="month" aria-pressed="true">Bu ay</button>
       <button data-p="last">Geçen ay</button>
@@ -595,24 +623,34 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <div class="f" style="border-top:0"><label for="repFrom">Başlangıç</label><input id="repFrom" type="date"></div>
       <div class="f" style="border-top:0"><label for="repTo">Bitiş</label><input id="repTo" type="date"></div>
     </div>
+    </div>
+    <div class="rpanel" id="rp-rep">
     <div class="note" style="margin:0;text-align:left" id="repTitle"></div>
     <div class="rgrid" id="repBoxes"></div>
     <div class="rwrap"><table class="rtable" id="repTable"></table></div>
     <div class="note" style="margin:0;text-align:left">Alınan = tahsil edildi işaretli tutarlar. Ödenen = ödendi işaretli tutarlar. Kâr = alınacak − ödenecek. Net kâr = kâr − masraflar + ekstra gelirler. Para birimleri ayrı ayrı gösterilir.</div>
-    <fieldset>
-      <div class="sec-t">Gelir / Gider (masraflar)</div>
+    </div>
+    <div class="rpanel" id="rp-kasa" hidden>
+    <div class="lgsum" id="lgSum"></div>
+    <fieldset class="lgadd">
+      <div class="kindseg" role="radiogroup" aria-label="Kayıt türü">
+        <button type="button" role="radio" data-k="expense" aria-checked="true" class="kexp"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14"/></svg>Gider</button>
+        <button type="button" role="radio" data-k="income" aria-checked="false" class="kinc"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Gelir</button>
+      </div>
+      <select id="lgKind" hidden><option value="expense">Gider (masraf)</option><option value="income">Ekstra gelir</option></select>
+      <select id="lgCat" hidden><option>Yakıt</option><option>HGS / Otopark</option><option>Yıkama</option><option>Bakım / Lastik</option><option>Yemek</option><option>Şoför ücreti</option><option>Kira / Araç taksidi</option><option>Sigorta / Vergi</option><option>Telefon / İnternet</option><option>Diğer</option></select>
+      <div class="catgrid" id="lgCats" role="radiogroup" aria-label="Kategori"></div>
+      <div class="amtrow"><input id="lgAmt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Tutar" aria-label="Tutar"><select id="lgCur" aria-label="Para birimi"><option>TRY</option><option>EUR</option><option>USD</option><option>GBP</option></select></div>
       <div class="row2">
         <div class="f"><label for="lgDate">Tarih</label><input id="lgDate" type="date"></div>
-        <div class="f"><label for="lgKind">Tür</label><select id="lgKind"><option value="expense">Gider (masraf)</option><option value="income">Ekstra gelir</option></select></div>
+        <div class="f"><label for="lgNote">Açıklama</label><input id="lgNote" placeholder="isteğe bağlı"></div>
       </div>
-      <div class="row2">
-        <div class="f"><label for="lgCat">Kategori</label><select id="lgCat"><option>Yakıt</option><option>HGS / Otopark</option><option>Yıkama</option><option>Bakım / Lastik</option><option>Yemek</option><option>Şoför ücreti</option><option>Kira / Araç taksidi</option><option>Sigorta / Vergi</option><option>Telefon / İnternet</option><option>Diğer</option></select></div>
-        <div class="f"><label for="lgAmt">Tutar</label><div class="inline"><input id="lgAmt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"><select id="lgCur"><option>TRY</option><option>EUR</option><option>USD</option><option>GBP</option></select></div></div>
-      </div>
-      <div class="f"><label for="lgNote">Açıklama</label><input id="lgNote" placeholder="isteğe bağlı"></div>
-      <div class="btnrow"><button type="button" class="btn gold" id="lgAdd">Ekle</button><span class="err" id="lgErr" hidden></span></div>
-      <div id="lgList"></div>
+      <div class="btnrow"><button type="button" class="btn gold" id="lgAdd" style="flex:1">Kaydet</button><span class="err" id="lgErr" hidden></span></div>
     </fieldset>
+    <div class="sec-t" style="padding-left:2px">Bu dönemin kayıtları</div>
+    <div id="lgList" class="lglist"></div>
+    </div>
+    <div class="rpanel" id="rp-clean" hidden>
     <fieldset>
       <div class="sec-t">Eski kayıtları temizle</div>
       <div class="note" style="margin:0;text-align:left;padding:8px 14px">Eski rezervasyonlar ve fotoğrafları silinir, yer açılır. Raporlardaki rakamlar (ciro, kâr, tahsilat) ve kasa defteri silinmez, aynen kalır. Yaklaşan (ileri tarihli) kayıtlar hiçbir zaman silinmez.</div>
@@ -627,6 +665,8 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div style="display:flex;gap:10px"><button class="btn" id="delBulkNo">Vazgeç</button><button class="btn red" id="delBulkYes">Evet, sil</button></div>
       </div>
     </fieldset>
+    <div class="note" style="text-align:left">Tek tek sildiğiniz rezervasyonlar Ayarlar → Silinenler'de 30 gün durur.</div>
+    </div>
   </div>
 </div>
 
@@ -723,7 +763,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 1.6</div>
+    <div class="note">Transfer Defteri · sürüm 1.7</div>
   </div>
 </div>
 
@@ -1669,7 +1709,8 @@ function calcLedger(from,to){
 }
 function netProfit(R,Lg){const o={};new Set([...Object.keys(R.profit),...Object.keys(Lg.exp),...Object.keys(Lg.inc)]).forEach(c=>{o[c]=(R.profit[c]||0)-(Lg.exp[c]||0)+(Lg.inc[c]||0);});return o;}
 function renderLedger(from,to){
-  const {L}=calcLedger(from,to);
+  const {L,exp,inc}=calcLedger(from,to);
+  $("lgSum").innerHTML=`<div><small>Giderler</small><b style="color:var(--bad)">${esc(fmtMap(exp))}</b></div><div><small>Ekstra gelirler</small><b style="color:var(--ok)">${esc(fmtMap(inc))}</b></div>`;
   $("lgList").innerHTML=L.length?L.map(x=>`<div class="pay"><span>${esc(x.date.slice(8,10)+"."+x.date.slice(5,7))} · ${esc(x.category||"")}${x.note?" · "+esc(x.note):""}</span><b style="color:${x.kind==="income"?"var(--ok)":"var(--bad)"}">${x.kind==="income"?"+":"−"}${esc(money(x.amount,x.currency))}</b><button type="button" class="btn sm" data-lgdel="${x.id}" style="padding:4px 8px">Sil</button></div>`).join(""):'<div class="note" style="margin:0;padding:6px 14px 12px;text-align:left">Bu aralıkta gelir/gider kaydı yok.</div>';
   $("lgList").querySelectorAll("[data-lgdel]").forEach(b=>b.addEventListener("click",async()=>{const {error}=await sb.from("ledger").delete().eq("id",b.dataset.lgdel);if(error)return toast("Silinemedi");ledger=ledger.filter(x=>x.id!==b.dataset.lgdel);renderReport();}));
 }
@@ -1680,7 +1721,17 @@ $("lgAdd").addEventListener("click",async()=>{
   if(error){$("lgErr").textContent=errMsg(error);$("lgErr").hidden=false;return;}
   $("lgErr").hidden=true;ledger.unshift(data);$("lgAmt").value="";$("lgNote").value="";toast("Eklendi");renderReport();
 });
-$("lgKind").addEventListener("change",()=>{const inc=$("lgKind").value==="income";$("lgCat").innerHTML=(inc?["Ekstra transfer","Tur komisyonu","Bahşiş","Diğer gelir"]:["Yakıt","HGS / Otopark","Yıkama","Bakım / Lastik","Yemek","Şoför ücreti","Kira / Araç taksidi","Sigorta / Vergi","Telefon / İnternet","Diğer"]).map(c=>`<option>${c}</option>`).join("");});
+$("lgKind").addEventListener("change",()=>{const inc=$("lgKind").value==="income";$("lgCat").innerHTML=(inc?["Ekstra transfer","Tur komisyonu","Bahşiş","Diğer gelir"]:["Yakıt","HGS / Otopark","Yıkama","Bakım / Lastik","Yemek","Şoför ücreti","Kira / Araç taksidi","Sigorta / Vergi","Telefon / İnternet","Diğer"]).map(c=>`<option>${c}</option>`).join("");renderCats();});
+/* kasa: tür ve kategori düğmeleri */
+function renderCats(){const cur=$("lgCat").value;$("lgCats").innerHTML=[...$("lgCat").options].map(o=>`<button type="button" role="radio" aria-checked="${o.value===cur}">${esc(o.value)}</button>`).join("");
+  $("lgCats").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{$("lgCat").value=b.textContent;renderCats();}));}
+document.querySelectorAll(".kindseg button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".kindseg button").forEach(x=>x.setAttribute("aria-checked",x===b?"true":"false"));$("lgKind").value=b.dataset.k;$("lgKind").dispatchEvent(new Event("change"));}));
+renderCats();
+/* rapor sekmeleri */
+let repTab="rep";
+function setRepTab(t){repTab=t;document.querySelectorAll(".rtabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.rt===t?"true":"false"));
+  ["rep","kasa","clean"].forEach(k=>{$("rp-"+k).hidden=k!==t;});$("repPeriod").hidden=t==="clean";$("repShare").style.visibility=t==="rep"?"visible":"hidden";}
+document.querySelectorAll(".rtabs button").forEach(b=>b.addEventListener("click",()=>setRepTab(b.dataset.rt)));
 function renderReport(){
   const r=repRange();$("repRange").hidden=repP!=="custom";
   const list=legs().filter(b=>b.date>=r.from&&b.date<=r.to);
