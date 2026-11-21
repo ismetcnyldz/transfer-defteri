@@ -96,7 +96,7 @@ svg.i{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-l
 .toast b{display:block;font-size:14.5px}
 .toast span{font-size:13px;color:var(--muted)}
 @keyframes drop{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}
-@media (max-width:520px){.brow{grid-template-columns:48px 1fr auto}.brow .f{display:none}.toast{margin-right:0}}
+@media (max-width:520px){.brow{grid-template-columns:48px 1fr auto}.brow .f{display:none}.toast{margin-right:0}.brow:nth-child(n+5){display:none}.hero-art{padding-bottom:44px}}
 @media (prefers-reduced-motion:reduce){.brow,.toast{animation:none}html{scroll-behavior:auto}}
 
 /* towns strip */
@@ -105,65 +105,48 @@ svg.i{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-l
 .towns .wrap span{display:inline-flex;align-items:center;gap:8px}
 .towns svg{width:18px;height:18px}
 
-section{padding:96px 0}
-@media (max-width:700px){section{padding:68px 0}}
+section{padding:84px 0}
+@media (max-width:700px){section{padding:56px 0}}
 .sec-head{max-width:760px;margin-bottom:48px}
 .sec-head .lead{margin-top:16px}
 
-/* steps (a real sequence) */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;counter-reset:s}
-.step{position:relative}
-.step .no{font-family:var(--display);font-weight:800;font-size:64px;line-height:1;color:var(--c);letter-spacing:-.04em}
-.step h3{margin-top:10px}
-.step p{color:var(--muted);margin-top:8px}
-.phone{margin-top:22px;border-radius:34px;padding:9px;background:var(--ink);box-shadow:0 24px 60px rgba(13,27,62,.22);max-width:300px}
-.phone .scr{border-radius:26px;overflow:hidden;aspect-ratio:9/16;background:#0b1430}
-.phone img{width:100%;height:auto}
-@media (max-width:900px){.steps{grid-template-columns:1fr;gap:56px}.phone{max-width:320px}}
+/* how: step tabs + one phone */
+.how .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.how .lead{margin-top:14px}
+.tabs{list-style:none;padding:0;margin:30px 0 0;display:grid;gap:10px;counter-reset:st}
+.tabs button{counter-increment:st;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;display:grid;grid-template-columns:44px 1fr;column-gap:14px;align-items:center;padding:14px 16px;border-radius:16px;border:0;background:transparent;box-shadow:inset 0 0 0 1.5px var(--line);transition:background .2s,box-shadow .2s}
+.tabs button::before{content:counter(st);grid-row:span 2;width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:22px;background:color-mix(in srgb,var(--c) 16%,#fff);color:var(--ink)}
+.tabs button b{font-family:var(--display);font-size:19px;letter-spacing:-.01em}
+.tabs button span{color:var(--muted);font-size:15px}
+.tabs button[aria-selected="true"]{background:#fff;box-shadow:inset 0 0 0 2px var(--c),0 10px 30px rgba(13,27,62,.08)}
+.tabs button[aria-selected="true"]::before{background:var(--c);color:#fff}
+.phone{border-radius:38px;padding:10px;background:var(--ink);box-shadow:0 30px 70px rgba(13,27,62,.25);width:100%;max-width:320px;justify-self:center}
+.phone .scr{border-radius:29px;overflow:hidden;aspect-ratio:585/1266;background:#0b1430}
+.phone img{width:100%;height:100%;object-fit:cover;transition:opacity .25s}
+@media (max-width:860px){.how .wrap{grid-template-columns:1fr;gap:32px}.phone{max-width:250px}.tabs{margin-top:22px}.tabs button{padding:11px 12px}.tabs button b{font-size:17px}}
 
-/* features: ruled list, not cards */
+/* features: compact grid */
 .feat{background:var(--paper)}
-.flist{display:grid;grid-template-columns:repeat(2,1fr);column-gap:56px;border-top:1px solid var(--line)}
-.fi{display:grid;grid-template-columns:54px 1fr;gap:18px;padding:26px 0;border-bottom:1px solid var(--line)}
-.fi .ic{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:var(--c);color:#fff}
-.fi .ic svg{width:26px;height:26px}
-.fi p{color:var(--muted);margin-top:6px;font-size:16px}
-@media (max-width:760px){.flist{grid-template-columns:1fr}}
+.feat h2{max-width:20ch;margin-bottom:40px}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px 40px}
+.fi .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--c);color:#fff;margin-bottom:14px}
+.fi .ic svg{width:23px;height:23px}
+.fi h3{font-size:19px}
+.fi p{color:var(--muted);margin-top:4px;font-size:15.5px;line-height:1.5}
+@media (max-width:860px){.fgrid{grid-template-columns:1fr 1fr;gap:26px 18px}.fi h3{font-size:17px}.fi p{font-size:14.5px}}
 
-/* money split */
-.money .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
-.money ul{list-style:none;padding:0;margin:28px 0 0;display:grid;gap:16px}
-.money li{display:grid;grid-template-columns:28px 1fr;gap:12px;font-size:17px}
-.money li svg{width:24px;height:24px;color:var(--mint);margin-top:2px}
-.money .shots{display:flex;gap:18px;justify-content:center}
-.money .shots .phone{margin-top:0;max-width:260px}
-.money .shots .phone:last-child{margin-top:60px}
-@media (max-width:900px){.money .wrap{grid-template-columns:1fr;gap:40px}.money .shots .phone{max-width:44vw}}
-
-/* languages band */
-.langs{background:var(--bloom);color:#fff;padding:72px 0}
-.langs .wrap{display:grid;grid-template-columns:1fr 1.3fr;gap:48px;align-items:center}
-.langs h2{font-size:clamp(30px,4.4vw,46px)}
-.langs p{color:#ffe3ee;margin-top:14px}
-.hello{display:grid;gap:12px}
-.hello div{background:rgba(255,255,255,.14);border-radius:14px;padding:14px 18px;font-family:var(--display);font-weight:700;font-size:clamp(19px,2.4vw,24px);display:flex;align-items:center;gap:14px}
-.hello span{font-family:var(--body);font-size:13px;font-weight:700;background:#fff;color:var(--bloom);border-radius:8px;padding:3px 8px;flex:none}
-@media (max-width:860px){.langs .wrap{grid-template-columns:1fr}}
-
-/* pricing */
+/* pricing + cta */
 .price{background:var(--ink);color:#fff}
-.price .lead{color:#c9d6ee}
-.plans{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:860px}
-.plan{border-radius:22px;padding:30px;background:var(--ink2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.price .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.price .lead{color:#c9d6ee;margin:14px 0 26px}
+.price .tel{margin-top:14px;color:#9fb2d6}.price .tel a{color:#fff;font-weight:700;text-decoration:none}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.plan{border-radius:20px;padding:24px 22px;background:var(--ink2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
 .plan.hi{background:var(--sun);color:#2a1d00;box-shadow:none}
-.plan .nm{font-weight:700;font-size:16px;opacity:.85}
-.plan .amt{font-family:var(--display);font-weight:800;font-size:58px;letter-spacing:-.03em;line-height:1;margin-top:10px}
-.plan .amt small{font-size:18px;font-weight:700;letter-spacing:0;opacity:.75}
-.plan ul{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:9px;font-size:16px}
-.plan li{display:flex;gap:10px}.plan li svg{width:20px;height:20px;flex:none;margin-top:3px}
-.trial{margin-top:26px;display:inline-flex;gap:10px;align-items:center;background:rgba(34,197,139,.16);color:#7df0c2;font-weight:700;padding:10px 16px;border-radius:12px}
-.trial svg{width:20px;height:20px}
-@media (max-width:700px){.plans{grid-template-columns:1fr}}
+.plan .nm{font-weight:700;font-size:15px;opacity:.85}
+.plan .amt{font-family:var(--display);font-weight:800;font-size:clamp(30px,4vw,44px);letter-spacing:-.03em;line-height:1.05;margin-top:8px;white-space:nowrap}
+.plan .per{font-size:14px;opacity:.75;margin-top:4px}
+@media (max-width:860px){.price .wrap{grid-template-columns:1fr;gap:30px}}
 
 /* faq */
 .faq .wrap{max-width:860px}
@@ -174,11 +157,6 @@ summary::after{content:"";width:12px;height:12px;border-right:2.5px solid var(--
 details[open] summary::after{transform:rotate(-135deg)}
 details p{color:var(--muted);padding:0 0 20px;max-width:68ch}
 
-/* final cta */
-.final{background:var(--sun);color:#2a1d00;padding:80px 0}
-.final .wrap{display:flex;flex-wrap:wrap;gap:28px;align-items:center;justify-content:space-between}
-.final h2{font-size:clamp(32px,5vw,54px);max-width:16ch}
-.final p{margin-top:12px;font-size:18px}
 footer{background:var(--ink);color:#9fb2d6;font-size:15px;padding:34px 0}
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center}
 footer a{color:#fff;text-decoration:none;font-weight:600}
@@ -204,7 +182,7 @@ footer .sp{margin-left:auto}
       <p class="lead">Antalya'daki VIP transfer ve tur firmaları için rezervasyon uygulaması. Müşteriniz formu kendi dilinde doldurur, kayıt telefonunuza düşer, onay mesajı WhatsApp'tan tek dokunuşla gider.</p>
       <div class="cta">
         <a class="btn btn-wa wa-link" href="https://wa.me/905455260007" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>30 gün ücretsiz deneyin</a>
-        <a class="btn btn-ghost" href="#nasil">Nasıl çalıştığını görün</a>
+        <a class="btn btn-ghost" href="#fiyat">Fiyatlar</a>
       </div>
       <p class="note"><b>Kurulum yok, kart istenmez.</b> Hesabınızı WhatsApp'tan açıyoruz.</p>
     </div>
@@ -228,86 +206,48 @@ footer .sp{margin-left:auto}
   </div>
 </div>
 
-<section id="nasil" aria-labelledby="h-nasil">
+<section id="nasil" class="how" aria-labelledby="h-nasil">
   <div class="wrap">
-    <div class="sec-head">
+    <div class="how-txt">
       <h2 id="h-nasil">Müşteri yazar, siz onaylarsınız</h2>
-      <p class="lead">WhatsApp'ta isim, otel, uçuş kodu sormakla vakit kaybetmeyin. Üç adımda rezervasyon tamam.</p>
+      <p class="lead">İsim, otel, uçuş kodu sormakla vakit kaybetmeyin. Dört adımda bütün iş.</p>
+      <ol class="tabs" role="tablist" aria-label="Nasıl çalışır">
+        <li><button role="tab" aria-selected="true" aria-controls="howImg" data-img="form" data-alt="Müşterinin İngilizce rezervasyon formu" style="--c:var(--sea)"><b>Linki gönderin</b><span>Müşteri formu 4 dilde kendisi doldurur.</span></button></li>
+        <li><button role="tab" aria-selected="false" aria-controls="howImg" data-img="flash" data-alt="Yeni rezervasyon bildirimi ve liste" style="--c:var(--bloom)"><b>Kayıt listenize düşer</b><span>Uygulama sesli haber verir.</span></button></li>
+        <li><button role="tab" aria-selected="false" aria-controls="howImg" data-img="confirm" data-alt="Rezervasyonu onaylama ekranı" style="--c:var(--mint)"><b>Tek dokunuşla onaylayın</b><span>Onay mesajı müşterinin dilinde WhatsApp'tan gider.</span></button></li>
+        <li><button role="tab" aria-selected="false" aria-controls="howImg" data-img="rep" data-alt="Aylık rapor ekranı" style="--c:var(--sun)"><b>Ay sonu hesap hazır</b><span>Alınan, bekleyen, ödenen ve kâr tek ekranda.</span></button></li>
+      </ol>
     </div>
-    <div class="steps">
-      <div class="step" style="--c:var(--sea)"><div class="no">1</div><h3>Linki gönderin</h3><p>"Link gönder"e basın, WhatsApp açılır. Müşteriye rezervasyon formunuzun linki ve havalimanı karşılama sayfanız gider.</p><div class="phone"><div class="scr"><img src="site/img/form.webp" alt="Müşterinin İngilizce rezervasyon formu" loading="lazy" width="585" height="1266"></div></div></div>
-      <div class="step" style="--c:var(--bloom)"><div class="no">2</div><h3>Kayıt listenize düşer</h3><p>Müşteri adını, otelini, uçuş kodunu ve yolcuları kendisi yazar. Telefonunuz sesli haber verir, kayıt listenin başına gelir.</p><div class="phone"><div class="scr"><img src="site/img/flash.webp" alt="Yeni rezervasyon bildirimi ve rezervasyon listesi" loading="lazy" width="585" height="1266"></div></div></div>
-      <div class="step" style="--c:var(--sun)"><div class="no">3</div><h3>Tek dokunuşla onaylayın</h3><p>Fiyatı girin, "Onaylandı"ya basın. Müşteriye kendi dilinde hazır WhatsApp onay mesajı açılır, siz sadece gönderirsiniz.</p><div class="phone"><div class="scr"><img src="site/img/confirm.webp" alt="Rezervasyonu onaylama ve WhatsApp onay mesajı" loading="lazy" width="585" height="1266"></div></div></div>
-    </div>
+    <div class="phone"><div class="scr"><img id="howImg" src="site/img/form.webp" alt="Müşterinin İngilizce rezervasyon formu" width="585" height="1266"></div></div>
   </div>
 </section>
 
 <section class="feat" id="ozellikler" aria-labelledby="h-oz">
   <div class="wrap">
-    <div class="sec-head">
-      <h2 id="h-oz">İşinizin her parçası için bir yer</h2>
-      <p class="lead">Defter, not kâğıdı, hesap makinesi ve WhatsApp arasında kaybolan her şey tek uygulamada.</p>
-    </div>
-    <div class="flist">
-      <div class="fi"><span class="ic" style="--c:var(--sea)"><svg class="i" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span><div><h3>4 dilde müşteri formu</h3><p>İngilizce, Almanca, Rusça ve Türkçe. Uçuş kodu ve tüm yolcuların isimleri zorunlu, eksik bilgiyle kayıt gelmez.</p></div></div>
-      <div class="fi"><span class="ic" style="--c:var(--bloom)"><svg class="i" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></span><div><h3>Sesli bildirim</h3><p>Linkten yeni rezervasyon gelince uygulama zil çalar ve "Yeni rezervasyon" diye sesli söyler.</p></div></div>
-      <div class="fi"><span class="ic" style="--c:var(--mint)"><svg class="i" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/><path d="m9 12 2 2 4-4"/></svg></span><div><h3>WhatsApp onay mesajı</h3><p>Tarih, uçuş, otel, yolcular ve fiyat müşterinin dilinde hazır yazılır. Siz sadece "Gönder"e basarsınız.</p></div></div>
-      <div class="fi"><span class="ic" style="--c:#ff7a1a"><svg class="i" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span><div><h3>Havalimanı karşılama sayfası</h3><p>Müşteri sizi nerede bulacağını İngilizce ya da Almanca okur, fotoğrafını ve videosunu izler.</p></div></div>
-      <div class="fi"><span class="ic" style="--c:#7c3aed"><svg class="i" viewBox="0 0 24 24"><path d="M2 22h20"/><path d="M6.4 17.4 3.5 13l2.2-1 2.9 1.4 3.6-2.2L6 6.5l2.6-1.2 7.7 3.3 3.3-1.6a2 2 0 0 1 1.7 3.6L8.6 16.9z"/></svg></span><div><h3>Gidiş-dönüş tek kayıtta</h3><p>Dönüş, tarihi yaklaşınca listede kendiliğinden belirir. Dönüş ödemesi ayrı takip edilir.</p></div></div>
-      <div class="fi"><span class="ic" style="--c:var(--sun);color:#2a1d00"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span><div><h3>2 saat önceden hatırlatma</h3><p>Saati yaklaşan transferler listenin en üstünde uyarı olarak çıkar, hiçbir karşılama unutulmaz.</p></div></div>
-      <div class="fi"><span class="ic" style="--c:#2563eb"><svg class="i" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span><div><h3>Tahsilat ve ödeme takibi</h3><p>Kimden ne alacağınız, şoföre ya da acentaya ne ödeyeceğiniz her kaydın üzerinde görünür.</p></div></div>
-      <div class="fi"><span class="ic" style="--c:#0d9488"><svg class="i" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><div><h3>Kayıtlar bulutta</h3><p>Telefon değişse ya da kaybolsa da kayıtlar gitmez. Yanlışlıkla sildiğiniz kaydı 30 gün içinde geri alırsınız.</p></div></div>
+    <h2 id="h-oz">Defter, not kâğıdı ve hesap makinesi tek uygulamada</h2>
+    <div class="fgrid">
+      <div class="fi"><span class="ic" style="--c:var(--sea)"><svg class="i" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span><h3>4 dilde form</h3><p>İngilizce, Almanca, Rusça, Türkçe. Eksik bilgiyle kayıt gelmez.</p></div>
+      <div class="fi"><span class="ic" style="--c:#ff7a1a"><svg class="i" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span><h3>Karşılama sayfası</h3><p>Müşteri sizi havalimanında fotoğraf ve videoyla bulur.</p></div>
+      <div class="fi"><span class="ic" style="--c:#7c3aed"><svg class="i" viewBox="0 0 24 24"><path d="M2 22h20"/><path d="M6.4 17.4 3.5 13l2.2-1 2.9 1.4 3.6-2.2L6 6.5l2.6-1.2 7.7 3.3 3.3-1.6a2 2 0 0 1 1.7 3.6L8.6 16.9z"/></svg></span><h3>Gidiş-dönüş</h3><p>Tek kayıtta; dönüş günü yaklaşınca listede belirir.</p></div>
+      <div class="fi"><span class="ic" style="--c:#2563eb"><svg class="i" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span><h3>Para takibi</h3><p>Kimden ne alacağınız, kime ne ödeyeceğiniz her kayıtta.</p></div>
+      <div class="fi"><span class="ic" style="--c:var(--sun);color:#2a1d00"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span><h3>Hatırlatma</h3><p>Saati yaklaşan transfer listenin başında uyarı olur.</p></div>
+      <div class="fi"><span class="ic" style="--c:#0d9488"><svg class="i" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><h3>Kayıtlar bulutta</h3><p>Telefon değişse de kaybolmaz. Silineni 30 gün geri alırsınız.</p></div>
     </div>
   </div>
 </section>
-
-<section class="money" aria-labelledby="h-para">
-  <div class="wrap">
-    <div>
-      <h2 id="h-para">Ay sonunda hesap hazır</h2>
-      <p class="lead" style="margin-top:16px">Alınan, bekleyen, ödenen ve kalan kâr tek ekranda. Yakıt, yıkama, köprü gibi masrafları da yazın, net kârı görün.</p>
-      <ul>
-        <li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Bu ay, geçen ay, bu yıl ya da istediğiniz tarih aralığı</span></li>
-        <li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Euro, dolar, sterlin ve TL ayrı ayrı toplanır</span></li>
-        <li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Raporu tek dokunuşla WhatsApp'tan paylaşın</span></li>
-        <li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Eski kayıtları silseniz de rapor rakamları korunur</span></li>
-      </ul>
-    </div>
-    <div class="shots">
-      <div class="phone"><div class="scr"><img src="site/img/list.webp" alt="Rezervasyon listesi: bugünkü transferler ve bekleyen tahsilat" loading="lazy" width="585" height="1266"></div></div>
-      <div class="phone"><div class="scr"><img src="site/img/rep.webp" alt="Aylık rapor: alınan, bekleyen, ödenen, kâr" loading="lazy" width="585" height="1266"></div></div>
-    </div>
-  </div>
-</section>
-
-<div class="langs" aria-labelledby="h-dil">
-  <div class="wrap">
-    <div>
-      <h2 id="h-dil">Müşteriniz hangi dili konuşursa</h2>
-      <p>Form, onay mesajı ve karşılama sayfası müşterinin dilinde. Telefon numarasından dili kendisi tahmin eder.</p>
-    </div>
-    <div class="hello" lang="en">
-      <div><span>EN</span>Your transfer is confirmed</div>
-      <div lang="de"><span>DE</span>Ihr Transfer ist bestätigt</div>
-      <div lang="ru"><span>RU</span>Ваш трансфер подтверждён</div>
-      <div lang="tr"><span>TR</span>Transferiniz onaylandı</div>
-    </div>
-  </div>
-</div>
 
 <section class="price" id="fiyat" aria-labelledby="h-fiyat">
   <div class="wrap">
-    <div class="sec-head">
-      <h2 id="h-fiyat">Bir transferin kârından az</h2>
-      <p class="lead">Tüm özellikler her iki planda da aynı. İstediğiniz zaman bırakırsınız.</p>
+    <div class="price-txt">
+      <h2 id="h-fiyat">İlk 30 gün ücretsiz</h2>
+      <p class="lead">Kurulum yok, ödeme bilgisi istenmez. Beğenirseniz devam edersiniz; tüm özellikler iki planda da aynı.</p>
+      <a class="btn btn-wa wa-link" href="https://wa.me/905455260007" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>WhatsApp'tan hesap açın</a>
+      <p class="tel">veya arayın: <a href="tel:+905455260007">0545 526 00 07</a></p>
     </div>
     <div class="plans">
-      <div class="plan"><div class="nm">Aylık</div><div class="amt">250 TL <small>/ ay</small></div>
-        <ul><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Sınırsız rezervasyon</li><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Müşteri formu ve karşılama sayfası</li><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Raporlar ve kasa defteri</li></ul></div>
-      <div class="plan hi"><div class="nm">Yıllık</div><div class="amt">3000 TL <small>/ yıl</small></div>
-        <ul><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Aylık planın her şeyi</li><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Yılda tek ödeme</li><li><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Her ay ödeme derdi yok</li></ul></div>
+      <div class="plan"><div class="nm">Aylık</div><div class="amt">250 TL</div><div class="per">her ay</div></div>
+      <div class="plan hi"><div class="nm">Yıllık</div><div class="amt">3000 TL</div><div class="per">yılda tek ödeme</div></div>
     </div>
-    <div class="trial"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg>İlk 30 gün ücretsiz, ödeme bilgisi istenmez</div>
   </div>
 </section>
 
@@ -316,19 +256,14 @@ footer .sp{margin-left:auto}
     <div class="sec-head"><h2 id="h-sss">Sık sorulanlar</h2></div>
     <details><summary>Uygulamayı nereden indiriyorum?</summary><p>İndirmenize gerek yok. Size verdiğimiz kullanıcı adı ve şifreyle transferdefteri.net/app adresinden girersiniz. Telefonda "Ana ekrana ekle" derseniz uygulama gibi simgesiyle açılır.</p></details>
     <details><summary>Müşteri bu sayfada ödeme yapıyor mu?</summary><p>Hayır. Müşteri sadece bilgilerini yazar. Fiyatı ve ödemeyi siz belirler, siz alırsınız. Uygulama yalnızca kimden ne alacağınızı takip eder.</p></details>
-    <details><summary>Müşterinin bilgisi eksik gelirse?</summary><p>Formda uçuş kodu, tarih, saat, otel ve tüm yolcuların isimleri zorunlu. Yine de yanlış bir şey varsa kaydı açıp düzeltirsiniz.</p></details>
+    
     <details><summary>Telefonum değişirse kayıtlarım ne olur?</summary><p>Kayıtlar telefonda değil bulutta saklanır. Yeni telefondan aynı kullanıcı adıyla girdiğinizde hepsi yerinde olur.</p></details>
-    <details><summary>Bilgisayardan da kullanabilir miyim?</summary><p>Evet. Aynı adresten bilgisayarda, tablette ve telefonda aynı anda kullanabilirsiniz. Bir cihazda eklenen kayıt diğerinde hemen görünür.</p></details>
+    
     <details><summary>30 gün bitince ne oluyor?</summary><p>Devam etmek isterseniz aylık 250 TL ya da yıllık 3000 TL ödersiniz. İstemezseniz hiçbir şey yapmanız gerekmez, hesabınız kendiliğinden durur.</p></details>
   </div>
 </section>
 
-<section class="final" aria-labelledby="h-son">
-  <div class="wrap">
-    <div><h2 id="h-son">Bu sezonu defterle değil, Transfer Defteri'yle açın</h2><p>WhatsApp'tan yazın, hesabınızı aynı gün açalım.</p></div>
-    <a class="btn btn-ink wa-link" href="https://wa.me/905455260007" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>WhatsApp'tan yazın</a>
-  </div>
-</section>
+
 </main>
 
 <footer>
@@ -340,6 +275,11 @@ footer .sp{margin-left:auto}
   </div>
 </footer>
 <script>
+/* nasıl çalışır: adım seçince ekran değişsin */
+(function(){var img=document.getElementById("howImg");var bs=[].slice.call(document.querySelectorAll(".tabs button"));
+bs.forEach(function(b,i){b.addEventListener("click",function(){bs.forEach(function(x){x.setAttribute("aria-selected",x===b?"true":"false");});img.style.opacity=0;setTimeout(function(){img.src="site/img/"+b.dataset.img+".webp";img.alt=b.dataset.alt;img.style.opacity=1;},150);});
+b.addEventListener("keydown",function(e){var k=e.key==="ArrowDown"||e.key==="ArrowRight"?1:e.key==="ArrowUp"||e.key==="ArrowLeft"?-1:0;if(k){e.preventDefault();var n=bs[(i+k+bs.length)%bs.length];n.focus();n.click();}});});
+["flash","confirm","rep"].forEach(function(n){var im=new Image();im.src="site/img/"+n+".webp";});})();
 /* WhatsApp bağlantılarına hazır mesaj */
 document.querySelectorAll(".wa-link").forEach(function(a){a.href="https://wa.me/905455260007?text="+encodeURIComponent("Merhaba, Transfer Defteri'ni 30 gün ücretsiz denemek istiyorum.");});
 /* oturumu açık olan firmalar için giriş düğmesi */
