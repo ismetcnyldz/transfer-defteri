@@ -82,6 +82,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ico svg{width:20px;height:20px}
 #btnAdmin{background:linear-gradient(160deg,var(--c-blue),var(--c-blue2))}
 #btnReports{background:linear-gradient(160deg,var(--c-violet),var(--c-violet2))}
+#btnKasa{background:linear-gradient(160deg,#f97316,#ea580c)}
 #btnSettings{background:linear-gradient(160deg,var(--c-teal),var(--c-teal2))}
 #btnPlaces{background:linear-gradient(160deg,var(--c-orange),#c2410c)}
 #btnLink{background:linear-gradient(160deg,var(--c-green),var(--c-green2))!important;color:#fff!important}
@@ -383,6 +384,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <button class="ico" id="btnLink" aria-label="Müşteriye rezervasyon linki gönder" hidden style="background:var(--ok-soft);color:var(--ok)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg><span>Link gönder</span></button>
       <button class="ico" id="btnAdmin" aria-label="Firma ekle ve yönet" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M19 8v6M16 11h6"/></svg><span>Firma ekle</span><span class="dot" id="adminDot" hidden></span></button>
       <button class="ico" id="btnPlaces" aria-label="Oteller ve yerler" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M8 8h2M8 12h2M8 16h2M17 14h1M17 18h1M3 21h18"/></svg><span>Oteller</span></button>
+      <button class="ico" id="btnKasa" aria-label="Kasa defteri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M8 7h8M8 11h6"/></svg><span>Kasa</span></button>
       <button class="ico" id="btnReports" aria-label="Raporlar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Raporlar</span></button>
       <button class="ico" id="btnSettings" aria-label="Ayarlar ve müşteri linki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ayarlar</span></button></div>
     </div>
@@ -603,7 +605,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 <div id="repSheet" class="sheet" hidden>
   <div class="sheet-hdr"><div class="in gut">
     <button class="lnk quiet" id="repClose">Kapat</button>
-    <h2>Raporlar</h2>
+    <h2 id="repH">Raporlar</h2>
     <button class="lnk" id="repShare">Paylaş</button>
   </div></div>
   <div class="sheet-body gut">
@@ -763,7 +765,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 1.7</div>
+    <div class="note">Transfer Defteri · sürüm 1.8</div>
   </div>
 </div>
 
@@ -1756,7 +1758,13 @@ function renderReport(){
   window.__rep={r,R,Lg,NP};
 }
 async function openReports(){$("repSheet").hidden=false;document.body.style.overflow="hidden";$("delBulkConfirm").hidden=true;if(!$("lgDate").value)$("lgDate").value=todayStr();if(!ledgerLoaded){await loadLedger();}if(!$("repFrom").value){const n=new Date();$("repFrom").value=ymd(new Date(n.getFullYear(),n.getMonth(),1));$("repTo").value=ymd(n);}renderReport();}
-$("btnReports").addEventListener("click",openReports);
+/* Kasa ayrı: aynı ekran, sadece kasa bölümü */
+function repMode(m){const kasa=m==="kasa";$("repH").textContent=kasa?"Kasa":"Raporlar";
+  document.querySelector('.rtabs button[data-rt="kasa"]').hidden=true;
+  document.querySelector(".rtabs").hidden=kasa;document.querySelector(".rtabs").style.gridTemplateColumns="1fr 1fr";
+  setRepTab(kasa?"kasa":"rep");}
+$("btnReports").addEventListener("click",async()=>{await openReports();repMode("rep");});
+$("btnKasa").addEventListener("click",async()=>{await openReports();repMode("kasa");});
 $("repClose").addEventListener("click",()=>{$("repSheet").hidden=true;document.body.style.overflow="";});
 $("repSegs").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{repP=b.dataset.p;$("repSegs").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));renderReport();}));
 $("repFrom").addEventListener("change",renderReport);$("repTo").addEventListener("change",renderReport);
