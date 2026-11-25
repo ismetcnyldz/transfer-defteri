@@ -37,3 +37,8 @@ Bu dosya yeni bir Claude sohbetinde kaldığımız yerden devam etmek için öze
 - Ayarlar: kullanıcı adı değiştirme (change_username RPC), yetkili adı, e-posta, adres, web/instagram.
 - Güvenlik: companies_protect tetikleyicisi — firmalar plan/bitiş/durum/kullanıcı adını REST ile değiştiremez (supabase/008_account.sql).
 - Admin panelinde firma kaydedince firma adı artık ezilmiyor.
+
+## 25 Kasım 2026
+- 3D ikonlar (app/ic3d/*.webp), 3D amblem rozeti, uygulama simgesi, giriş ekranı fotoğrafı.
+- Kendi kendine üyelik: public_signup RPC (supabase/009_signup.sql), /app/#kayit.
+- Şoförler (settings.drivers), rezervasyona şoför atama + "Şoföre gönder", "Günün işlerini paylaş" (bugün/yarın, şoföre göre), Flightradar24 uçuş takip linki, acenta linki (?a=Ad → bookings.agent). supabase/010_drivers.sql.

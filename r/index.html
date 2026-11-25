@@ -267,7 +267,7 @@ $("form").addEventListener("submit",async e=>{
   if(namesBad){E.textContent=t.err_names;E.hidden=false;(others.find(i=>i.value.trim().length<2)||E).scrollIntoView({block:"center"});return;}
   const passengers=[{type:"adult",name:(first+" "+last).trim()}].concat(others.map(i=>({type:i.dataset.type,name:i.value.trim().replace(/\s+/g," "),age:i.dataset.age||""})));
   const ret=$("retSw").getAttribute("aria-checked")==="true";
-  const payload={first_name:first,last_name:last,phone:$("cc").value+" "+$("phone").value.trim(),email:$("email").value.trim(),language:lang,date,time,flight:$("flight").value.trim().toUpperCase(),
+  const payload={agent:(new URLSearchParams(location.search).get("a")||"").slice(0,60),first_name:first,last_name:last,phone:$("cc").value+" "+$("phone").value.trim(),email:$("email").value.trim(),language:lang,date,time,flight:$("flight").value.trim().toUpperCase(),
     return_date:ret?$("rdate").value:"",return_time:ret?$("rtime").value:"",return_flight:ret?$("rflight").value.trim().toUpperCase():"",
     adults:counts.adults,children:counts.children,child_ages:ages.slice(0,counts.children),infants:counts.infants,baby_seat:seat,booster:booster,luggage:counts.luggage,
     hotel,area:$("hotel").dataset.area||"",from_place:"Antalya Havalimanı (AYT) – Dış Hatlar T1",to_place:"Otel",customer_note:$("note").value.trim(),passengers};

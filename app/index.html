@@ -188,6 +188,10 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .sic svg.i{width:14px;height:14px;stroke-width:2.3}
 .sec-t.has-ic{display:flex;align-items:center;padding-top:12px}
 .i3s{width:22px;height:22px;vertical-align:-6px;margin-right:6px}
+.jobsbtn{flex:1 1 100%;display:flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:800;font-size:15px;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:12px;padding:9px 12px;cursor:pointer}
+.ftrack{float:right;font-weight:800;color:var(--c-blue);text-decoration:none;font-size:13px}
+.drvrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.drvrow b{flex:1}
 .sic3{width:30px;height:30px;margin-right:9px;flex:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}
 .cbar svg.i,.contact svg.i{width:16px;height:16px;margin-right:6px;vertical-align:-3px}
 .btn svg.i,.danger svg.i{width:17px;height:17px;vertical-align:-3px;margin-right:6px}
@@ -418,6 +422,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <div class="stat" id="stNextWrap" hidden><img class="st3" src="ic3d/hatirlatma.webp" alt=""><div class="lbl">Sıradaki</div><div class="val" id="stNext">–</div></div>
     </div>
     <div class="tools">
+      <button type="button" class="jobsbtn" id="btnJobs"><img src="ic3d/link.webp" alt="" width="26" height="26">Günün işlerini paylaş</button>
       <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="İsim, otel, telefon ara" autocomplete="off"></label>
       <div class="tabs" role="tablist">
         <button role="tab" data-tab="upcoming" aria-selected="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Yaklaşan</button>
@@ -470,7 +475,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="f"><label for="fDate">Tarih</label><input id="fDate" type="date"></div>
         <div class="f"><label for="fTime">Saat</label><input id="fTime" type="time"></div>
       </div>
-      <div class="f"><label for="fFlight">Uçuş no (isteğe bağlı)</label><input id="fFlight" placeholder="TK 1234" autocapitalize="characters"></div>
+      <div class="f"><label for="fFlight">Uçuş no (isteğe bağlı) <a class="ftrack" id="fTrack" target="_blank" rel="noopener" hidden>Uçuşu takip et ›</a></label><input id="fFlight" placeholder="TK 1234" autocapitalize="characters"></div>
       <div class="sec-t" style="border-top:1px solid var(--line);padding-top:12px">Dönüş (aynı kayıt — boş bırakılırsa tek yön)</div>
       <div class="row2">
         <div class="f" style="border-top:0"><label for="fRDate">Dönüş tarihi</label><input id="fRDate" type="date"></div>
@@ -509,7 +514,8 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="f"><label for="fFrom">Nereden</label><input id="fFrom" placeholder="Havalimanı, otel, ilçe…" autocomplete="off"></div>
         <div class="f"><label for="fTo">Nereye</label><input id="fTo" placeholder="Havalimanı, otel, ilçe…" autocomplete="off"></div>
       </div>
-      <div class="f"><label for="fVehicle">Araç / Şoför (isteğe bağlı)</label><input id="fVehicle" placeholder="Vito 07 ABC 123 · Mehmet"></div>
+      <div class="f"><label for="fDriver">Şoför</label><div class="inline"><select id="fDriver"></select><a class="btn sm" id="drvSend" target="_blank" rel="noopener" hidden>Şoföre gönder</a></div></div>
+      <div class="f"><label for="fVehicle">Araç (isteğe bağlı)</label><input id="fVehicle" placeholder="Vito 07 ABC 123"></div>
     </fieldset>
 
     <fieldset>
@@ -615,6 +621,8 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <div class="tog"><span><svg class="i" viewBox="0 0 24 24" style="vertical-align:-3px;margin-right:6px;color:var(--c-blue)"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z"/><path d="M15 3v6h6M8 13h8M8 17h5"/></svg>Rezervasyon formu linki</span><button class="sw" id="lkForm" role="switch" aria-checked="true" aria-label="Rezervasyon formu linki"></button></div>
       <div class="tog" id="lkMeetRow"><span><svg class="i" viewBox="0 0 24 24" style="vertical-align:-3px;margin-right:6px;color:var(--c-orange)"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>Karşılama sayfası<br><small style="color:var(--muted);font-weight:600">İngilizce/Almanca yazı + görsel + video</small></span><button class="sw" id="lkMeet" role="switch" aria-checked="true" aria-label="Karşılama sayfası"></button></div>
       <div class="hint" id="lkMeetNone" hidden style="padding:4px 14px 12px">Karşılama sayfanız henüz yok. Ayarlar → Havalimanı karşılama bölümünden yazı, görsel ve video ekleyin.</div>
+      <div class="f"><label for="lkAgent">Acenta / otel için ayrı link (isteğe bağlı)</label><input id="lkAgent" placeholder="örn. Sunny Tours"></div>
+      <div class="hint" style="padding:0 14px 10px">Ad yazarsanız link o acentaya özel olur; gelen rezervasyonda acentanın adı görünür.</div>
       <div class="btnrow"><a class="btn sm" id="lkMeetOpen" target="_blank" rel="noopener">Karşılama sayfasını gör</a></div>
     </fieldset>
     <fieldset>
@@ -697,6 +705,19 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 </div>
 
 <!-- ayarlar -->
+<div id="jobsSheet" class="sheet" hidden>
+  <div class="sheet-hdr"><div class="in gut">
+    <button class="lnk quiet" id="jobsClose">Kapat</button>
+    <h2>Günün işleri</h2>
+    <span></span>
+  </div></div>
+  <div class="sheet-body gut">
+    <div class="segs" id="jobsDay"><button type="button" data-d="0" aria-pressed="false">Bugün</button><button type="button" data-d="1" aria-pressed="true">Yarın</button></div>
+    <div class="f" style="border:1px solid var(--line);border-radius:12px"><label for="jobsDrv">Kime</label><select id="jobsDrv"></select></div>
+    <textarea id="jobsText" style="width:100%;min-height:300px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface);color:var(--fg);font:inherit;font-size:15px"></textarea>
+    <div class="btnrow" style="margin-bottom:40px"><a class="btn gold" id="jobsWa" target="_blank" rel="noopener" style="flex:1"><img src="ic3d/onay.webp" alt="" width="22" height="22" style="vertical-align:-6px;margin-right:6px">WhatsApp'tan gönder</a><button type="button" class="btn" id="jobsCopy">Kopyala</button></div>
+  </div>
+</div>
 <div id="trashSheet" class="sheet" hidden>
   <div class="sheet-hdr"><div class="in gut">
     <button class="lnk quiet" id="trashClose">Kapat</button>
@@ -754,6 +775,13 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <div class="btnrow"><button type="button" class="btn gold" id="mtSave">Karşılama bilgisini kaydet</button><a class="btn sm" id="mtOpen" target="_blank" rel="noopener">Sayfayı gör</a><span class="err" id="mtErr" hidden></span></div>
     </fieldset>
     <fieldset>
+      <div class="sec-t">Şoförler</div>
+      <div class="hint" style="padding:6px 14px 0">Rezervasyona şoför seçip işi tek dokunuşla şoförün WhatsApp'ına gönderirsiniz.</div>
+      <div id="drvList" style="padding:6px 14px"></div>
+      <div class="row2"><div class="f"><label for="drvName">Şoför adı</label><input id="drvName" placeholder="Mehmet"></div><div class="f"><label for="drvPhone">WhatsApp</label><input id="drvPhone" type="tel" inputmode="tel" placeholder="05xx xxx xx xx"></div></div>
+      <div class="btnrow"><button type="button" class="btn" id="drvAdd">Şoför ekle</button></div>
+    </fieldset>
+    <fieldset>
       <div class="sec-t">Silinenler</div>
       <div class="hint" style="padding:6px 14px 0">Silinen rezervasyonlar 30 gün burada durur, geri alınabilir. 30 gün sonra fotoğraflarıyla birlikte kalıcı silinir.</div>
       <div class="btnrow"><button type="button" class="btn" id="btnTrash"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>Silinenleri aç</button></div>
@@ -789,7 +817,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 2.2</div>
+    <div class="note">Transfer Defteri · sürüm 2.3</div>
   </div>
 </div>
 
@@ -1041,7 +1069,7 @@ sb.auth.onAuthStateChange((ev,s)=>{
 });
 
 /* ---------- data layer ---------- */
-const MAP={passengers:"passengers",booster:"booster",retReceiveAmount:"ret_receive_amount",retReceiveCur:"ret_receive_cur",retReceived:"ret_received",retPayAmount:"ret_pay_amount",retPayCur:"ret_pay_cur",retPaid:"ret_paid",date:"date",time:"time",flight:"flight",returnDate:"return_date",returnTime:"return_time",returnFlight:"return_flight",firstName:"first_name",lastName:"last_name",phone:"phone",email:"email",language:"language",adults:"adults",children:"children",childAges:"child_ages",infants:"infants",babySeat:"baby_seat",luggage:"luggage",hotel:"hotel",area:"area",from:"from_place",to:"to_place",vehicle:"vehicle",receiveAmount:"receive_amount",receiveCur:"receive_cur",payAmount:"pay_amount",payCur:"pay_cur",payTo:"pay_to",received:"received",paid:"paid",status:"status",reminderMin:"reminder_min",note:"note",customerNote:"customer_note",photos:"photos",source:"source",createdAt:"created_at",updatedAt:"updated_at"};
+const MAP={driverName:"driver_name",driverPhone:"driver_phone",agent:"agent",passengers:"passengers",booster:"booster",retReceiveAmount:"ret_receive_amount",retReceiveCur:"ret_receive_cur",retReceived:"ret_received",retPayAmount:"ret_pay_amount",retPayCur:"ret_pay_cur",retPaid:"ret_paid",date:"date",time:"time",flight:"flight",returnDate:"return_date",returnTime:"return_time",returnFlight:"return_flight",firstName:"first_name",lastName:"last_name",phone:"phone",email:"email",language:"language",adults:"adults",children:"children",childAges:"child_ages",infants:"infants",babySeat:"baby_seat",luggage:"luggage",hotel:"hotel",area:"area",from:"from_place",to:"to_place",vehicle:"vehicle",receiveAmount:"receive_amount",receiveCur:"receive_cur",payAmount:"pay_amount",payCur:"pay_cur",payTo:"pay_to",received:"received",paid:"paid",status:"status",reminderMin:"reminder_min",note:"note",customerNote:"customer_note",photos:"photos",source:"source",createdAt:"created_at",updatedAt:"updated_at"};
 const fromDb=r=>{const o={id:r.id};for(const k in MAP)o[k]=r[MAP[k]];if(o.time)o.time=String(o.time).slice(0,5);if(o.returnTime)o.returnTime=String(o.returnTime).slice(0,5);o.childAges=o.childAges||[];o.photos=o.photos||[];return o;};
 const toDb=o=>{const r={};for(const k in MAP){if(k==="createdAt"||k==="updatedAt")continue;let v=o[k];if(v===""||v===undefined)v=null;if(["time","returnTime","returnDate","luggage"].includes(k)&&!v)v=null;r[MAP[k]]=v;}r.company_id=company.id;return r;};
 
@@ -1232,6 +1260,8 @@ function card(b){
         ${b._leg==="arr"?`<span class="chip acc">${ic("land")}Geliş · dönüş ${esc(b.returnDate.slice(8,10)+"."+b.returnDate.slice(5,7))}</span>`:""}
         ${b._leg==="ret"?`<span class="chip info">${ic("takeoff")}Dönüş · geliş ${esc((baseOf(b).date||"").slice(8,10)+"."+(baseOf(b).date||"").slice(5,7))}</span>`:""}
         ${Number(b.reminderMin)>0?`<span class="chip" title="Hatırlatma açık">${ic("bell")}</span>`:""}
+        ${b.driverName?`<span class="chip">${ic("user")}${esc(b.driverName)}</span>`:""}
+        ${b.agent?`<span class="chip acc">${ic("building")}${esc(b.agent)}</span>`:""}
         ${b.source==="link"?`<span class="chip info">${ic("link")}Linkten geldi${b.language?" · "+(LANG[b.language]||b.language):""}</span>`:""}
       </div>
     </div>
@@ -1307,7 +1337,7 @@ function openSheet(b){
   sw("fSeat",!!b?.babySeat);sw("fBooster",!!b?.booster);
   $("fHotel").value=b?.hotel||"";$("fArea").value=b?.area||"";$("hotelHint").hidden=true;
   $("fFrom").value=b?.from||"Antalya Havalimanı (AYT) – Dış Hatlar T1";$("fTo").value=b?.to||"Otel";
-  $("fVehicle").value=b?.vehicle||"";
+  $("fVehicle").value=b?.vehicle||"";fillDrivers(b?.driverName||"",b?.driverPhone||"");updTrack();
   $("fRecv").value=b?.receiveAmount||"";$("fRecvCur").value=b?.receiveCur||"EUR";$("fPay").value=b?.payAmount||"";$("fPayCur").value=b?.payCur||"EUR";$("fPayTo").value=b?.payTo||"";
   $("fRRecv").value=b?.retReceiveAmount||"";$("fRRecvCur").value=b?.retReceiveCur||b?.receiveCur||"EUR";$("fRPay").value=b?.retPayAmount||"";$("fRPayCur").value=b?.retPayCur||b?.payCur||"EUR";
   sw("fRReceived",!!b?.retReceived);sw("fRPaid",!!b?.retPaid);syncRetPay();
@@ -1361,7 +1391,8 @@ function waHelloText(b){
           de:`Hallo ${name}, hier ist ${co} wegen Ihrer Transferbuchung am ${dt}:\n`,
           ru:`Здравствуйте, ${name}! Пишем из ${co} по поводу вашего трансфера ${dt}:\n`}[L];
 }
-const waUrl=(phone,text)=>"https://wa.me/"+digits(phone)+"?text="+encodeURIComponent(text);
+const waNum=ph=>{let d=digits(ph);if(d.startsWith("00"))d=d.slice(2);else if(d.startsWith("0"))d="90"+d.slice(1);else if(d.length===10&&d.startsWith("5"))d="90"+d;return d;};
+const waUrl=(phone,text)=>"https://wa.me/"+waNum(phone)+"?text="+encodeURIComponent(text);
 function updateContact(){
   const d=digits($("fPhone").value);const bar=$("contactBar");
   if(!d||!editing?.id){bar.hidden=true;return;}
@@ -1379,7 +1410,7 @@ function readForm(){
     firstName:v("fFirst"),lastName:v("fLast"),phone:v("fPhone"),email:v("fEmail"),
     adults:+$("fAdults").value||0,children:+$("fChildren").value||0,infants:+$("fInfants").value||0,
     childAges:[...$("fAges").querySelectorAll("select")].map(x=>+x.value),babySeat:swv("fSeat"),booster:swv("fBooster"),luggage:$("fLug").value===""?null:+$("fLug").value,
-    hotel:v("fHotel"),area:v("fArea"),from:v("fFrom"),to:v("fTo"),vehicle:v("fVehicle"),
+    hotel:v("fHotel"),area:v("fArea"),from:v("fFrom"),to:v("fTo"),vehicle:v("fVehicle"),driverName:(drvSel()||{}).name||null,driverPhone:(drvSel()||{}).phone||null,
     receiveAmount:+$("fRecv").value||0,receiveCur:$("fRecvCur").value,payAmount:+$("fPay").value||0,payCur:$("fPayCur").value,payTo:v("fPayTo"),
     retReceiveAmount:v("fRDate")?(+$("fRRecv").value||0):0,retReceiveCur:$("fRRecvCur").value,retPayAmount:v("fRDate")?(+$("fRPay").value||0):0,retPayCur:$("fRPayCur").value,retReceived:v("fRDate")?swv("fRReceived"):false,retPaid:v("fRDate")?swv("fRPaid"):false,
     received:swv("fReceived"),paid:swv("fPaid"),reminderMin:+$("fRemind").value||0,note:v("fNote"),photos:photos.slice()
@@ -1836,7 +1867,57 @@ $("delBulkYes").addEventListener("click",async()=>{
 });
 
 /* ---------- link gönder ---------- */
-function custLink(){return location.origin+ROOT+"r/?c="+(company.slug||"");}
+/* ---------- şoförler ---------- */
+const drivers=()=>Array.isArray(settings&&settings.drivers)?settings.drivers:[];
+function fillDrivers(name,phone){
+  const list=drivers().slice();if(name&&!list.some(d=>d.name===name))list.push({name,phone});
+  $("fDriver").innerHTML='<option value="">— Şoför seçilmedi —</option>'+list.map((d,i)=>`<option value="${i}" ${d.name===name?"selected":""}>${esc(d.name)}${d.phone?" · "+esc(d.phone):""}</option>`).join("");
+  $("fDriver").dataset.list=JSON.stringify(list);updDrvSend();
+}
+function drvSel(){const i=$("fDriver").value;if(i==="")return null;try{return JSON.parse($("fDriver").dataset.list||"[]")[+i]||null;}catch(e){return null;}}
+function jobLine(b,withPhone){
+  const pax=[b.adults?b.adults+" yetişkin":"",b.children?b.children+" çocuk":"",b.infants?b.infants+" bebek":""].filter(Boolean).join(", ");
+  const L=[`🕐 ${b.time||"--:--"} · ${esc2(b.firstName)} ${esc2(b.lastName)}`];
+  if(b.flight)L.push("✈️ "+b.flight);
+  const A=b.from||"Havalimanı",H=b.hotel||b.to||"";
+  L.push("📍 "+(b._leg==="ret"?"DÖNÜŞ: "+[H,A]:[A,H]).filter(Boolean).join(" → "));
+  if(pax)L.push("👥 "+pax+(b.babySeat?" · bebek koltuğu":"")+(b.booster?" · yükseltici":""));
+  if(withPhone&&b.phone)L.push("📞 "+b.phone);
+  const amt=b.receiveAmount;const got=b.received;
+  if(Number(amt)>0&&!got)L.push("💶 Tahsil edilecek: "+amt+" "+(b.receiveCur||""));
+  if(b.note)L.push("📝 "+b.note);
+  return L.join("\n");
+}
+const esc2=x=>String(x||"").trim();
+function updDrvSend(){const d=drvSel();const a=$("drvSend");if(d&&d.phone){a.hidden=false;a.onclick=function(){const b=readFormFull();this.href=waUrl(d.phone,"Merhaba "+d.name+", yeni iş:\n\n"+fmtDateLong(b.date)+"\n"+jobLine(b,true));};}else a.hidden=true;}
+$("fDriver").addEventListener("change",updDrvSend);
+function updTrack(){const f=($("fFlight").value||"").replace(/\s+/g,"").toLowerCase();$("fTrack").hidden=f.length<3;$("fTrack").href="https://www.flightradar24.com/data/flights/"+encodeURIComponent(f);}
+$("fFlight").addEventListener("input",updTrack);
+function renderDrvList(){const list=drivers();$("drvList").innerHTML=list.length?list.map((d,i)=>`<div class="drvrow"><b>${esc(d.name)}</b><span style="color:var(--muted)">${esc(d.phone||"")}</span><button type="button" class="btn sm" data-del="${i}">Sil</button></div>`).join(""):'<div class="hint" style="padding:4px 0">Henüz şoför eklenmedi.</div>';
+  $("drvList").querySelectorAll("[data-del]").forEach(bt=>bt.addEventListener("click",()=>{const l=drivers().slice();l.splice(+bt.dataset.del,1);saveDrivers(l);}));}
+async function saveDrivers(list){const {error}=await sb.from("settings").upsert({company_id:company.id,drivers:list});if(error)return toast("Kaydedilemedi: "+errMsg(error));settings.drivers=list;renderDrvList();toast("Şoför listesi kaydedildi");}
+$("drvAdd").addEventListener("click",()=>{const n=$("drvName").value.trim(),ph=$("drvPhone").value.trim();if(!n)return toast("Şoför adını yazın");const l=drivers().slice();l.push({name:n,phone:ph});$("drvName").value="";$("drvPhone").value="";saveDrivers(l);});
+/* ---------- günün işleri ---------- */
+let jobsDay=1;
+function openJobs(){$("jobsSheet").hidden=false;document.body.style.overflow="hidden";
+  $("jobsDrv").innerHTML='<option value="">Herkes (tüm işler)</option>'+drivers().map((d,i)=>`<option value="${i}">${esc(d.name)}</option>`).join("");buildJobs();}
+function buildJobs(){
+  const d=new Date();d.setDate(d.getDate()+jobsDay);const day=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  const di=$("jobsDrv").value;const drv=di===""?null:drivers()[+di];
+  let L=legs().filter(l=>l.date===day&&l.status!=="cancelled");
+  if(drv)L=L.filter(l=>(baseOf(l).driverName||"")===drv.name);
+  L.sort((a,b)=>String(a.time||"").localeCompare(String(b.time||"")));
+  const head=(drv?"Merhaba "+drv.name+", "+(jobsDay?"yarınki":"bugünkü"):(jobsDay?"Yarınki":"Bugünkü"))+" işler ("+fmtDateLong(day)+") — "+L.length+" transfer";
+  $("jobsText").value=L.length?head+"\n\n"+L.map((l,i)=>(i+1)+") "+jobLine(Object.assign({},baseOf(l),l),true)+(drv||!baseOf(l).driverName?"":"\n🚐 Şoför: "+baseOf(l).driverName)).join("\n\n"):head+"\n\nİş yok.";
+  $("jobsWa").href=drv&&drv.phone?waUrl(drv.phone,$("jobsText").value):"https://wa.me/?text="+encodeURIComponent($("jobsText").value);
+}
+$("btnJobs").addEventListener("click",openJobs);
+$("jobsClose").addEventListener("click",()=>{$("jobsSheet").hidden=true;document.body.style.overflow="";});
+$("jobsDrv").addEventListener("change",buildJobs);
+$("jobsText").addEventListener("input",()=>{const di=$("jobsDrv").value;const drv=di===""?null:drivers()[+di];$("jobsWa").href=drv&&drv.phone?waUrl(drv.phone,$("jobsText").value):"https://wa.me/?text="+encodeURIComponent($("jobsText").value);});
+document.querySelectorAll("#jobsDay button").forEach(b=>b.addEventListener("click",()=>{jobsDay=+b.dataset.d;document.querySelectorAll("#jobsDay button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));buildJobs();}));
+$("jobsCopy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("jobsText").value);toast("Kopyalandı");}catch(e){$("jobsText").select();}});
+function custLink(){const a=($("lkAgent")&&$("lkAgent").value||"").trim();return location.origin+ROOT+"r/?c="+(company.slug||"")+(a?"&a="+encodeURIComponent(a):"");}
 function meetLink(){return location.origin+ROOT+"k/?c="+(company.slug||"");}
 function hasMeet(){const m=company&&company.meeting||{};return !!((m.texts&&Object.values(m.texts).some(x=>x&&x.trim()))||m.photo||m.video);}
 function defaultMsg(){
@@ -1850,10 +1931,11 @@ function openLink(){
   $("lkLink").textContent=custLink();$("lkOpen").href=custLink();
   const hm=hasMeet();$("lkMeetRow").hidden=!hm;$("lkMeetNone").hidden=hm;$("lkMeetOpen").hidden=!hm;$("lkMeetOpen").href=meetLink();
   let saved=null;try{saved=localStorage.getItem("td_lkmsg2_"+company.id);}catch(e){}
-  $("lkMsg").value=saved||defaultMsg();updLkWa();
+  $("lkAgent").value="";$("lkMsg").value=saved||defaultMsg();updLkWa();
 }
 ["lkForm","lkMeet"].forEach(id=>$(id).addEventListener("click",()=>{sw(id,!swv(id));$("lkMsg").value=defaultMsg();try{localStorage.removeItem("td_lkmsg2_"+company.id);}catch(e){}updLkWa();}));
 $("lkReset").addEventListener("click",()=>{$("lkMsg").value=defaultMsg();try{localStorage.removeItem("td_lkmsg2_"+company.id);}catch(e){}updLkWa();});
+$("lkAgent").addEventListener("input",()=>{$("lkLink").textContent=custLink();$("lkOpen").href=custLink();$("lkMsg").value=defaultMsg();updLkWa();});
 function updLkWa(){$("lkWa").href="https://wa.me/?text="+encodeURIComponent($("lkMsg").value.trim()||custLink());}
 $("lkMsg").addEventListener("input",()=>{updLkWa();try{localStorage.setItem("td_lkmsg2_"+company.id,$("lkMsg").value);}catch(e){}});
 $("btnLink").addEventListener("click",openLink);$("fabLink").addEventListener("click",openLink);
@@ -1892,7 +1974,7 @@ $("mtSave").addEventListener("click",async()=>{
 });
 
 /* ---------- settings ---------- */
-function openSettings(){
+function openSettings(){renderDrvList();
   $("setSheet").hidden=false;document.body.style.overflow="hidden";fillMeeting();
   $("custLink").textContent=custLink();
   $("waLink").href="https://wa.me/?text="+encodeURIComponent("Transfer rezervasyon formu: "+custLink());
