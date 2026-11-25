@@ -42,3 +42,6 @@ Bu dosya yeni bir Claude sohbetinde kaldığımız yerden devam etmek için öze
 - 3D ikonlar (app/ic3d/*.webp), 3D amblem rozeti, uygulama simgesi, giriş ekranı fotoğrafı.
 - Kendi kendine üyelik: public_signup RPC (supabase/009_signup.sql), /app/#kayit.
 - Şoförler (settings.drivers), rezervasyona şoför atama + "Şoföre gönder", "Günün işlerini paylaş" (bugün/yarın, şoföre göre), Flightradar24 uçuş takip linki, acenta linki (?a=Ad → bookings.agent). supabase/010_drivers.sql.
+
+## 25 Kasım – karşılama içeriği
+- Melita Transfer'e ait karşılama yazısı/fotoğraf/video kaldırıldı (companies.meeting = {}), media/melita-transfer silindi. Eski metin supabase/005_meeting.sql içinde duruyor. Her firma kendi karşılamasını Ayarlar > Karşılama'dan ekler.
