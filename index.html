@@ -184,10 +184,10 @@ footer .sp{margin-left:auto}
       <h1 id="h1">Transferleriniz tek defterde.<span class="ln2">Cebinizde.</span></h1>
       <p class="lead">Türkiye'nin dört bir yanındaki VIP transfer ve tur firmaları için rezervasyon uygulaması. Müşteriniz formu kendi dilinde doldurur, kayıt telefonunuza düşer, onay mesajı WhatsApp'tan tek dokunuşla gider.</p>
       <div class="cta">
-        <a class="btn btn-wa wa-link" href="https://wa.me/905455260007" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>30 gün ücretsiz deneyin</a>
+        <a class="btn btn-wa" href="/app/#kayit"><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Ücretsiz hesap aç</a>
         <a class="btn btn-ghost" href="#fiyat">Fiyatlar</a>
       </div>
-      <p class="note"><b>Kurulum yok, kart istenmez.</b> Hesabınızı WhatsApp'tan açıyoruz.</p>
+      <p class="note"><b>30 gün ücretsiz, kart istenmez.</b> Hesabınızı 1 dakikada kendiniz açarsınız.</p>
     </div>
     <div class="hero-art" aria-hidden="true">
       <div class="toast"><span class="ti"><svg class="i" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></span><div><b>Yeni rezervasyon geldi</b><span>Thomas Schneider · DE 1520 · 08:30</span></div></div>
@@ -242,7 +242,7 @@ footer .sp{margin-left:auto}
     <div class="price-txt">
       <h2 id="h-fiyat">İlk 30 gün ücretsiz</h2>
       <p class="lead">Kurulum yok, ödeme bilgisi istenmez. Beğenirseniz devam edersiniz; tüm özellikler iki planda da aynı.</p>
-      <a class="btn btn-wa wa-link" href="https://wa.me/905455260007" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>WhatsApp'tan hesap açın</a>
+      <div style="display:flex;flex-wrap:wrap;gap:12px"><a class="btn btn-wa" href="/app/#kayit"><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Ücretsiz hesap aç</a><a class="btn btn-ghost wa-link" href="https://wa.me/905455260007" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>Sorunuz mu var?</a></div>
     </div>
     <div class="plans">
       <div class="plan"><div class="nm">Aylık</div><div class="amt">250 TL</div><div class="per">her ay</div></div>
@@ -254,7 +254,7 @@ footer .sp{margin-left:auto}
 <section class="faq" id="sss" aria-labelledby="h-sss">
   <div class="wrap">
     <div class="sec-head"><h2 id="h-sss">Sık sorulanlar</h2></div>
-    <details><summary>Uygulamayı nereden indiriyorum?</summary><p>İndirmenize gerek yok. Size verdiğimiz kullanıcı adı ve şifreyle transferdefteri.net/app adresinden girersiniz. Telefonda "Ana ekrana ekle" derseniz uygulama gibi simgesiyle açılır.</p></details>
+    <details><summary>Uygulamayı nereden indiriyorum?</summary><p>İndirmenize gerek yok. "Ücretsiz hesap aç" ile kendi kullanıcı adınızı ve şifrenizi belirlersiniz, transferdefteri.net/app adresinden girersiniz. Telefonda "Ana ekrana ekle" derseniz uygulama gibi simgesiyle açılır.</p></details>
     <details><summary>Müşteri bu sayfada ödeme yapıyor mu?</summary><p>Hayır. Müşteri sadece bilgilerini yazar. Fiyatı ve ödemeyi siz belirler, siz alırsınız. Uygulama yalnızca kimden ne alacağınızı takip eder.</p></details>
     
     <details><summary>Telefonum değişirse kayıtlarım ne olur?</summary><p>Kayıtlar telefonda değil bulutta saklanır. Yeni telefondan aynı kullanıcı adıyla girdiğinizde hepsi yerinde olur.</p></details>
@@ -285,7 +285,7 @@ b.addEventListener("keydown",function(e){var k=e.key==="ArrowDown"||e.key==="Arr
 b.addEventListener("click",function(){var on=v.muted;v.muted=!on;if(on){v.currentTime=0;v.play();}b.setAttribute("aria-pressed",on?"true":"false");b.querySelector("span").textContent=on?"Sesi kapat":"Sesi aç";
 document.getElementById("sndw").setAttribute("d",on?"M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14":"m22 9-6 6M16 9l6 6");});})();
 /* WhatsApp bağlantılarına hazır mesaj */
-document.querySelectorAll(".wa-link").forEach(function(a){a.href="https://wa.me/905455260007?text="+encodeURIComponent("Merhaba, Transfer Defteri'ni 30 gün ücretsiz denemek istiyorum.");});
+document.querySelectorAll(".wa-link").forEach(function(a){a.href="https://wa.me/905455260007?text="+encodeURIComponent("Merhaba, Transfer Defteri hakkında bilgi almak istiyorum.");});
 /* oturumu açık olan firmalar için giriş düğmesi */
 try{if(Object.keys(localStorage).some(function(k){return /^sb-.*-auth-token$/.test(k);})){document.querySelectorAll('a[href="/app/"]').forEach(function(a){if(a.classList.contains("login"))a.textContent="Uygulamayı aç";});}}catch(e){}
 </script>

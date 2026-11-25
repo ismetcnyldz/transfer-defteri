@@ -371,9 +371,9 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
   <div class="box">
     <div class="lhero" aria-hidden="true"></div>
     <div class="logo"><img class="lmark" src="ic3d/amblem-160.webp" alt="" width="56" height="56"><div><h1>Transfer Defteri</h1><small>VIP transfer &amp; tur operasyon defteri</small></div></div>
-    <div class="tabs" role="tablist" style="justify-self:stretch" id="authTabs" hidden>
+    <div class="tabs" role="tablist" style="justify-self:stretch" id="authTabs">
       <button role="tab" id="tabLogin" aria-selected="true" style="flex:1">Giriş yap</button>
-      <button role="tab" id="tabSignup" aria-selected="false" style="flex:1">Yeni firma kaydı</button>
+      <button role="tab" id="tabSignup" aria-selected="false" style="flex:1">Ücretsiz hesap aç</button>
     </div>
     <form class="card-f" id="loginForm">
       <div class="in"><label for="lEmail">Kullanıcı adı veya e‑posta</label><input id="lEmail" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>
@@ -384,14 +384,16 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
       <button class="sbtn" id="lForgot" type="button">Şifremi unuttum</button>
     </form>
     <form class="card-f" id="signupForm" hidden>
-      <div class="in"><label for="sCompany">Firma adı</label><input id="sCompany" autocomplete="organization" placeholder="Örn. Antalya VIP Transfer" required></div>
-      <div class="in"><label for="sEmail2">E‑posta</label><input id="sEmail2" type="email" autocomplete="email" inputmode="email" required></div>
-      <div class="in"><label for="sPhone">WhatsApp numaranız</label><input id="sPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+90 5xx xxx xx xx"></div>
+      <div class="in"><label for="sCompany">Firma adı</label><input id="sCompany" autocomplete="organization" placeholder="Örn. Yıldız VIP Transfer" required></div>
+      <div class="in"><label for="sContact2">Adınız soyadınız</label><input id="sContact2" autocomplete="name"></div>
+      <div class="in"><label for="sPhone">WhatsApp numaranız</label><input id="sPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="05xx xxx xx xx" required></div>
+      <div class="in"><label for="sUser2">Kullanıcı adı (girişte kullanacaksınız)</label><input id="sUser2" autocapitalize="off" autocomplete="username" spellcheck="false" placeholder="örn. yildizvip" required></div>
       <div class="in"><label for="sPass2">Şifre (en az 6 karakter)</label><input id="sPass2" type="password" autocomplete="new-password" minlength="6" required></div>
+      <div class="in" style="position:absolute;left:-9999px" aria-hidden="true"><label for="sWeb2">Web</label><input id="sWeb2" tabindex="-1" autocomplete="off"></div>
       <div class="err" id="sErr2" hidden></div>
       <div class="okmsg" id="sOk2" hidden></div>
-      <button class="pbtn" id="sBtn2" type="submit">Ücretsiz dene (14 gün)</button>
-      <div class="note" style="margin:0">Kart bilgisi istenmez. Deneme süresi bitince devam etmek isterseniz paket seçersiniz.</div>
+      <button class="pbtn" id="sBtn2" type="submit">Ücretsiz hesap aç (30 gün)</button>
+      <div class="note" style="margin:0">Kart bilgisi istenmez. 30 gün bitince devam etmek isterseniz aylık ya da yıllık paket seçersiniz.</div>
     </form>
     <div class="note" style="margin:0">Bir kez giriş yaptığınızda bu cihazda oturumunuz açık kalır.</div>
   </div>
@@ -787,7 +789,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 2.1</div>
+    <div class="note">Transfer Defteri · sürüm 2.2</div>
   </div>
 </div>
 
@@ -989,18 +991,23 @@ $("loginForm").addEventListener("submit",async e=>{
 function showAuthTab(signup){$("loginForm").hidden=signup;$("signupForm").hidden=!signup;$("tabLogin").setAttribute("aria-selected",signup?"false":"true");$("tabSignup").setAttribute("aria-selected",signup?"true":"false");}
 $("tabLogin").addEventListener("click",()=>showAuthTab(false));
 $("tabSignup").addEventListener("click",()=>showAuthTab(true));
-if(location.hash==="#kayit"){$("authTabs").hidden=false;showAuthTab(true);}
+if(location.hash==="#kayit"){showAuthTab(true);}
 $("signupForm").addEventListener("submit",async e=>{
   e.preventDefault();$("sErr2").hidden=true;$("sOk2").hidden=true;
-  const companyName=$("sCompany").value.trim(),email=$("sEmail2").value.trim(),pass=$("sPass2").value,phone=$("sPhone").value.trim();
-  if(companyName.length<2){$("sErr2").textContent="Firma adı gerekli.";$("sErr2").hidden=false;return;}
-  if(pass.length<6){$("sErr2").textContent="Şifre en az 6 karakter olmalı.";$("sErr2").hidden=false;return;}
-  $("sBtn2").disabled=true;
-  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{company:companyName,whatsapp:phone},emailRedirectTo:location.origin+BASE}});
-  $("sBtn2").disabled=false;
-  if(error){$("sErr2").textContent=/already registered|already been registered/i.test(error.message)?"Bu e‑posta zaten kayıtlı. Giriş yap sekmesini kullanın.":errMsg(error);$("sErr2").hidden=false;return;}
-  if(data.session){toast("Hoş geldiniz! Hesabınız hazır.");}
-  else{$("sOk2").textContent="Hesabınız oluşturuldu. E‑postanıza gelen onay bağlantısına tıklayıp giriş yapın.";$("sOk2").hidden=false;}
+  if($("sWeb2").value)return; /* bot tuzağı */
+  const p={company:$("sCompany").value.trim(),contact:$("sContact2").value.trim(),whatsapp:$("sPhone").value.trim(),username:$("sUser2").value.trim(),password:$("sPass2").value};
+  const bad=m=>{$("sErr2").textContent=m;$("sErr2").hidden=false;};
+  if(p.company.length<2)return bad("Firma adını yazın.");
+  if(p.whatsapp.replace(/\D/g,"").length<10)return bad("WhatsApp numaranızı yazın.");
+  if(p.username.length<3)return bad("Kullanıcı adı en az 3 karakter olmalı.");
+  if(p.password.length<6)return bad("Şifre en az 6 karakter olmalı.");
+  $("sBtn2").disabled=true;$("sBtn2").textContent="Hesabınız açılıyor…";
+  const {data,error}=await sb.rpc("public_signup",{p});
+  if(error){$("sBtn2").disabled=false;$("sBtn2").textContent="Ücretsiz hesap aç (30 gün)";return bad(errMsg(error));}
+  const r=await sb.auth.signInWithPassword({email:data.login_email,password:p.password});
+  $("sBtn2").disabled=false;$("sBtn2").textContent="Ücretsiz hesap aç (30 gün)";
+  if(r.error){$("sOk2").textContent="Hesabınız açıldı. Kullanıcı adınız: "+data.username+" — Giriş yap sekmesinden girebilirsiniz.";$("sOk2").hidden=false;showAuthTab(false);$("lEmail").value=data.username;return;}
+  toast("Hoş geldiniz! 30 günlük deneme başladı. Kullanıcı adınız: "+data.username);
 });
 $("lForgot").addEventListener("click",async()=>{
   const email=$("lEmail").value.trim();if(!email||!email.includes("@")){$("lErr").textContent="Kullanıcı adıyla giriş yapıyorsanız yeni şifre için bize yazın; e‑posta ile girdiyseniz e‑postanızı yazın.";$("lErr").hidden=false;return;}
@@ -1061,6 +1068,7 @@ async function loadAll(){
   renderPlate();
   const {data:acc}=await sb.rpc("my_access");access=acc||{};
   $("btnAdmin").hidden=!access.is_admin;
+  if(access.is_admin)setTimeout(checkNewFirms,2500);
   $("btnPlaces").hidden=true;
   if(!access.access&&!access.is_admin){showWall();return;}
   $("loadNote").hidden=true;
@@ -1648,10 +1656,21 @@ function chime(){
 }
 function speak(text){try{if(!("speechSynthesis" in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=1;const v=speechSynthesis.getVoices().find(v=>/^tr/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}}
 let flashT;
+/* yönetici: siteden yeni kaydolan firmaları haber ver */
+async function checkNewFirms(){
+  try{const {data}=await sb.rpc("admin_overview");if(!data)return;
+    let seen=null;try{seen=localStorage.getItem("td_seen_firms");}catch(e){}
+    if(!seen){try{localStorage.setItem("td_seen_firms",new Date().toISOString());}catch(e){}return;}
+    const fresh=data.filter(c=>c.created_at>seen);if(!fresh.length)return;
+    flash(fresh.length+" yeni firma kaydoldu",fresh.slice(0,3).map(c=>c.name+(c.whatsapp?" · "+c.whatsapp:"")).join(", "));
+    $("flash").onclick=()=>{$("flash").classList.remove("show");try{localStorage.setItem("td_seen_firms",new Date().toISOString());}catch(e){}openAdmin();};
+    chime&&chime();
+  }catch(e){}
+}
 function flash(title,sub,b){$("flashT").textContent=title;$("flashS").textContent=sub;const el=$("flash");el.classList.add("show");el.onclick=()=>{el.classList.remove("show");if(b)openSheet(b);};clearTimeout(flashT);flashT=setTimeout(()=>el.classList.remove("show"),9000);}
 async function sysNotify(title,body,b){
   if(!nf.push||!("Notification" in window)||Notification.permission!=="granted")return;
-  const opt={body,icon:"icon-192.png",badge:"icon-192.png",tag:"td-"+(b?b.id:Date.now()),renotify:true,vibrate:[200,100,200],data:{id:b&&b.id}};
+  const opt={body,icon:"../icon-192.png",badge:"../icon-192.png",tag:"td-"+(b?b.id:Date.now()),renotify:true,vibrate:[200,100,200],data:{id:b&&b.id}};
   try{const reg=swReg||(await navigator.serviceWorker?.getRegistration());if(reg){await reg.showNotification(title,opt);return;}}catch(e){}
   try{new Notification(title,opt);}catch(e){}
 }
