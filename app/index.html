@@ -48,6 +48,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 /* login */
 .login{min-height:100%;display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-left,0px))}
 .login .box{width:100%;max-width:380px;display:grid;gap:18px}
+.login .lhero{height:170px;border-radius:20px;background:linear-gradient(180deg,rgba(13,27,62,0) 40%,rgba(13,27,62,.55)),url(ic3d/karsilama-foto.webp) 40% 60%/cover;box-shadow:0 14px 34px rgba(13,27,62,.3)}
+.login .lmark{width:56px;height:56px;flex:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.3))}
 .logo{display:flex;align-items:center;gap:12px}
 .logo .mark{width:48px;height:48px;border-radius:14px;background:#1b1f2a;display:grid;place-items:center;color:#e0b860;font-weight:800;font-size:24px}
 .logo h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
@@ -67,8 +69,9 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .hdr-in{padding-block:10px 8px;display:grid;gap:10px}
 .brand{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .hdr-in > *{min-width:0}
-.brand h1{flex:1 1 0;font-size:clamp(17px,5.2vw,24px);font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;min-width:0;text-transform:uppercase}
+.brand h1{flex:1 1 0;font-size:clamp(16px,4.6vw,24px);font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;min-width:0;text-transform:uppercase}
 .brand h1 .van{position:relative;flex:none;width:52px;height:46px}
+.brand h1 .van .emb3{display:block;width:52px;height:52px;margin:-3px auto 0;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
 .brand h1 .van .emb{display:grid;place-items:center;width:52px;height:46px;margin:0 auto;border-radius:14px;background:linear-gradient(160deg,#16295c,#0d1b3e);box-shadow:0 4px 14px rgba(13,27,62,.35),inset 0 0 0 1.5px rgba(255,215,106,.35)}
 .brand h1 .van svg{width:36px;height:30px;display:block}
 :root[data-theme="dark"] .brand h1 .van .emb{box-shadow:0 0 0 1.5px rgba(255,215,106,.5),0 0 18px rgba(255,190,40,.25)}
@@ -86,6 +89,10 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .brand .date{display:none}
 .ico{width:54px;height:48px;border-radius:12px;background:var(--c-teal);color:#fff!important;box-shadow:0 4px 12px rgba(0,0,0,.18);display:grid;grid-template-rows:auto auto;justify-items:center;align-content:center;gap:2px;color:var(--fg);position:relative;font-size:10px;font-weight:700;letter-spacing:.02em;padding:0 4px}
 .ico svg{width:20px;height:20px}
+.ico .i3d{width:30px;height:30px;display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}
+#btnKasa,#btnReports,#btnSettings{background:var(--surface)!important;border:1.5px solid var(--line);box-shadow:0 4px 14px rgba(15,23,42,.10);height:56px;width:52px;padding:0 2px}
+#btnKasa span{color:#ea580c}#btnReports span{color:var(--c-violet)}#btnSettings span{color:var(--c-teal)}
+.fab .i3d{width:32px;height:32px;margin:-6px 0 -6px -6px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
 #btnAdmin{background:linear-gradient(160deg,var(--c-blue),var(--c-blue2))}
 #btnReports{background:linear-gradient(160deg,var(--c-violet),var(--c-violet2))}
 #btnKasa{background:linear-gradient(160deg,#f97316,#ea580c)}
@@ -100,6 +107,10 @@ h1,h2,h3{margin:0;text-wrap:balance}
 #stNextWrap{grid-column:1/-1}
 #stNextWrap .val{font-size:26px;white-space:normal}
 #stNextWrap{background:linear-gradient(150deg,var(--c-green),var(--c-green2));box-shadow:0 6px 16px rgba(22,163,74,.25)}
+.stat{position:relative;overflow:hidden}
+.stat .st3{position:absolute;right:6px;top:6px;width:46px;height:46px;pointer-events:none;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25))}
+.stat .lbl{position:relative;padding-right:44px;min-height:34px}
+.stat .val{position:relative}
 .stat .lbl{font-size:14px;letter-spacing:.03em;text-transform:uppercase;color:rgba(255,255,255,.88);font-weight:800}
 .stat .val, .stat .val span{color:#fff!important}
 .stat .val{font-size:38px;font-weight:800;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.1}
@@ -176,6 +187,8 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .sic{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:8px;margin-right:8px;vertical-align:middle;color:#fff;background:var(--sc,var(--c-blue));box-shadow:0 2px 6px color-mix(in srgb,var(--sc,#2563eb) 40%,transparent)}
 .sic svg.i{width:14px;height:14px;stroke-width:2.3}
 .sec-t.has-ic{display:flex;align-items:center;padding-top:12px}
+.i3s{width:22px;height:22px;vertical-align:-6px;margin-right:6px}
+.sic3{width:30px;height:30px;margin-right:9px;flex:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}
 .cbar svg.i,.contact svg.i{width:16px;height:16px;margin-right:6px;vertical-align:-3px}
 .btn svg.i,.danger svg.i{width:17px;height:17px;vertical-align:-3px;margin-right:6px}
 .chip.ok{background:var(--ok-soft);color:var(--ok)}
@@ -356,7 +369,8 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 <div id="flash" class="flash" role="status" aria-live="assertive"><b id="flashT"></b><span id="flashS"></span></div>
 <div id="loginView" class="login" hidden>
   <div class="box">
-    <div class="logo"><div class="mark">T</div><div><h1>Transfer Defteri</h1><small>VIP transfer &amp; tur operasyon defteri</small></div></div>
+    <div class="lhero" aria-hidden="true"></div>
+    <div class="logo"><img class="lmark" src="ic3d/amblem-160.webp" alt="" width="56" height="56"><div><h1>Transfer Defteri</h1><small>VIP transfer &amp; tur operasyon defteri</small></div></div>
     <div class="tabs" role="tablist" style="justify-self:stretch" id="authTabs" hidden>
       <button role="tab" id="tabLogin" aria-selected="true" style="flex:1">Giriş yap</button>
       <button role="tab" id="tabSignup" aria-selected="false" style="flex:1">Yeni firma kaydı</button>
@@ -387,19 +401,19 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
 <header class="hdr">
   <div class="hdr-in gut">
     <div class="brand">
-      <h1><span class="van" aria-hidden="true"><span class="emb"><svg viewBox="0 0 230 190"><defs><linearGradient id="vgold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#e0a100"/></linearGradient></defs><path d="M8 22 C60 26 92 52 115 150 C138 52 170 26 222 22 C176 40 150 78 126 176 L104 176 C80 78 54 40 8 22 Z" fill="url(#vgold)"/><path d="M40 38 C72 46 92 70 106 118" fill="none" stroke="#0d1b3e" stroke-width="6" stroke-linecap="round"/><path d="M190 38 C158 46 138 70 124 118" fill="none" stroke="#0d1b3e" stroke-width="6" stroke-linecap="round"/></svg></span><span class="plate" id="plateBadge" hidden><span class="tr">TR</span><span class="no" id="plateNo"></span></span></span><em id="coName">Transfer Defteri<small>TRANSFER DEFTERİ</small></em></h1>
+      <h1><span class="van" aria-hidden="true"><img class="emb3" src="ic3d/amblem-160.webp" alt="" width="52" height="52"><span class="plate" id="plateBadge" hidden><span class="tr">TR</span><span class="no" id="plateNo"></span></span></span><em id="coName">Transfer Defteri<small>TRANSFER DEFTERİ</small></em></h1>
       <div class="right"><div class="date" id="todayLbl"></div>
       <button class="ico" id="btnLink" aria-label="Müşteriye rezervasyon linki gönder" hidden style="background:var(--ok-soft);color:var(--ok)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg><span>Link gönder</span></button>
       <button class="ico" id="btnAdmin" aria-label="Firma ekle ve yönet" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M19 8v6M16 11h6"/></svg><span>Firma ekle</span><span class="dot" id="adminDot" hidden></span></button>
       <button class="ico" id="btnPlaces" aria-label="Oteller ve yerler" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 10h5a1 1 0 0 1 1 1v10M8 8h2M8 12h2M8 16h2M17 14h1M17 18h1M3 21h18"/></svg><span>Oteller</span></button>
-      <button class="ico" id="btnKasa" aria-label="Kasa defteri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M8 7h8M8 11h6"/></svg><span>Kasa</span></button>
-      <button class="ico" id="btnReports" aria-label="Raporlar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Raporlar</span></button>
-      <button class="ico" id="btnSettings" aria-label="Ayarlar ve müşteri linki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ayarlar</span></button></div>
+      <button class="ico" id="btnKasa" aria-label="Kasa defteri"><img class="i3d" src="ic3d/kasa.webp" alt="" width="30" height="30"><span>Kasa</span></button>
+      <button class="ico" id="btnReports" aria-label="Raporlar"><img class="i3d" src="ic3d/rapor.webp" alt="" width="30" height="30"><span>Raporlar</span></button>
+      <button class="ico" id="btnSettings" aria-label="Ayarlar ve müşteri linki"><img class="i3d" src="ic3d/ayar.webp" alt="" width="30" height="30"><span>Ayarlar</span></button></div>
     </div>
     <div class="stats">
-      <div class="stat"><div class="lbl">Bugün</div><div class="val num" id="stToday">–</div></div>
-      <div class="stat"><div class="lbl">Bekleyen tahsilat</div><div class="val num" id="stDue">–</div></div>
-      <div class="stat" id="stNextWrap" hidden><div class="lbl">Sıradaki</div><div class="val" id="stNext">–</div></div>
+      <div class="stat"><img class="st3" src="ic3d/arac.webp" alt=""><div class="lbl">Bugün</div><div class="val num" id="stToday">–</div></div>
+      <div class="stat"><img class="st3" src="ic3d/tahsilat.webp" alt=""><div class="lbl">Bekleyen tahsilat</div><div class="val num" id="stDue">–</div></div>
+      <div class="stat" id="stNextWrap" hidden><img class="st3" src="ic3d/hatirlatma.webp" alt=""><div class="lbl">Sıradaki</div><div class="val" id="stNext">–</div></div>
     </div>
     <div class="tools">
       <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="İsim, otel, telefon ara" autocomplete="off"></label>
@@ -433,8 +447,8 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
   <div id="loadNote" class="note">Yükleniyor…</div>
 </main>
 
-<button class="fab fab-link" id="fabLink" aria-label="Müşteriye rezervasyon linki gönder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>Link gönder</button>
-<button class="fab" id="fab" aria-label="Yeni rezervasyon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Yeni</button>
+<button class="fab fab-link" id="fabLink" aria-label="Müşteriye rezervasyon linki gönder"><img class="i3d" src="ic3d/link.webp" alt="" width="30" height="30">Link gönder</button>
+<button class="fab" id="fab" aria-label="Yeni rezervasyon"><img class="i3d" src="ic3d/yeni.webp" alt="" width="30" height="30">Yeni</button>
 </div>
 
 <!-- rezervasyon formu -->
@@ -773,7 +787,7 @@ fieldset{border:0;margin:0;padding:0;background:var(--surface);border:1px solid 
         <div class="err" id="passErr" hidden></div>
       </div>
     </fieldset>
-    <div class="note">Transfer Defteri · sürüm 2.0</div>
+    <div class="note">Transfer Defteri · sürüm 2.1</div>
   </div>
 </div>
 
@@ -943,8 +957,9 @@ const IC={
 };
 const ic=(n,cls)=>`<svg class="i${cls?" "+cls:""}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]||""}</svg>`;
 /* bölüm başlıklarına renkli ikon */
+const SEC_3D={land:"gelis",takeoff:"donus",users:"yolcu",idcard:"yolcu",wallet:"tahsilat",coins:"tahsilat",bell:"hatirlatma",send:"link",msg:"onay",ledger:"kasa",pin:"karsilama",trash:"sil",settings:"ayar",building:"arac",route:"arac"};
 const SEC_IC=[[/^Geliş/,"land","--c-blue"],[/^Dönüş ödemesi/,"coins","--c-violet"],[/^Dönüş/,"takeoff","--c-violet"],[/^Yolcu isimleri/,"idcard","--c-teal"],[/^Yolcu/,"users","--c-teal"],[/^Güzergah/,"route","--c-orange"],[/^Ödeme/,"wallet","--c-green"],[/^Durum/,"bell","--c-amber"],[/^Fotoğraf/,"camera","--c-blue"],[/^Neler gönderilsin/,"send","--c-green"],[/^Hazır mesaj/,"msg","--c-teal"],[/^Gelir/,"ledger","--c-orange"],[/^Eski kayıt/,"broom","--c-violet"],[/^Firma/,"building","--c-blue"],[/^Havalimanı karşılama/,"pin","--c-orange"],[/^Silinenler/,"trash","--c-violet"],[/^Görünüm/,"palette","--c-teal"],[/^Bildirim/,"bell","--c-amber"],[/^Hesap/,"key","--c-blue"],[/^Platform/,"settings","--c-violet"],[/^Giriş/,"key","--c-blue"],[/^Üyelik/,"crown","--c-amber"]];
-function decorateSections(root){(root||document).querySelectorAll(".sec-t:not(.has-ic)").forEach(el=>{const t=el.textContent.trim();const m=SEC_IC.find(([re])=>re.test(t));if(!m)return;el.classList.add("has-ic");el.insertAdjacentHTML("afterbegin",`<span class="sic" style="--sc:var(${m[2]})">${ic(m[1])}</span>`);});}
+function decorateSections(root){(root||document).querySelectorAll(".sec-t:not(.has-ic)").forEach(el=>{const t=el.textContent.trim();const m=SEC_IC.find(([re])=>re.test(t));if(!m)return;el.classList.add("has-ic");el.insertAdjacentHTML("afterbegin",SEC_3D[m[1]]?`<img class="sic3" src="ic3d/${SEC_3D[m[1]]}.webp" alt="" width="30" height="30">`:`<span class="sic" style="--sc:var(${m[2]})">${ic(m[1])}</span>`);});}
 decorateSections();
 const SYM={EUR:"€",USD:"$",GBP:"£",TRY:"₺"};
 const LANG={tr:"Türkçe",en:"English",ru:"Русский",de:"Deutsch"};
@@ -1343,7 +1358,7 @@ function updateContact(){
   const d=digits($("fPhone").value);const bar=$("contactBar");
   if(!d||!editing?.id){bar.hidden=true;return;}
   bar.hidden=false;
-  bar.innerHTML=`<a class="wa" id="waHello" target="_blank" rel="noopener">${ic("msg")}WhatsApp</a>${editing&&editing.status==="confirmed"?`<a class="wa" id="waConfirm2" target="_blank" rel="noopener">${ic("check")}Onay mesajı</a>`:""}<a href="tel:+${d}">${ic("phone")}Ara</a><button type="button" id="cpPhone">${ic("copy")}Numarayı kopyala</button>`;
+  bar.innerHTML=`<a class="wa" id="waHello" target="_blank" rel="noopener"><img class="i3s" src="ic3d/onay.webp" alt="">WhatsApp</a>${editing&&editing.status==="confirmed"?`<a class="wa" id="waConfirm2" target="_blank" rel="noopener">${ic("check")}Onay mesajı</a>`:""}<a href="tel:+${d}"><img class="i3s" src="ic3d/ara.webp" alt="">Ara</a><button type="button" id="cpPhone">${ic("copy")}Numarayı kopyala</button>`;
   $("waHello").addEventListener("click",function(){this.href=waUrl($("fPhone").value,waHelloText(readFormFull()));});
   if($("waConfirm2"))$("waConfirm2").addEventListener("click",function(){this.href=waUrl($("fPhone").value,waConfirmText(readFormFull()));});
   $("cpPhone").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("fPhone").value);toast("Kopyalandı");}catch(e){$("fPhone").select();}});
