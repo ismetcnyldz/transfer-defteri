@@ -45,3 +45,11 @@ Bu dosya yeni bir Claude sohbetinde kaldığımız yerden devam etmek için öze
 
 ## 25 Kasım – karşılama içeriği
 - Melita Transfer'e ait karşılama yazısı/fotoğraf/video kaldırıldı (companies.meeting = {}), media/melita-transfer silindi. Eski metin supabase/005_meeting.sql içinde duruyor. Her firma kendi karşılamasını Ayarlar > Karşılama'dan ekler.
+
+## 25 Kasım – U-ETDS
+- 011/012 SQL çalıştırıldı: yolcu kimlik alanları (nat/sex/doc), bookings.plate, uetds_status/ref/msg/at, uetds_accounts (şifre geri okunmaz, uetds_save RPC), onaylanınca otomatik sıraya alma tetikleyicisi, iptal/silmede iptal sırası, uetds_claim/uetds_unstick (service_role).
+- Müşteri formu: firma U-ETDS açtıysa her yolcu için uyruk/cinsiyet/pasaport ister; gizlilik notu.
+- Uygulama: Ayarlar → U-ETDS, şoför TC, plaka, rezervasyonda eksik listesi ve "bildir" düğmesi, kartta durum.
+- uetds-worker/: sabit IP sunucuda çalışacak gönderici (alan adları WSDL ile doğrulanacak). UETDS_IP sabiti sunucu kurulunca doldurulacak.
+- Siteye "Telefona yükleme" bölümü.
+- Gizlilik/Kullanım sayfaları /home/claude/work/*_body.html + build_legal.py ile hazır; firma unvan/adres/e-posta gelince yayınlanacak.

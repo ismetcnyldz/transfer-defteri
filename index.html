@@ -106,6 +106,15 @@ svg.i{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-l
 @media (max-width:520px){.brow{grid-template-columns:48px 1fr auto}.brow .f{display:none}.toast{margin-right:0}.brow:nth-child(n+5){display:none}.hero-art{padding-bottom:44px}}
 @media (prefers-reduced-motion:reduce){.brow,.toast{animation:none}html{scroll-behavior:auto}}
 
+.inst{background:#fff;scroll-margin-top:64px}
+.inst .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:26px}
+@media (max-width:760px){.inst .grid{grid-template-columns:1fr}}
+.inst .os{border-radius:20px;padding:24px 24px 18px;background:var(--sky);box-shadow:inset 0 0 0 1px rgba(13,27,62,.07)}
+.inst .os h3{display:flex;align-items:center;gap:10px;font-size:22px}
+.inst .os h3 svg{width:26px;height:26px;fill:var(--ink)}
+.inst ol{margin:14px 0 0;padding-left:22px;line-height:1.55}
+.inst li{margin:0 0 8px}
+.inst .soon{margin-top:22px;color:#5a6782;font-size:15px}
 section{padding:84px 0}
 @media (max-width:700px){section{padding:56px 0}}
 .sec-head{max-width:760px;margin-bottom:48px}
@@ -178,7 +187,7 @@ footer .sp{margin-left:auto}
 <header class="top">
   <div class="wrap">
     <a class="brand" href="/" aria-label="Transfer Defteri ana sayfa"><img class="mk3" src="app/ic3d/amblem-160.webp" alt="" width="40" height="40">Transfer Defteri</a>
-    <nav class="nav" aria-label="Sayfa bölümleri"><a href="#nasil">Nasıl çalışır</a><a href="#ozellikler">Özellikler</a><a href="#fiyat">Fiyat</a><a href="#sss">Sorular</a></nav>
+    <nav class="nav" aria-label="Sayfa bölümleri"><a href="#nasil">Nasıl çalışır</a><a href="#ozellikler">Özellikler</a><a href="#fiyat">Fiyat</a><a href="#yukle">Yükleme</a><a href="#sss">Sorular</a></nav>
     <a class="btn btn-ghost login" href="/app/">Giriş yap</a>
   </div>
 </header>
@@ -261,10 +270,37 @@ footer .sp{margin-left:auto}
   </div>
 </section>
 
+<section class="inst" id="yukle" aria-labelledby="h-yukle">
+  <div class="wrap">
+    <div class="sec-head"><h2 id="h-yukle">Telefona yükleme</h2><p style="margin:10px 0 0;max-width:60ch">Mağazadan indirmenize gerek yok. Bir dakikada ana ekranınıza ekler, uygulama gibi simgesinden açarsınız.</p></div>
+    <div class="grid">
+      <div class="os">
+        <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.6 9.5 19.4 6.4a.5.5 0 0 0-.9-.5l-1.8 3.1A10.8 10.8 0 0 0 12 8a10.8 10.8 0 0 0-4.7 1L5.5 5.9a.5.5 0 0 0-.9.5l1.8 3.1A10 10 0 0 0 1.5 17h21a10 10 0 0 0-4.9-7.5zM7 14.2a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2zm10 0a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2z"/></svg>Android</h3>
+        <ol>
+          <li>Telefonunuzda <b>Chrome</b> ile <b>transferdefteri.net/app</b> adresini açın.</li>
+          <li>Sağ üstteki <b>⋮</b> menüsüne dokunun.</li>
+          <li><b>"Uygulamayı yükle"</b> ya da <b>"Ana ekrana ekle"</b>yi seçin, onaylayın.</li>
+          <li>Ana ekrana gelen Transfer Defteri simgesinden açın ve giriş yapın.</li>
+        </ol>
+      </div>
+      <div class="os">
+        <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.9-3-.9c-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.6s-2.5-1-2.5-3.7zM14.1 5.8c.6-.8 1.1-1.8 1-2.8-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.7-1 2.7 1 .1 2-.5 2.6-1.3z"/></svg>iPhone</h3>
+        <ol>
+          <li><b>Safari</b> ile <b>transferdefteri.net/app</b> adresini açın.</li>
+          <li>Alttaki <b>Paylaş</b> düğmesine (yukarı ok olan kare) dokunun.</li>
+          <li>Listeden <b>"Ana Ekrana Ekle"</b>yi seçin, sağ üstte <b>"Ekle"</b>ye dokunun.</li>
+          <li>Simgeden açın. Bildirimler için iOS 16.4 veya üstü gerekir.</li>
+        </ol>
+      </div>
+    </div>
+    <p class="soon">Google Play ve App Store sürümleri yakında.</p>
+  </div>
+</section>
+
 <section class="faq" id="sss" aria-labelledby="h-sss">
   <div class="wrap">
     <div class="sec-head"><h2 id="h-sss">Sık sorulanlar</h2></div>
-    <details><summary>Uygulamayı nereden indiriyorum?</summary><p>İndirmenize gerek yok. "Ücretsiz hesap aç" ile kendi kullanıcı adınızı ve şifrenizi belirlersiniz, transferdefteri.net/app adresinden girersiniz. Telefonda "Ana ekrana ekle" derseniz uygulama gibi simgesiyle açılır.</p></details>
+    <details><summary>Uygulamayı nereden indiriyorum?</summary><p>İndirmenize gerek yok. "Ücretsiz hesap aç" ile kendi kullanıcı adınızı ve şifrenizi belirlersiniz, transferdefteri.net/app adresinden girersiniz. Telefonda "Ana ekrana ekle" derseniz uygulama gibi simgesiyle açılır; adımlar yukarıdaki <a href="#yukle">Telefona yükleme</a> bölümünde.</p></details>
     <details><summary>Müşteri bu sayfada ödeme yapıyor mu?</summary><p>Hayır. Müşteri sadece bilgilerini yazar. Fiyatı ve ödemeyi siz belirler, siz alırsınız. Uygulama yalnızca kimden ne alacağınızı takip eder.</p></details>
     
     <details><summary>Telefonum değişirse kayıtlarım ne olur?</summary><p>Kayıtlar telefonda değil bulutta saklanır. Yeni telefondan aynı kullanıcı adıyla girdiğinizde hepsi yerinde olur.</p></details>
